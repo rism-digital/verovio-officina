@@ -6,9 +6,9 @@
   import EditorSurface from './components/EditorSurface.svelte';
   import StatusBar from './components/StatusBar.svelte';
   import { createWorkerBridge } from './app/worker/bridge';
-  import { dirty, mode, selection, statusLine, viewModel, workerStatus } from './app/state';
+  import { dirty, mode, selection, statusLine, verovioState, viewModel, workerStatus } from './app/state';
   import type { SelectionInfo, ViewModel } from './app/types';
-  import type { VerovioOptions } from './app/worker/verovio-types';
+  import type { Options as VerovioOptions } from './app/worker/verovio-types';
 
   const VEROVIO_URL = 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js';
   let fileInput: HTMLInputElement | null = null;
@@ -28,7 +28,12 @@
 
   let lastLayoutSize = { width: 0, height: 0 };
 
+  function clampZoom(value: number) {
+    return Math.min(200, Math.max(10, Math.floor(value)));
+  }
+
   function buildVerovioOptions(size: { width: number; height: number }): VerovioOptions {
+    const { zoom } = get(verovioState);
     return {
       adjustPageHeight: false,
       adjustPageWidth: false,
@@ -42,9 +47,20 @@
       pageMarginRight: 50,
       pageMarginTop: 50,
       pageMarginBottom: 50,
-      scale: 100,
+      scale: clampZoom(zoom),
       xmlIdSeed: 1
     };
+  }
+
+  function syncPageState(nextPageCount: number) {
+    verovioState.update((current) => {
+      const clampedPage = Math.min(Math.max(1, current.currentPage), nextPageCount || 1);
+      return {
+        ...current,
+        pageCount: nextPageCount || 1,
+        currentPage: clampedPage
+      };
+    });
   }
 
   async function renderMei(text: string) {
@@ -54,7 +70,10 @@
       await bridge.verovio.setOptions(options);
     }
     await bridge.verovio.loadData(text);
-    const svg = await bridge.verovio.renderToSVG(1);
+    const { currentPage } = get(verovioState);
+    const svg = await bridge.verovio.renderToSVG(currentPage);
+    const pageCount = await bridge.verovio.getPageCount();
+    syncPageState(pageCount);
     const nextView: ViewModel = {
       text,
       svg,
@@ -65,7 +84,6 @@
   }
 
   async function applyLayoutForSize(size: { width: number; height: number }) {
-    console.log(size);
     if (!size.width || !size.height) return;
     lastLayoutSize = size;
     const current = get(viewModel);
@@ -74,7 +92,10 @@
     const options = buildVerovioOptions(size);
     await bridge.verovio.setOptions(options);
     await bridge.verovio.redoLayout();
-    const svg = await bridge.verovio.renderToSVG(1);
+    const { currentPage } = get(verovioState);
+    const svg = await bridge.verovio.renderToSVG(currentPage);
+    const pageCount = await bridge.verovio.getPageCount();
+    syncPageState(pageCount);
     viewModel.set({ ...current, svg });
     workerStatus.set('idle');
   }
@@ -118,7 +139,6 @@
     statusLine.set(`Opened ${file.name}.`);
     target.value = '';
   }
-
 
   async function saveDoc() {
     const exported = await bridge.verovio.getMEI();

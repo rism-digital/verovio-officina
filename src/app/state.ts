@@ -8,6 +8,11 @@ export const viewModel = writable<ViewModel>({
   svg: '',
   selection: { type: 'none' }
 });
+export const verovioState = writable({
+  zoom: 100,
+  pageCount: 1,
+  currentPage: 1
+});
 export const workerStatus = writable<'idle' | 'busy'>('idle');
 export const dirty = writable(false);
 export const statusLine = writable('Ready');

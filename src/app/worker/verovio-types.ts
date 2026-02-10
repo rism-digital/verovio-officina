@@ -40,3 +40,22 @@ export type VerovioToolkit = {
   getVersion: () => string;
   onRuntimeInitialized: () => void;
 };
+
+export interface Options {
+  adjustPageHeight: boolean;
+  adjustPageWidth: boolean;
+  appXPathQuery?: Array<string>;
+  breaks: string;
+  choiceXPathQuery?: Array<string>;
+  footer: string;
+  justifyVertically: boolean;
+  mensuralResponsiveView: string;
+  pageHeight: number;
+  pageWidth: number;
+  pageMarginLeft: number;
+  pageMarginRight: number;
+  pageMarginTop: number;
+  pageMarginBottom: number;
+  scale: number;
+  xmlIdSeed: number;
+}
