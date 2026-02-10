@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount, tick } from 'svelte';
+  import EditorToolPanel from './EditorToolPanel.svelte';
   import type { ViewModel } from '../app/types';
 
   export let view: ViewModel;
@@ -79,14 +80,14 @@
   }
 
   $: if (view.svg) {
-    void refreshOverlay();
+    refreshOverlay();
   }
 
 </script>
 
 <div class="vrv-editor-surface">
   <div class="vrv-h-split">
-    <div class="vrv-editor-tool-panel"></div>
+    <EditorToolPanel />
     <div class="vrv-v-split">
       <div class="vrv-verovio-view" bind:this={verovioView}>
         <div class="vrv-svg-wrapper" bind:this={svgWrapper}>{@html view.svg}</div>

@@ -748,6 +748,10 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     ////////////////////////////////////////////////////////////////////////
 
     .vrv-tab-group {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
         .vrv-tab-selectors {
             display: flex;
             align-items: center;
@@ -773,15 +777,17 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         }
 
         .vrv-tab-content {
+            flex: 1 1 auto;
+            min-height: 0;
             background-color: $background;
             padding: 10px;
-            min-height: inherit;
-            max-height: inherit;
+            overflow: hidden;
 
             .vrv-tab-content-panel {
-                min-height: inherit;
-                max-height: inherit;
+                flex: 1 1 auto;
+                min-height: 0;
                 flex-direction: column;
+                overflow: auto;
             }
         }
     }
