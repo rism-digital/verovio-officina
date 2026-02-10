@@ -1,5 +1,9 @@
 {
     "cSpell.words": [
+        "activable",
+        "disableable",
+        "inactivable",
+        "toggleable",
         "verovio"
     ],
     "svelte.plugin.svelte.compilerWarnings": {

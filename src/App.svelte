@@ -11,6 +11,7 @@
 
   const VEROVIO_URL = 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js';
   let fileInput: HTMLInputElement | null = null;
+  let verovioVersion = '';
 
   const worker = new Worker(new URL('./app/worker/worker.ts', import.meta.url), {
     type: 'classic'
@@ -20,6 +21,7 @@
   onMount(async () => {
     workerStatus.set('busy');
     await bridge.init(VEROVIO_URL);
+    verovioVersion = await bridge.verovio.getVersion();
     workerStatus.set('idle');
   });
 
@@ -97,50 +99,21 @@
   }
 </script>
 
-<div class="app">
+<div class="vrv-wrapper">
   <Menu on:open={triggerOpenFile} on:save={saveDoc} on:export={exportDoc}>
-    <button slot="mode" type="button" class:active={$mode === 'insert'} on:click={toggleMode}>
-      {$mode === 'insert' ? 'Insert mode' : 'Edit mode'}
-    </button>
   </Menu>
 
   <input
-    class="visually-hidden"
+    class="vrv-file-input"
     type="file"
     accept=".mei,.xml"
     bind:this={fileInput}
     on:change={openFile}
   />
 
-  <Toolbar mode={$mode} selection={$selection} onToggleMode={toggleMode} />
+  <Toolbar mode={$mode} onToggleMode={toggleMode} />
 
-  <EditorSurface view={$viewModel} mode={$mode} onSelect={handleSelect} />
+  <EditorSurface view={$viewModel} onSelect={handleSelect} />
 
-  <StatusBar status={$statusLine} dirty={$dirty} />
+  <StatusBar status={$statusLine} dirty={$dirty} version={verovioVersion} />
 </div>
-
-<style lang="scss">
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  .app {
-    display: grid;
-    grid-template-rows: auto auto 1fr auto;
-    min-height: 100vh;
-  }
-
-  button.active {
-    background: var(--accent-1);
-    color: #fff;
-    border-color: transparent;
-  }
-</style>
