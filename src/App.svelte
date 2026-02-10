@@ -13,6 +13,7 @@
   const VEROVIO_URL = 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js';
   let fileInput: HTMLInputElement | null = null;
   let verovioVersion = '';
+  const ZOOM_STEP = 10;
 
   const worker = new Worker(new URL('./app/worker/worker.ts', import.meta.url), {
     type: 'classic'
@@ -48,6 +49,7 @@
       pageMarginTop: 50,
       pageMarginBottom: 50,
       scale: clampZoom(zoom),
+      scaleToPageSize: true,
       xmlIdSeed: 1
     };
   }
@@ -63,6 +65,14 @@
     });
   }
 
+  async function updateRenderedView() {
+    const { currentPage } = get(verovioState);
+    const svg = await bridge.verovio.renderToSVG(currentPage);
+    const pageCount = await bridge.verovio.getPageCount();
+    syncPageState(pageCount);
+    return svg;
+  }
+
   async function renderMei(text: string) {
     workerStatus.set('busy');
     if (lastLayoutSize.width && lastLayoutSize.height) {
@@ -70,10 +80,7 @@
       await bridge.verovio.setOptions(options);
     }
     await bridge.verovio.loadData(text);
-    const { currentPage } = get(verovioState);
-    const svg = await bridge.verovio.renderToSVG(currentPage);
-    const pageCount = await bridge.verovio.getPageCount();
-    syncPageState(pageCount);
+    const svg = await updateRenderedView();
     const nextView: ViewModel = {
       svg,
       selection: get(selection)
@@ -91,12 +98,19 @@
     const options = buildVerovioOptions(size);
     await bridge.verovio.setOptions(options);
     await bridge.verovio.redoLayout();
-    const { currentPage } = get(verovioState);
-    const svg = await bridge.verovio.renderToSVG(currentPage);
-    const pageCount = await bridge.verovio.getPageCount();
-    syncPageState(pageCount);
+    const svg = await updateRenderedView();
     viewModel.set({ ...current, svg });
     workerStatus.set('idle');
+  }
+
+  async function adjustZoom(delta: number) {
+    verovioState.update((current) => ({
+      ...current,
+      zoom: clampZoom(current.zoom + delta)
+    }));
+    if (lastLayoutSize.width && lastLayoutSize.height) {
+      await applyLayoutForSize(lastLayoutSize);
+    }
   }
 
   async function setSelection(next: SelectionInfo) {
@@ -165,7 +179,14 @@
 />
 
 <div class="vrv-wrapper">
-  <Menu on:open={triggerOpenFile} on:save={saveDoc} on:export={exportDoc}>
+  <Menu
+    on:open={triggerOpenFile}
+    on:save={saveDoc}
+    on:export={exportDoc}
+    on:zoomIn={() => adjustZoom(ZOOM_STEP)}
+    on:zoomOut={() => adjustZoom(-ZOOM_STEP)}
+    canZoom={$verovioState.pageCount > 0}
+  >
   </Menu>
 
   <Toolbar mode={$mode} onToggleMode={toggleMode} />

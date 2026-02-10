@@ -9,7 +9,7 @@ export const viewModel = writable<ViewModel>({
 });
 export const verovioState = writable({
   zoom: 100,
-  pageCount: 1,
+  pageCount: 0,
   currentPage: 1
 });
 export const workerStatus = writable<'idle' | 'busy'>('idle');

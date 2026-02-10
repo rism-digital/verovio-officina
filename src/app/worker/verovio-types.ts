@@ -14,6 +14,7 @@ export type VerovioOptions = {
   pageMarginTop: number;
   pageMarginBottom: number;
   scale: number;
+  scaleToPageSize: boolean;
   xmlIdSeed: number;
 };
 
@@ -57,5 +58,6 @@ export interface Options {
   pageMarginTop: number;
   pageMarginBottom: number;
   scale: number;
+  scaleToPageSize: boolean;
   xmlIdSeed: number;
 }
