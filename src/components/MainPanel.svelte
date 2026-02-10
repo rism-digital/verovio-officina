@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount, tick } from "svelte";
-  import EditorToolPanel from "./EditorToolPanel.svelte";
+  import SidePanel from "./SidePanel.svelte";
   import type { ViewModel } from "../app/types";
 
   export let view: ViewModel;
@@ -158,7 +158,7 @@
 
 <div class="vrv-editor-surface">
   <div class="vrv-h-split">
-    <EditorToolPanel on:selectElement={forwardSelect} />
+    <SidePanel on:selectElement={forwardSelect} />
     <div class="vrv-v-split">
       <div class="vrv-verovio-view" bind:this={verovioView}>
         <div class="vrv-svg-wrapper" bind:this={svgWrapper}>

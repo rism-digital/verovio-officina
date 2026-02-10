@@ -3,7 +3,7 @@
   import { get } from "svelte/store";
   import Menu from "./components/Menu.svelte";
   import Toolbar from "./components/Toolbar.svelte";
-  import EditorSurface from "./components/EditorSurface.svelte";
+  import MainPanel from "./components/MainPanel.svelte";
   import StatusBar from "./components/StatusBar.svelte";
   import { createWorkerBridge } from "./app/worker/bridge";
   import {
@@ -265,7 +265,7 @@
 
   <Toolbar mode={$mode} onToggleMode={toggleMode} />
 
-  <EditorSurface
+  <MainPanel
     view={$viewModel}
     onSelect={handleSelect}
     onResize={applyLayoutForSize}
