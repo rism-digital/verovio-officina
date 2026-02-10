@@ -75,7 +75,6 @@
     const pageCount = await bridge.verovio.getPageCount();
     syncPageState(pageCount);
     const nextView: ViewModel = {
-      text,
       svg,
       selection: get(selection)
     };
@@ -106,14 +105,11 @@
   }
 
   async function handleSelect(active: boolean) {
-    const view = get(viewModel);
     if (active) {
       await setSelection({
         type: 'text',
         label: 'Body Text',
-        properties: {
-          length: String(view.text.length)
-        }
+        properties: {}
       });
     } else {
       await setSelection({ type: 'none' });

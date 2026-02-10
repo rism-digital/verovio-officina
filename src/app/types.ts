@@ -7,7 +7,6 @@ export type SelectionInfo = {
 };
 
 export type ViewModel = {
-  text: string;
   svg: string;
   selection: SelectionInfo;
 };
