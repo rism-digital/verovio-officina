@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { onDestroy, onMount, tick } from 'svelte';
-  import EditorToolPanel from './EditorToolPanel.svelte';
-  import type { ViewModel } from '../app/types';
+  import { onDestroy, onMount, tick } from "svelte";
+  import EditorToolPanel from "./EditorToolPanel.svelte";
+  import type { ViewModel } from "../app/types";
 
   export let view: ViewModel;
   export let onSelect: (active: boolean) => void;
   export let onResize: (size: { width: number; height: number }) => void;
+  export let onElementSelect: (id: string | null) => void;
 
   let verovioView: HTMLDivElement | null = null;
   let svgWrapper: HTMLDivElement | null = null;
@@ -29,11 +30,14 @@
   }
 
   onMount(() => {
-    if (!verovioView || typeof ResizeObserver === 'undefined') return;
+    if (!verovioView || typeof ResizeObserver === "undefined") return;
     resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
-        emitSize(Math.max(0, Math.floor(width)), Math.max(0, Math.floor(height)));
+        emitSize(
+          Math.max(0, Math.floor(width)),
+          Math.max(0, Math.floor(height)),
+        );
       }
     });
     resizeObserver.observe(verovioView);
@@ -52,26 +56,90 @@
     if (!svgWrapper || !svgOverlay) return;
     svgOverlay.innerHTML = svgWrapper.innerHTML;
 
-    svgWrapper.querySelectorAll('g.bounding-box').forEach((node) => {
-      node.remove();
-    });
-
-    svgOverlay.querySelectorAll('g, path, text, ellipse, polyline').forEach((node) => {
-      const element = node as SVGElement;
-      element.style.stroke = 'transparent';
-      element.style.fill = 'transparent';
-    });
-
-    svgOverlay.querySelectorAll('.slur.bounding-box, .tie.bounding-box').forEach((node) => {
+    // Remove bounding boxes and other non-essential elements, and prepare for selection
+    svgWrapper.querySelectorAll("g.bounding-box").forEach((node) => {
       node.remove();
     });
 
     svgOverlay
-      .querySelectorAll('.slur path, .tie path, .stem rect, .dots ellipse, .barLineAttr path')
+      .querySelectorAll(".slur.bounding-box, .tie.bounding-box")
+      .forEach((node) => {
+        node.remove();
+      });
+
+    // Make all elements transparent but still hittable
+    svgOverlay
+      .querySelectorAll("g, path, text, ellipse, polyline")
       .forEach((node) => {
         const element = node as SVGElement;
-        element.style.strokeWidth = '90';
+        element.style.stroke = "transparent";
+        element.style.fill = "transparent";
       });
+
+    svgOverlay
+      .querySelectorAll(
+        ".slur path, .tie path, .stem rect, .dots ellipse, .barLineAttr path",
+      )
+      .forEach((node) => {
+        const element = node as SVGElement;
+        element.style.strokeWidth = "90";
+      });
+
+    svgOverlay.querySelectorAll("g").forEach((node) => {
+      const element = node as SVGGElement & { dataset: { bound?: string } };
+      if (element.dataset.bound === "true") return;
+      element.dataset.bound = "true";
+      element.addEventListener("mousedown", handleOverlayMouseDown);
+    });
+  }
+
+  function clearOverlaySelection() {
+    if (!svgOverlay) return;
+    svgOverlay.querySelectorAll("g.selected").forEach((node) => {
+      node.classList.remove("selected");
+    });
+  }
+
+  function getClosestMEIElement(
+    node: Element | null,
+    elementType?: string,
+  ): SVGGElement | null {
+    if (!node) return null;
+
+    const isG = node.tagName?.toLowerCase() === "g";
+    const isBlocked =
+      node.classList.contains("bounding-box") ||
+      node.classList.contains("notehead");
+
+    if (!isG || isBlocked) {
+      return getClosestMEIElement(node.parentElement, elementType);
+    }
+
+    if (elementType && !node.classList.contains(elementType)) {
+      return getClosestMEIElement(node.parentElement, elementType);
+    }
+
+    return node as SVGGElement;
+  }
+
+  function handleOverlayMouseDown(event: MouseEvent) {
+    event.stopPropagation();
+
+    // Clicking on the overlay - nothing to do
+    if (<HTMLDivElement>(<HTMLElement>event.target).parentNode === svgOverlay) {
+      return;
+    }
+
+    // Get MEI element
+    let node: SVGGElement | null = getClosestMEIElement(
+      <SVGElement>event.target,
+    );
+    if (!node || !node.id) {
+      console.log(node, "MEI element not found or with no id");
+      return; // this should never happen, but as a safety
+    }
+    // console.log(node);
+    onElementSelect?.(node.id);
   }
 
   async function refreshOverlay() {
@@ -82,7 +150,6 @@
   $: if (view.svg) {
     refreshOverlay();
   }
-
 </script>
 
 <div class="vrv-editor-surface">
@@ -90,13 +157,14 @@
     <EditorToolPanel />
     <div class="vrv-v-split">
       <div class="vrv-verovio-view" bind:this={verovioView}>
-        <div class="vrv-svg-wrapper" bind:this={svgWrapper}>{@html view.svg}</div>
+        <div class="vrv-svg-wrapper" bind:this={svgWrapper}>
+          {@html view.svg}
+        </div>
         <div
           class="vrv-svg-overlay"
           bind:this={svgOverlay}
           on:focus={() => onSelect(true)}
           on:blur={() => onSelect(false)}
-          on:click={() => onSelect(true)}
         ></div>
       </div>
       <div class="vrv-keyboard-panel" style="display: flex;"></div>

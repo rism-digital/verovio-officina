@@ -3,6 +3,7 @@
         "activable",
         "disableable",
         "inactivable",
+        "notehead",
         "toggleable",
         "verovio"
     ],

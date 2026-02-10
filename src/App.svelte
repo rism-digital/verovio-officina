@@ -173,6 +173,19 @@
     }
   }
 
+  async function handleElementSelect(id: string | null) {
+    console.log(id);
+    if (!id) {
+      await setSelection({ type: "none" });
+      return;
+    }
+    await setSelection({
+      type: "block",
+      label: id,
+      properties: { id },
+    });
+  }
+
   function toggleMode() {
     mode.update((current) => (current === "insert" ? "edit" : "insert"));
   }
@@ -244,6 +257,7 @@
     view={$viewModel}
     onSelect={handleSelect}
     onResize={applyLayoutForSize}
+    onElementSelect={handleElementSelect}
   />
 
   <StatusBar status={$statusLine} dirty={$dirty} version={verovioVersion} />
