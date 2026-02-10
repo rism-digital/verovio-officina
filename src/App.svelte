@@ -20,6 +20,7 @@
 
   const VEROVIO_URL =
     "https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js";
+  const STORAGE_KEY = "verovio-editor";
   let fileInput: HTMLInputElement | null = null;
   let verovioVersion = "";
   const zoomLevels = [10, 20, 35, 75, 100, 150, 200];
@@ -37,6 +38,13 @@
     await bridge.init(VEROVIO_URL);
     verovioVersion = await bridge.verovio.getVersion();
     workerStatus.set("idle");
+
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      await loadData(stored);
+      statusLine.set("Loaded from local storage.");
+      dirty.set(false);
+    }
   });
 
   let lastLayoutSize = { width: 0, height: 0 };
@@ -179,6 +187,7 @@
     if (!file) return;
     selection.set({ type: "none" });
     const content = await file.text();
+    localStorage.setItem(STORAGE_KEY, content);
     await loadData(content);
     dirty.set(false);
     statusLine.set(`Opened ${file.name}.`);
@@ -187,7 +196,7 @@
 
   async function saveDoc() {
     const exported = await bridge.verovio.getMEI();
-    localStorage.setItem("svelte-editor-doc", exported);
+    localStorage.setItem(STORAGE_KEY, exported);
     dirty.set(false);
     statusLine.set("Saved to local storage.");
   }
