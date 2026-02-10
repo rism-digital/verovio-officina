@@ -1,3 +1,22 @@
+export type VerovioOptions = {
+  adjustPageHeight: boolean;
+  adjustPageWidth: boolean;
+  appXPathQuery?: Array<string>;
+  breaks: string;
+  choiceXPathQuery?: Array<string>;
+  footer: string;
+  justifyVertically: boolean;
+  mensuralResponsiveView: string;
+  pageHeight: number;
+  pageWidth: number;
+  pageMarginLeft: number;
+  pageMarginRight: number;
+  pageMarginTop: number;
+  pageMarginBottom: number;
+  scale: number;
+  xmlIdSeed: number;
+};
+
 export type VerovioToolkit = {
   edit: (mei: string) => string;
   editInfo: () => string;
@@ -17,7 +36,7 @@ export type VerovioToolkit = {
   renderToMIDI: () => string;
   renderToSVG: (page: number) => string;
   select: (id: string) => string;
-  setOptions: (options: string) => void;
+  setOptions: (options: VerovioOptions) => void;
   getVersion: () => string;
   onRuntimeInitialized: () => void;
 };

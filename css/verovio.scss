@@ -150,9 +150,10 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     // Properties for button-like elements
     ////////////////////////////////////////////////////////////////////////
 
-    .vrv-views {
-        position: absolute;
-        overflow: scroll;
+    .vrv-editor-surface {
+            display: block;
+            height: 100%;
+            min-height: 0;
 
         .vrv-loading {
             display: flex;
@@ -174,10 +175,11 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         // View and SVG elements
         ////////////////////////////////////////////////////////////////////////
 
-        .vrv-view {
+        .vrv-verovio-view {
             display: block;
-            min-height: 0;
             height: 100%;
+            min-height: 0;
+            position: relative;
 
             .vrv-svg-wrapper,
             .vrv-svg-overlay {
@@ -220,65 +222,55 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
 
             .vrv-h-split {
                 display: flex;
+                height: 100%;
             }
 
             .vrv-v-split {
                 display: flex;
                 flex-direction: column;
-            }
-
-            .vrv-split {
-                display: flex;
-                width: 100%;
                 height: 100%;
-                overflow: hidden;
             }
+        }
 
-            // common to vertical and horizontal
-            .vrv-split> :nth-child(2) {
-                position: relative;
-            }
+        // Actual layout structure under .vrv-editor-surface
+        .vrv-h-split {
+            display: flex;
+            height: 100%;
+            min-height: 0;
+        }
 
-            .vrv-split> :nth-child(3) {
-                flex: auto;
-                min-height: 200px;
-                min-width: 400px;
-            }
+        .vrv-editor-tool-panel {
+            min-width: $editor-tool-panel-width;
+            max-width: $editor-tool-panel-width;
+            background: $background-light;
+            padding: 8px;
+            border-right: 2px solid $background;
+            color: $text-color;
+        }
 
-            // vertical only
-            .vrv-split.vertical {
-                flex-direction: column;
-            }
+        .vrv-v-split {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            min-height: 0;
+        }
 
-            .vrv-split.vertical> :nth-child(1) {
-                height: 200px;
-                min-height: 200px;
-            }
+        .vrv-verovio-view {
+            flex: 1 1 auto;
+            min-height: 0;
+        }
 
-            .vrv-split.vertical> :nth-child(2) {
-                height: 10px;
-                cursor: row-resize;
-                background: url(../icons/toolbar/drag-h.png) no-repeat center;
-                background-color: $background-active;
-            }
+        .vrv-keyboard-panel {
+            display: flex;
+            min-height: $editor-keyboard-height;
+            background-color: $background;
+            border-top: 1px solid $background-border;
+            border-bottom: 1px solid $background-border;
+        }
 
-            // horizontal only
-            .vrv-split.horizontal {
-                flex-direction: row;
-            }
-
-            .vrv-split.horizontal> :nth-child(1) {
-                width: 200px;
-                min-width: 200px;
-            }
-
-            .vrv-split.horizontal> :nth-child(2) {
-                width: 10px;
-                cursor: col-resize;
-                background: url(../icons/toolbar/drag-v.png) no-repeat center;
-                background-color: $background-active;
-            }
-            
+        .vrv-svg-wrapper,
+        .vrv-svg-overlay {
+            inset: 0;
         }
     }
 

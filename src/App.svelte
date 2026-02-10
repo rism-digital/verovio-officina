@@ -8,6 +8,7 @@
   import { createWorkerBridge } from './app/worker/bridge';
   import { dirty, mode, selection, statusLine, viewModel, workerStatus } from './app/state';
   import type { SelectionInfo, ViewModel } from './app/types';
+  import type { VerovioOptions } from './app/worker/verovio-types';
 
   const VEROVIO_URL = 'https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js';
   let fileInput: HTMLInputElement | null = null;
@@ -25,8 +26,33 @@
     workerStatus.set('idle');
   });
 
+  let lastLayoutSize = { width: 0, height: 0 };
+
+  function buildVerovioOptions(size: { width: number; height: number }): VerovioOptions {
+    return {
+      adjustPageHeight: false,
+      adjustPageWidth: false,
+      breaks: 'auto',
+      footer: 'auto',
+      justifyVertically: false,
+      mensuralResponsiveView: 'auto',
+      pageHeight: Math.max(0, Math.floor(size.height)),
+      pageWidth: Math.max(0, Math.floor(size.width)),
+      pageMarginLeft: 50,
+      pageMarginRight: 50,
+      pageMarginTop: 50,
+      pageMarginBottom: 50,
+      scale: 100,
+      xmlIdSeed: 1
+    };
+  }
+
   async function renderMei(text: string) {
     workerStatus.set('busy');
+    if (lastLayoutSize.width && lastLayoutSize.height) {
+      const options = buildVerovioOptions(lastLayoutSize);
+      await bridge.verovio.setOptions(options);
+    }
     await bridge.verovio.loadData(text);
     const svg = await bridge.verovio.renderToSVG(1);
     const nextView: ViewModel = {
@@ -35,6 +61,21 @@
       selection: get(selection)
     };
     viewModel.set(nextView);
+    workerStatus.set('idle');
+  }
+
+  async function applyLayoutForSize(size: { width: number; height: number }) {
+    console.log(size);
+    if (!size.width || !size.height) return;
+    lastLayoutSize = size;
+    const current = get(viewModel);
+    if (!current.svg) return;
+    workerStatus.set('busy');
+    const options = buildVerovioOptions(size);
+    await bridge.verovio.setOptions(options);
+    await bridge.verovio.redoLayout();
+    const svg = await bridge.verovio.renderToSVG(1);
+    viewModel.set({ ...current, svg });
     workerStatus.set('idle');
   }
 
@@ -99,21 +140,21 @@
   }
 </script>
 
+<input
+  class="vrv-file-input"
+  type="file"
+  accept=".mei,.xml"
+  bind:this={fileInput}
+  on:change={openFile}
+/>
+
 <div class="vrv-wrapper">
   <Menu on:open={triggerOpenFile} on:save={saveDoc} on:export={exportDoc}>
   </Menu>
 
-  <input
-    class="vrv-file-input"
-    type="file"
-    accept=".mei,.xml"
-    bind:this={fileInput}
-    on:change={openFile}
-  />
-
   <Toolbar mode={$mode} onToggleMode={toggleMode} />
 
-  <EditorSurface view={$viewModel} onSelect={handleSelect} />
+  <EditorSurface view={$viewModel} onSelect={handleSelect} onResize={applyLayoutForSize} />
 
   <StatusBar status={$statusLine} dirty={$dirty} version={verovioVersion} />
 </div>
