@@ -97,14 +97,6 @@
         .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-svg-wrapper svg,
         .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-svg-overlay svg {
           float: left; }
-      .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-svg-overlay g.selected path,
-      .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-svg-overlay g.selected rect,
-      .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-svg-overlay g.selected ellipse,
-      .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-svg-overlay g.selected polyline,
-      .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-svg-overlay g.selected text {
-        stroke: #8B0000;
-        stroke-opacity: 0.7;
-        fill: transparent; }
       .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-doc-wrapper {
         height: 100%; }
       .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-side-panel {
