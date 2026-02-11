@@ -63,6 +63,7 @@
   padding: 0;
   text-align: initial;
   min-height: 100vh;
+  max-height: 100vh;
   display: grid;
   grid-template-rows: auto auto 1fr auto; }
   .vrv-wrapper *,
@@ -73,23 +74,13 @@
     display: block;
     height: 100%;
     min-height: 0; }
-    .vrv-wrapper .vrv-main-panel .vrv-loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      width: 100%;
-      background-color: grey;
-      color: white; }
-      .vrv-wrapper .vrv-main-panel .vrv-loading .vrv-loading-text {
-        text-align: center;
-        height: 120px;
-        background: url(./loading.svg) no-repeat center; }
     .vrv-wrapper .vrv-main-panel .vrv-verovio-view {
       display: block;
       height: 100%;
       min-height: 0;
-      position: relative; }
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0; }
       .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-svg-wrapper,
       .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-svg-overlay {
         overflow: auto;
@@ -98,26 +89,6 @@
         .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-svg-overlay svg {
           float: left; }
       .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-doc-wrapper {
-        height: 100%; }
-      .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-side-panel {
-        min-width: 300px;
-        max-width: 300px;
-        background: #565656;
-        padding: 8px;
-        border-right: 2px solid #3c3c3c;
-        color: white; }
-      .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-keyboard-panel {
-        display: flex;
-        min-height: 110px;
-        background-color: #3c3c3c;
-        border-top: 1px solid #565656;
-        border-bottom: 1px solid #565656; }
-      .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-h-split {
-        display: flex;
-        height: 100%; }
-      .vrv-wrapper .vrv-main-panel .vrv-verovio-view .vrv-v-split {
-        display: flex;
-        flex-direction: column;
         height: 100%; }
     .vrv-wrapper .vrv-main-panel .vrv-h-split {
       display: flex;
@@ -129,13 +100,14 @@
       background: #565656;
       padding: 8px;
       border-right: 2px solid #3c3c3c;
-      color: white; }
+      color: white;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden; }
     .vrv-wrapper .vrv-main-panel .vrv-v-split {
       display: flex;
       flex-direction: column;
-      flex: 1 1 auto;
-      min-height: 0; }
-    .vrv-wrapper .vrv-main-panel .vrv-verovio-view {
       flex: 1 1 auto;
       min-height: 0; }
     .vrv-wrapper .vrv-main-panel .vrv-keyboard-panel {
@@ -144,9 +116,6 @@
       background-color: #3c3c3c;
       border-top: 1px solid #565656;
       border-bottom: 1px solid #565656; }
-    .vrv-wrapper .vrv-main-panel .vrv-svg-wrapper,
-    .vrv-wrapper .vrv-main-panel .vrv-svg-overlay {
-      inset: 0; }
   .vrv-wrapper svg {
     display: block;
     margin: 0 auto; }
@@ -497,6 +466,7 @@
   .vrv-wrapper .vrv-tab-group {
     display: flex;
     flex-direction: column;
+    flex: 1 1 auto;
     height: 100%;
     min-height: 0; }
     .vrv-wrapper .vrv-tab-group .vrv-tab-selectors {
@@ -514,12 +484,16 @@
       .vrv-wrapper .vrv-tab-group .vrv-tab-selectors .vrv-tab-selector:not(:last-child) {
         border-right: 1px solid #565656; }
     .vrv-wrapper .vrv-tab-group .vrv-tab-content {
+      display: flex;
+      flex-direction: column;
       flex: 1 1 auto;
+      height: 100%;
       min-height: 0;
       background-color: #3c3c3c;
       padding: 10px;
       overflow: hidden; }
       .vrv-wrapper .vrv-tab-group .vrv-tab-content .vrv-tab-content-panel {
+        display: flex;
         flex: 1 1 auto;
         min-height: 0;
         flex-direction: column;

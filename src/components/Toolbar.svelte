@@ -5,7 +5,7 @@
     export let onToggleMode: () => void;
 </script>
 
-<section class="vrv-editor-toolbar vrv-text-no-select" style="display: block;">
+<section class="vrv-editor-toolbar vrv-text-no-select">
     <div class="vrv-btn-group">
         <div class="vrv-btn vrv-toggleable {mode === 'insert' ? 'toggled' : ''}" on:click={onToggleMode}>
             {mode === "insert" ? "Insert" : "Edit"}

@@ -137,7 +137,7 @@
         if (!svgWrapper || !id) return;
         let element = <SVGElement>svgWrapper.querySelector("#" + id);
         if (element) {
-            highlightWithColor(element, "#f00");
+            highlightWithColor(element, "#cd0000");
         }
     }
 
