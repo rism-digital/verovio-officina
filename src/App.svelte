@@ -1,9 +1,9 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { get } from "svelte/store";
+    import MainPanel from "./components/MainPanel.svelte";
     import Menu from "./components/Menu.svelte";
     import Toolbar from "./components/Toolbar.svelte";
-    import MainPanel from "./components/MainPanel.svelte";
     import StatusBar from "./components/StatusBar.svelte";
     import { createWorkerBridge } from "./app/worker/bridge";
     import {
@@ -15,7 +15,7 @@
         viewModel,
         workerStatus,
     } from "./app/state";
-    import type { EditInfoContent, EditorAction, SelectionInfo, TreeNodeData, ViewModel } from "./app/types";
+    import type { EditInfoContent, EditorAction, SelectionInfo } from "./app/types";
     import type { Options as VerovioOptions } from "./app/worker/verovio-types";
 
     const VEROVIO_URL =
@@ -25,7 +25,7 @@
     let verovioVersion = "";
     const zoomLevels = [10, 20, 35, 75, 100, 150, 200];
     let svgRenderId = 0;
-    let contextData: TreeNodeData | null = null;
+    let editInfoContent: EditInfoContent | null = null;
 
     const worker = new Worker(
         new URL("./app/worker/worker.ts", import.meta.url),
@@ -177,7 +177,7 @@
     async function handleSelect(id: string | null) {
         if (!id) {
             await setSelection({ type: "none" });
-            contextData = null;
+            editInfoContent = null;
             return;
         }
         const page = await bridge.verovio.getPageWithElement(id);
@@ -191,13 +191,13 @@
                 }
             const contextOk = await bridge.verovio.edit(editorAction);
             if (contextOk) {
-                contextData = (await bridge.verovio.editInfo() as EditInfoContent).context;
+                editInfoContent = await bridge.verovio.editInfo() as EditInfoContent;
             } else {
-                contextData = null;
+                editInfoContent = null;
             }
         } catch (error) {
             console.error("Failed to load context data", error);
-            contextData = null;
+            editInfoContent = null;
         }
         await setSelection({
             type: "element",
@@ -266,7 +266,7 @@
 
     <Toolbar mode={$mode} onToggleMode={toggleMode} />
 
-    <MainPanel view={$viewModel} onResize={applyLayoutForSize} onElementSelect={handleSelect} {contextData} />
+    <MainPanel view={$viewModel} onResize={applyLayoutForSize} onElementSelect={handleSelect} {editInfoContent} />
 
     <StatusBar status={$statusLine} dirty={$dirty} version={verovioVersion} />
 </div>

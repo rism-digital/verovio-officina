@@ -1,12 +1,12 @@
 <script lang="ts">
     import { onDestroy, onMount, tick } from "svelte";
     import SidePanel from "./SidePanel.svelte";
-    import type { TreeNodeData, ViewModel } from "../app/types";
+    import type { EditInfoContent, ViewModel } from "../app/types";
 
     export let view: ViewModel;
     export let onResize: (size: { width: number; height: number }) => void;
     export let onElementSelect: (id: string | null) => void;
-    export let contextData: { context?: TreeNodeData } | TreeNodeData | null = null;
+    export let editInfoContent: EditInfoContent| null = null;
 
     function forwardSelect(event: CustomEvent<string>) {
         onElementSelect?.(event.detail);
@@ -16,13 +16,14 @@
         highlightHover(event.detail);
     }
 
+    const RESIZE_DEBOUNCE_MS = 150;
+
     let verovioView: HTMLDivElement | null = null;
     let svgWrapper: HTMLDivElement | null = null;
     let svgOverlay: HTMLDivElement | null = null;
     let resizeObserver: ResizeObserver | null = null;
     let lastSize = { width: 0, height: 0 };
     let resizeTimer: ReturnType<typeof setTimeout> | null = null;
-    const RESIZE_DEBOUNCE_MS = 150;
     let lastSvgId = 0;
     let lastSelectedId: string | null = null;
     let filterMarkup: string = "";
@@ -226,7 +227,7 @@
         <SidePanel
             on:selectElement={forwardSelect}
             on:hoverElement={forwardHover}
-            {contextData}
+            {editInfoContent}
         />
         <div class="vrv-v-split">
             <div class="vrv-verovio-view" bind:this={verovioView}>

@@ -1,4 +1,4 @@
-import type { WorkerRequest, WorkerResponse, VerovioRequest } from './messages';
+import type { VerovioRequest, WorkerRequest, WorkerResponse } from './messages';
 import type { VerovioToolkit } from './verovio-types';
 
 let seq = 0;

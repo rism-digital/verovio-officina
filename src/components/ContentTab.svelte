@@ -1,11 +1,11 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
     import TreeNode from "./TreeNode.svelte";
-    import type { TreeNodeData } from "../app/types";
+    import type { EditInfoContent } from "../app/types";
+
+    export let editInfoContent: EditInfoContent | null = null;
 
     const dispatch = createEventDispatcher<{ selectElement: string; hoverElement: string | null }>();
-
-    export let contextData: TreeNodeData | null = null;
 
     function handleSelect(event: CustomEvent<string>) {
         dispatch("selectElement", event.detail);
@@ -26,8 +26,8 @@
                 <div class="vrv-tree-breadcrumb"></div>
             </div>
         </div>
-        {#if contextData}
-            <TreeNode node={contextData} isRoot on:select={handleSelect} on:hover={handleHover} />
+        {#if editInfoContent && editInfoContent.context}
+            <TreeNode node={editInfoContent.context} isRoot on:select={handleSelect} on:hover={handleHover} />
         {:else}
             <div class="vrv-tree-root"></div>
         {/if}
