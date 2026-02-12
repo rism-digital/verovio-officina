@@ -21,14 +21,25 @@
 
     const VEROVIO_URL =
         "https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js";
-    const RNG_SCHEMA_URL = "https://music-encoding.org/schema/5.1/mei-all.rng";
+    const MEI_ALL_SCHEMA_URL = "https://music-encoding.org/schema/5.1/mei-all.rng";
+    const MEI_BASIC_SCHEMA_URL = "https://music-encoding.org/schema/5.1/mei-basic.rng";
     const STORAGE_KEY = "verovio-editor";
     let fileInput: HTMLInputElement | null = null;
     let verovioVersion = "";
     const zoomLevels = [10, 20, 35, 75, 100, 150, 200];
     let svgRenderId = 0;
     let editInfoContent: EditInfoContent | null = null;
-    let rngLoader: RNGLoader | null = null;
+    let rngMEIAll: RNGLoader | null = null;
+    let rngMEIBasic: RNGLoader | null = null;
+
+    async function loadRngSchema(loader: RNGLoader, schemaUrl: string) {
+        const response = await fetch(schemaUrl);
+        if (!response.ok) {
+            throw new Error(`Failed to load RNG schema: ${response.status}`);
+        }
+        const schemaText = await response.text();
+        loader.setRelaxNGSchema(schemaText);
+    }
 
     const worker = new Worker(
         new URL("./app/worker/worker.ts", import.meta.url),
@@ -44,15 +55,13 @@
         verovioVersion = await bridge.verovio.getVersion();
         workerStatus.set("idle");
 
-        rngLoader = new RNGLoader();
+        rngMEIAll = new RNGLoader();
+        rngMEIBasic = new RNGLoader();
+
         try {
-            const response = await fetch(RNG_SCHEMA_URL);
-            if (!response.ok) {
-                throw new Error(`Failed to load RNG schema: ${response.status}`);
-            }
-            const schemaText = await response.text();
-            rngLoader.setRelaxNGSchema(schemaText);
-            statusLine.set("Loaded RNG schema.");
+            await loadRngSchema(rngMEIAll, MEI_ALL_SCHEMA_URL);
+            await loadRngSchema(rngMEIBasic, MEI_BASIC_SCHEMA_URL);
+            statusLine.set("Loaded RNG schemas.");
         } catch (error) {
             console.error("Failed to load RNG schema", error);
             statusLine.set("Failed to load RNG schema.");
