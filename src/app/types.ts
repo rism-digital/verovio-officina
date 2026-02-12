@@ -17,6 +17,7 @@ export interface TreeNodeData {
     element: string;
     children?: TreeNodeData[];
     isLeaf?: boolean;
+    text?: string;
     attributes?: Record<string, unknown>;
 };
 

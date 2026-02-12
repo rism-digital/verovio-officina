@@ -74,6 +74,9 @@
 </script>
 
 <div class="vrv-attribute-list-wrapper">
+    {#if editInfoContent?.object && editInfoContent.object.text}
+        <input class="vrv-form-input" data-att-name="text" value={editInfoContent.object.text}>
+    {:else}
     <div class="vrv-attribute-filter"></div>
     <table class="vrv-attribute-table">
         <tbody>
@@ -133,4 +136,5 @@
             </tbody>
         {/if}
     </table>
+    {/if}
 </div>
