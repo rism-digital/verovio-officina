@@ -8,11 +8,11 @@
     export let rngMEIBasic: RNGLoader | null = null;
 
     $: elementName = editInfoContent?.object?.element ?? "";
-    $: attributes = (editInfoContent?.object?.attributes ?? {}) as Record<
-        string,
-        string
-    >;
-    
+    $: attributes = {
+        ...(editInfoContent?.object?.attributes ?? {}),
+        ...(editInfoContent?.object?.id ? { "xml:id": editInfoContent.object.id } : {}),
+    } as Record<string, string>;
+
     function isElementDef(value: unknown): value is ElementDef {
         return (
             Boolean(value) &&
@@ -34,6 +34,20 @@
     $: allNames = Object.keys(allAttrs).filter(
         (name) => !usedNames.has(name) && !basicNames.includes(name),
     );
+
+    const readOnlyPatterns: RegExp[] = [
+        /.*@xml:id/,
+        /.*@startid/,
+        /.*@endid/,
+        /.*@plist/,
+        /.*@copyof/,
+        /(staff|layer)@n$/,
+    ];
+
+    function isReadOnly(attrName: string) {
+        const input = `${elementName}@${attrName}`;
+        return readOnlyPatterns.some((pattern) => pattern.test(input));
+    }
 
     let showBasic = false;
     let showAll = false;
@@ -59,6 +73,7 @@
                     value={String(value)}
                     optionsAll={allAttrs?.[name] ?? null}
                     optionsBasic={basicAttrs?.[name] ?? null}
+                    readOnly={isReadOnly(name)}
                 />
             {/each}
             <tr>
@@ -78,6 +93,7 @@
                         value=""
                         optionsAll={allAttrs?.[name] ?? null}
                         optionsBasic={basicAttrs?.[name] ?? null}
+                        readOnly={isReadOnly(name)}
                     />
                 {/each}
                 <tr>
@@ -98,6 +114,7 @@
                         value=""
                         optionsAll={allAttrs?.[name] ?? null}
                         optionsBasic={basicAttrs?.[name] ?? null}
+                        readOnly={isReadOnly(name)}
                     />
                 {/each}
             </tbody>

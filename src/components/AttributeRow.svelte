@@ -3,6 +3,7 @@
     export let value: string;
     export let optionsAll: string[] | null = null;
     export let optionsBasic: string[] | null = null;
+    export let readOnly = false;
 
     $: filteredAll = optionsAll && optionsBasic
         ? optionsAll.filter((opt) => !optionsBasic.includes(opt))
@@ -22,7 +23,7 @@
     <td class="vrv-attribute-name">{name}</td>
     <td class="vrv-attribute-value">
         {#if hasOptions}
-            <select class="vrv-form-input">
+            <select class="vrv-form-input {readOnly ? 'disabled' : ''}" disabled={readOnly}>
                 <option value=""></option>
                 {#if optionsBasic && filteredAll.length > 0}
                     <optgroup label="MEI-basic">
@@ -42,7 +43,7 @@
                 {/if}
             </select>
         {:else}
-            <input class="vrv-form-input" value={value} />
+            <input class="vrv-form-input {readOnly ? 'disabled' : ''}" value={value} disabled={readOnly} />
         {/if}
     </td>
 </tr>
