@@ -6,6 +6,7 @@
     import Toolbar from "./components/Toolbar.svelte";
     import StatusBar from "./components/StatusBar.svelte";
     import { createWorkerBridge } from "./app/worker/bridge";
+    import { RNGLoader } from "./app/rng-loader";
     import {
         dirty,
         mode,
@@ -20,12 +21,14 @@
 
     const VEROVIO_URL =
         "https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js";
+    const RNG_SCHEMA_URL = "https://music-encoding.org/schema/5.1/mei-all.rng";
     const STORAGE_KEY = "verovio-editor";
     let fileInput: HTMLInputElement | null = null;
     let verovioVersion = "";
     const zoomLevels = [10, 20, 35, 75, 100, 150, 200];
     let svgRenderId = 0;
     let editInfoContent: EditInfoContent | null = null;
+    let rngLoader: RNGLoader | null = null;
 
     const worker = new Worker(
         new URL("./app/worker/worker.ts", import.meta.url),
@@ -40,6 +43,20 @@
         await bridge.init(VEROVIO_URL);
         verovioVersion = await bridge.verovio.getVersion();
         workerStatus.set("idle");
+
+        rngLoader = new RNGLoader();
+        try {
+            const response = await fetch(RNG_SCHEMA_URL);
+            if (!response.ok) {
+                throw new Error(`Failed to load RNG schema: ${response.status}`);
+            }
+            const schemaText = await response.text();
+            rngLoader.setRelaxNGSchema(schemaText);
+            statusLine.set("Loaded RNG schema.");
+        } catch (error) {
+            console.error("Failed to load RNG schema", error);
+            statusLine.set("Failed to load RNG schema.");
+        }
 
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
