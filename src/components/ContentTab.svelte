@@ -3,7 +3,7 @@
     import ElementReference from "./ElementReference.svelte";
     import Tree from "./Tree.svelte";
     import { selection } from "../app/state";
-    import type { EditAttributeHandler, EditInfoContent, HoverElementHandler, SelectElementHandler } from "../app/types";
+    import type { EditActionSetHandler, EditInfoContent, HoverElementHandler, SelectElementHandler } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
     export let editInfoContent: EditInfoContent | null = null;
@@ -11,7 +11,7 @@
     export let rngMEIBasic: RNGLoader | null = null;
     export let onSelectElement: SelectElementHandler | null = null;
     export let onHoverElement: HoverElementHandler | null = null;
-    export let onEditAttribute: EditAttributeHandler | null = null;
+    export let onEditAttribute: EditActionSetHandler | null = null;
 
     let closedSections = {
         structure: false,
@@ -63,7 +63,7 @@
             {editInfoContent}
             {rngMEIAll}
             {rngMEIBasic}
-            {onEditAttribute}
+            onEditSet={onEditAttribute}
         />
     </div>
 </div>

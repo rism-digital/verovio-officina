@@ -1,12 +1,12 @@
 <script lang="ts">
     import AttributeRow from "./AttributeRow.svelte";
-    import type { EditActionParamSet, EditAttributeHandler, EditInfoContent } from "../app/types";
+    import type { EditActionSetParam, EditActionSetHandler as EditSetHandler, EditInfoContent } from "../app/types";
     import type { ElementDef, RNGLoader } from "../app/rng-loader";
 
     export let editInfoContent: EditInfoContent | null = null;
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
-    export let onEditAttribute: EditAttributeHandler | null = null;
+    export let onEditSet: EditSetHandler | null = null;
 
     $: elementName = editInfoContent?.object?.element ?? "";
     $: attributes = {
@@ -79,12 +79,12 @@
     function emitTextEdit(attValue: string, commit: boolean) {
         const elementId = editInfoContent?.object?.id ?? null;
         if (!elementId) return;
-        const param: EditActionParamSet = {
+        const param: EditActionSetParam = {
             elementId,
             attribute: "text",
             value: attValue,
         };
-        onEditAttribute?.(param, commit);
+        onEditSet?.(param, commit);
     }
 
     function handleTextInput(event: Event) {
@@ -123,7 +123,7 @@
                     attributeType={typeFor(name)}
                     readOnly={isReadOnly(name)}
                     customOptions={customOptionsFor(name)}
-                    onEditAttribute={onEditAttribute}
+                    onEditAttribute={onEditSet}
                 />
             {/each}
             <tr>
@@ -147,7 +147,7 @@
                         attributeType={typeFor(name)}
                         readOnly={isReadOnly(name)}
                         customOptions={customOptionsFor(name)}
-                        onEditAttribute={onEditAttribute}
+                        onEditAttribute={onEditSet}
                     />
                 {/each}
                 <tr>
@@ -172,7 +172,7 @@
                         attributeType={typeFor(name)}
                         readOnly={isReadOnly(name)}
                         customOptions={customOptionsFor(name)}
-                        onEditAttribute={onEditAttribute}
+                        onEditAttribute={onEditSet}
                     />
                 {/each}
             </tbody>

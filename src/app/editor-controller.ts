@@ -1,5 +1,5 @@
 import { get, type Writable } from "svelte/store";
-import type { EditActionParamSet, EditInfoContent, EditorAction, SelectionInfo, ViewModel } from "./types";
+import type { EditActionSetParam, EditInfoContent, EditAction, SelectionInfo, ViewModel } from "./types";
 import type { VerovioOptions } from "./worker/verovio-types";
 import { createWorkerBridge, type WorkerBridge } from "./worker/bridge";
 
@@ -148,11 +148,11 @@ export class EditorController {
             await this.setCurrentPage(page);
         }
         try {
-            const editorAction: EditorAction = {
+            const editAction: EditAction = {
                 action: "context",
                 param: { elementId: id },
             };
-            const contextOk = await this.bridge.verovio.edit(editorAction);
+            const contextOk = await this.bridge.verovio.edit(editAction);
             if (contextOk) {
                 this.stores.editInfoContent.set(await this.bridge.verovio.editInfo() as EditInfoContent);
             } else {
@@ -168,10 +168,10 @@ export class EditorController {
         });
     }
 
-    async handleAttributeEdit(param: EditActionParamSet, commit: boolean): Promise<void> {
+    async handleAttributeEdit(param: EditActionSetParam, commit: boolean): Promise<void> {
         this.stores.workerBusy.set(true);
         try {
-            const editorAction: EditorAction = {
+            const editorAction: EditAction = {
                 action: "set",
                 param,
             };

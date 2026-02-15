@@ -2,7 +2,7 @@ export type Mode = 'edit' | 'insert';
 
 export type SelectElementHandler = (id: string) => void;
 export type HoverElementHandler = (id: string | null) => void;
-export type EditAttributeHandler = (param: EditActionParamSet, commit: boolean) => void;
+export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) => void;
 export type ActionHandler = () => void;
 
 export interface SelectionInfo {
@@ -51,13 +51,13 @@ export interface EditInfoContent {
     referringElements: ReferenceObject[];
 }
 
-export type EditActionParamSet = {
+export type EditActionSetParam = {
     elementId: string;
     attribute: string;
     value: string;
 };
 
-export type EditorAction = {
+export type EditAction = {
     action: "commit" | "context" | "set";
-    param?: EditActionParamSet | {};
+    param?: EditActionSetParam | {};
 };

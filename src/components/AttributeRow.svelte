@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { EditActionParamSet, EditAttributeHandler } from "../app/types";
+    import type { EditActionSetParam, EditActionSetHandler } from "../app/types";
 
     export let elementId: string | null = null;
     export let name: string;
@@ -9,7 +9,7 @@
     export let readOnly = false;
     export let customOptions: string[] | null = null;
     export let attributeType: string | null = null;
-    export let onEditAttribute: EditAttributeHandler | null = null;
+    export let onEditAttribute: EditActionSetHandler | null = null;
 
     $: filteredAll = optionsAll && optionsBasic
         ? optionsAll.filter((opt) => !optionsBasic.includes(opt))
@@ -27,7 +27,7 @@
 
     function emitEdit(attValue: string, commit: boolean) {
         if (!elementId) return;
-        const param: EditActionParamSet = {
+        const param: EditActionSetParam = {
             elementId,
             attribute: name,
             value: attValue,

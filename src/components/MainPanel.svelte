@@ -1,13 +1,13 @@
 <script lang="ts">
     import { onDestroy, onMount, tick } from "svelte";
     import SidePanel from "./SidePanel.svelte";
-    import type { EditActionParamSet, EditAttributeHandler, EditInfoContent, SelectElementHandler, ViewModel } from "../app/types";
+    import type { EditActionSetParam, EditActionSetHandler, EditInfoContent, SelectElementHandler, ViewModel } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
     export let view: ViewModel;
     export let onResize: (size: { width: number; height: number }) => void;
     export let onElementSelect: SelectElementHandler | null = null;
-    export let onAttributeEdit: EditAttributeHandler | null = null;
+    export let onAttributeEdit: EditActionSetHandler | null = null;
     export let editInfoContent: EditInfoContent| null = null;
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
@@ -20,7 +20,7 @@
         highlightHover(id);
     }
 
-    function handleEditAttribute(param: EditActionParamSet, commit: boolean) {
+    function handleEditAttribute(param: EditActionSetParam, commit: boolean) {
         onAttributeEdit?.(param, commit);
     }
 
