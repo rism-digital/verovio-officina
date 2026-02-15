@@ -3,6 +3,7 @@
     import AttributeList from "./AttributeList.svelte";
     import ElementReference from "./ElementReference.svelte";
     import Tree from "./Tree.svelte";
+    import { selection } from "../app/state";
     import type { AttributeEdit, EditInfoContent } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
@@ -55,7 +56,7 @@
         <Tree
             ancestors={editInfoContent?.ancestors ?? null}
             context={editInfoContent?.context ?? null}
-            selectedId={editInfoContent?.object?.id ?? null}
+            selectedId={$selection.id ?? null}
             on:selectElement={forwardSelect}
             on:hoverElement={forwardHover}
         />
