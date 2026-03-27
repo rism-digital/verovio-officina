@@ -34,37 +34,37 @@
         </div>
     </div>
     <div class="vrv-btn-group">
-        <div class="vrv-h-separator" />
+        <div class="vrv-h-separator"></div>
         <div
             class:disabled={!canGoPrev}
             class="vrv-btn-icon-left"
             style="background-image: url('/icons/toolbar/arrow-left.png');"
             data-before="Previous"
             on:click={() => onPrevPage?.()}
-        />
+        ></div>
         <div
             class:disabled={!canGoNext}
             class="vrv-btn-icon"
             style="background-image: url('/icons/toolbar/arrow-right.png');"
             data-before="Next"
             on:click={() => onNextPage?.()}
-        />
+        ></div>
     </div>
     <div class="vrv-btn-group">
-        <div class="vrv-h-separator" />
+        <div class="vrv-h-separator"></div>
         <div
             class:disabled={!canZoom || !canZoomOut}
             class="vrv-btn-icon-left"
             style="background-image: url('/icons/toolbar/zoom-out.png');"
             data-before="Zoom out"
             on:click={() => onZoomOut?.()}
-        />
+        ></div>
         <div
             class:disabled={!canZoom || !canZoomIn}
             class="vrv-btn-icon"
             style="background-image: url('/icons/toolbar/zoom-in.png');"
             data-before="Zoom in"
             on:click={() => onZoomIn?.()}
-        />
+        ></div>
     </div>
 </nav>
