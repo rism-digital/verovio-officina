@@ -20,6 +20,7 @@ type ControllerStores = {
     workerBusy: Writable<boolean>;
     dirty: Writable<boolean>;
     editInfoContent: Writable<EditInfoContent | null>;
+    isMensuralMusicOnly: Writable<boolean>;
 };
 
 export class EditorController {
@@ -28,6 +29,23 @@ export class EditorController {
     private readonly stores: ControllerStores;
     private lastLayoutSize = { width: 0, height: 0 };
     private svgRenderId = 0;
+    private verovioOptions: VerovioOptions = {
+        adjustPageHeight: false,
+        adjustPageWidth: false,
+        breaks: "auto",
+        footer: "auto",
+        justifyVertically: false,
+        mensuralResponsiveView: "none",
+        pageHeight: 0,
+        pageWidth: 0,
+        pageMarginLeft: 50,
+        pageMarginRight: 50,
+        pageMarginTop: 50,
+        pageMarginBottom: 50,
+        scale: 100,
+        scaleToPageSize: true,
+        xmlIdSeed: 1,
+    };
 
     constructor(workerUrl: URL, stores: ControllerStores) {
         this.worker = new Worker(workerUrl, { type: "classic" });
@@ -85,16 +103,30 @@ export class EditorController {
 
     async loadData(data: string): Promise<void> {
         this.stores.workerBusy.set(true);
+        this.stores.isMensuralMusicOnly.set(false);
+        this.updateVerovioOptions({ adjustPageHeight: true });
         this.stores.verovioState.update((current) => ({
             ...current,
             currentPage: 1,
             pageCount: 0,
         }));
         if (this.hasLayoutSize()) {
-            const options = this.buildVerovioOptions(this.lastLayoutSize);
-            await this.bridge.verovio.setOptions(options);
+            this.updateOptionsForSize(this.lastLayoutSize);
+            await this.applyCurrentOptions();
         }
         await this.bridge.verovio.loadData(data);
+        const editInfo = await this.bridge.verovio.editInfo();
+        const isMensuralMusicOnly = editInfo.isMensuralMusicOnly;
+        this.stores.isMensuralMusicOnly.set(isMensuralMusicOnly);
+        this.updateVerovioOptions({
+            adjustPageHeight: !isMensuralMusicOnly,
+            breaks: isMensuralMusicOnly ? "none" : "auto",
+        });
+        await this.applyCurrentOptions();
+        // Reload with adjustPageHeight set to false
+        if (isMensuralMusicOnly) {
+            await this.bridge.verovio.loadData(data);
+        }
         const pageCount = await this.bridge.verovio.getPageCount();
         this.stores.verovioState.update((current) => ({ ...current, pageCount }));
         await this.updateVerovioView();
@@ -106,8 +138,8 @@ export class EditorController {
         const current = get(this.stores.viewModel);
         if (!current.svg) return;
         this.stores.workerBusy.set(true);
-        const options = this.buildVerovioOptions(size);
-        await this.bridge.verovio.setOptions(options);
+        this.updateOptionsForSize(size);
+        await this.applyCurrentOptions();
         await this.bridge.verovio.redoLayout();
         const pageCount = await this.bridge.verovio.getPageCount();
         this.stores.verovioState.update((current) => ({ ...current, pageCount }));
@@ -138,7 +170,9 @@ export class EditorController {
             param: { elementId: current.id },
         });
         if (contextOk) {
-            this.stores.editInfoContent.set(await this.bridge.verovio.editInfo() as EditInfoContent);
+            this.stores.editInfoContent.set(
+                await this.bridge.verovio.editInfoContent(),
+            );
         } else {
             this.stores.editInfoContent.set(null);
         }
@@ -161,7 +195,9 @@ export class EditorController {
             };
             const contextOk = await this.bridge.verovio.edit(editAction);
             if (contextOk) {
-                this.stores.editInfoContent.set(await this.bridge.verovio.editInfo() as EditInfoContent);
+                this.stores.editInfoContent.set(
+                    await this.bridge.verovio.editInfoContent(),
+                );
             } else {
                 this.stores.editInfoContent.set(null);
             }
@@ -184,7 +220,9 @@ export class EditorController {
             };
             const ok = await this.bridge.verovio.edit(editorAction);
             if (ok) {
-                this.stores.editInfoContent.set(await this.bridge.verovio.editInfo() as EditInfoContent);
+                this.stores.editInfoContent.set(
+                    await this.bridge.verovio.editInfoContent(),
+                );
                 await this.applyEditLayout(commit);
                 if (commit) {
                     await this.refreshContextFromSelection();
@@ -257,24 +295,23 @@ export class EditorController {
         return Math.min(200, Math.max(10, Math.floor(value)));
     }
 
-    private buildVerovioOptions(size: { width: number; height: number }): VerovioOptions {
+    private updateVerovioOptions(patch: Partial<VerovioOptions>): void {
+        this.verovioOptions = {
+            ...this.verovioOptions,
+            ...patch,
+        };
+    }
+
+    private updateOptionsForSize(size: { width: number; height: number }): void {
         const { zoom } = get(this.stores.verovioState);
-        return {
-            adjustPageHeight: false,
-            adjustPageWidth: false,
-            breaks: "auto",
-            footer: "auto",
-            justifyVertically: false,
-            mensuralResponsiveView: "auto",
+        this.updateVerovioOptions({
             pageHeight: Math.max(0, Math.floor(size.height)),
             pageWidth: Math.max(0, Math.floor(size.width)),
-            pageMarginLeft: 50,
-            pageMarginRight: 50,
-            pageMarginTop: 50,
-            pageMarginBottom: 50,
             scale: this.clampZoom(zoom),
-            scaleToPageSize: true,
-            xmlIdSeed: 1,
-        };
+        });
+    }
+
+    private async applyCurrentOptions(): Promise<void> {
+        await this.bridge.verovio.setOptions(this.verovioOptions);
     }
 }

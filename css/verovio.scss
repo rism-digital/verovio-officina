@@ -172,14 +172,17 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             position: relative;
             flex: 1 1 auto;
             min-height: 0;
+            overflow-x: auto;
+            overflow-y: auto;
 
             .vrv-svg-wrapper,
             .vrv-svg-overlay {
+                inset: 0;
                 svg {
                     float: left;
                 }
 
-                overflow: auto;
+                overflow: visible;
                 position: absolute;
 
                 text {

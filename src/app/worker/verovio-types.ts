@@ -4,11 +4,11 @@ export type VerovioOptions = {
     adjustPageHeight: boolean;
     adjustPageWidth: boolean;
     appXPathQuery?: Array<string>;
-    breaks: string;
+    breaks: "auto" | "encoded" | "none";
     choiceXPathQuery?: Array<string>;
     footer: string;
     justifyVertically: boolean;
-    mensuralResponsiveView: string;
+    mensuralResponsiveView: "none" | "auto";
     pageHeight: number;
     pageWidth: number;
     pageMarginLeft: number;
@@ -22,7 +22,8 @@ export type VerovioOptions = {
 
 export type VerovioToolkit = {
     edit: (editorAction: EditAction) => boolean;
-    editInfo: () => EditInfo | EditInfoContent;
+    editInfo: () => EditInfo;
+    editInfoContent: () => EditInfoContent;
     getAvailableOptions: () => string;
     getDefaultOptions: () => string;
     getElementAttr: (id: string) => string;
@@ -43,6 +44,11 @@ export type VerovioToolkit = {
     getVersion: () => string;
     onRuntimeInitialized: () => void;
 };
+
+// Mapping for verovio calls to the same method returning different types
+export const VEROVIO_METHOD_ALIASES = {
+    editInfoContent: "editInfo",
+} as const;
 
 export interface Options {
     adjustPageHeight: boolean;

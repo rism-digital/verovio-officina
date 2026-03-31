@@ -1,4 +1,7 @@
-import type { VerovioToolkit } from "./verovio-types";
+import {
+    VEROVIO_METHOD_ALIASES,
+    type VerovioToolkit,
+} from "./verovio-types";
 
 export type VerovioInitMessage = {
     verovioUrl: string;
@@ -23,6 +26,7 @@ export type WorkerResponse = {
 let seq = 0;
 
 type VerovioMethod = keyof VerovioToolkit;
+type VerovioMethodAliases = Partial<Record<VerovioMethod, string>>;
 
 export type WorkerBridge = {
     init: (verovioUrl: string) => Promise<void>;
@@ -35,7 +39,10 @@ export type WorkerBridge = {
     };
 };
 
-export function createWorkerBridge(worker: Worker): WorkerBridge {
+export function createWorkerBridge(
+    worker: Worker,
+    methodAliases: VerovioMethodAliases = VEROVIO_METHOD_ALIASES,
+): WorkerBridge {
     const pending = new Map<
         string,
         { resolve: (value: any) => void; reject: (err: Error) => void }
@@ -54,7 +61,12 @@ export function createWorkerBridge(worker: Worker): WorkerBridge {
         args?: Parameters<VerovioToolkit[M]>
     ): Promise<ReturnType<VerovioToolkit[M]>> {
         const taskId = `task_${seq++}`;
-        const payload: VerovioRequest = { taskId, method: String(method), args };
+        const originalMethod = methodAliases[method] ?? String(method);
+        const payload: VerovioRequest = {
+            taskId,
+            method: originalMethod,
+            args,
+        };
         return new Promise((resolve, reject) => {
             pending.set(taskId, { resolve, reject });
             worker.postMessage(payload as WorkerRequest);

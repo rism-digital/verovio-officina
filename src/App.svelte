@@ -18,6 +18,7 @@
         mode,
         selection,
         statusLine,
+        isMensuralMusicOnly,
         verovioState,
         viewModel,
         workerBusy,
@@ -48,11 +49,10 @@
     let xmlReloadDialogOpen = false;
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
     let xmlInitialContent = "";
-    let ABOUT_LIBRARIES_HTML = "";
 
-    $: ABOUT_LIBRARIES_HTML = `Libraries used in this application:\n\n\
+    const ABOUT_LIBRARIES_HTML = `Libraries used in this application:\n\n\
 * [html-midi-player](https://github.com/cifkao/html-midi-player)\n\
-* [marked](https://marked.js.org/)\n\\n`;
+* [marked](https://marked.js.org/)\n\n`;
     const ABOUT_LICENSE_URL =
         "https://raw.githubusercontent.com/rism-digital/verovio-editor/refs/heads/main/LICENSE";
     const ABOUT_CHANGELOG_URL =
@@ -83,6 +83,7 @@
             workerBusy,
             dirty,
             editInfoContent,
+            isMensuralMusicOnly,
         },
     );
 
