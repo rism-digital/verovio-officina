@@ -64,6 +64,6 @@ export type EditActionSetParam = {
 };
 
 export type EditAction = {
-    action: "commit" | "context" | "set";
-    param?: EditActionSetParam | {};
+    action: "commit" | "context" | "properties" | "set";
+    param?: EditActionSetParam | Record<string, unknown>;
 };

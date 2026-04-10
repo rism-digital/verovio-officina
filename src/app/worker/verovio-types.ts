@@ -1,4 +1,4 @@
-import type { EditInfo, EditInfoContent, EditAction, MEIExportOptions } from "../types";
+import type { EditInfo, EditInfoContent, EditAction, MEIExportOptions, TreeNodeData } from "../types";
 
 export type VerovioOptions = {
     adjustPageHeight: boolean;
@@ -24,6 +24,7 @@ export type VerovioToolkit = {
     edit: (editorAction: EditAction) => boolean;
     editInfo: () => EditInfo;
     editInfoContent: () => EditInfoContent;
+    editInfoScoreDef: () => TreeNodeData;
     getAvailableOptions: () => string;
     getDefaultOptions: () => string;
     getElementAttr: (id: string) => string;
@@ -48,6 +49,7 @@ export type VerovioToolkit = {
 // Mapping for verovio calls to the same method returning different types
 export const VEROVIO_METHOD_ALIASES = {
     editInfoContent: "editInfo",
+    editInfoScoreDef: "editInfo",
 } as const;
 
 export interface Options {

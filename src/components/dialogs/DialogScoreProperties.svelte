@@ -1,30 +1,75 @@
 <script lang="ts">
-    import type { EditInfoContent, TreeNodeData } from "../../app/types";
+    import type { TreeNodeData } from "../../app/types";
+    import Tree from "../Tree.svelte";
     import Dialog from "./Dialog.svelte";
 
     export let open = false;
     export let title = "Score properties";
-    export let editInfoContent: EditInfoContent | null = null;
+    export let scoreDef: TreeNodeData | null = null;
+    export let onConfirm: ((scoreDef: TreeNodeData | null, edited: boolean) => void) | null = null;
     export let onOk: (() => void) | null = null;
     export let onCancel: (() => void) | null = null;
     export let onClose: (() => void) | null = null;
 
     let selectedNodeId: string | null = null;
+    let localScoreDef: TreeNodeData | null = null;
+    let initialSerializedScoreDef = "";
 
-    function uniqueNodes(nodes: TreeNodeData[]): TreeNodeData[] {
-        const seen = new Set<string>();
-        const result: TreeNodeData[] = [];
-        for (const node of nodes) {
-            if (!node?.id || seen.has(node.id)) continue;
-            seen.add(node.id);
-            result.push(node);
+    function findNodeById(node: TreeNodeData | null, id: string | null): TreeNodeData | null {
+        if (!node || !id) return null;
+        if (node.id === id) return node;
+        for (const child of node.children ?? []) {
+            const found = findNodeById(child, id);
+            if (found) return found;
         }
-        return result;
+        return null;
     }
 
-    function formatNodeLabel(node: TreeNodeData): string {
-        const n = node.attributes?.["n"];
-        return n ? `${node.element} ${String(n)}` : node.element;
+    function handleTreeSelect(id: string) {
+        selectedNodeId = id;
+    }
+
+    function cloneScoreDef(node: TreeNodeData | null): TreeNodeData | null {
+        if (!node) return null;
+        return JSON.parse(JSON.stringify(node)) as TreeNodeData;
+    }
+
+    function serializeScoreDef(node: TreeNodeData | null): string {
+        if (!node) return "";
+        return JSON.stringify(node);
+    }
+
+    function replaceNodeById(
+        node: TreeNodeData | null,
+        id: string | null,
+        updater: (node: TreeNodeData) => TreeNodeData,
+    ): TreeNodeData | null {
+        if (!node || !id) return node;
+        if (node.id === id) return updater(node);
+        if (!node.children?.length) return node;
+        return {
+            ...node,
+            children: node.children.map((child) =>
+                replaceNodeById(child, id, updater) as TreeNodeData,
+            ),
+        };
+    }
+
+    function updateSelectedAttribute(name: string, value: string) {
+        localScoreDef = replaceNodeById(localScoreDef, selectedNodeId, (node) => ({
+            ...node,
+            attributes: {
+                ...(node.attributes ?? {}),
+                [name]: value,
+            },
+        }));
+    }
+
+    function updateSelectedText(value: string) {
+        localScoreDef = replaceNodeById(localScoreDef, selectedNodeId, (node) => ({
+            ...node,
+            text: value,
+        }));
     }
 
     function normalizeAttributes(node: TreeNodeData | null): Record<string, string> {
@@ -37,28 +82,29 @@
         );
     }
 
-    $: nodes = editInfoContent
-        ? uniqueNodes([
-            ...editInfoContent.ancestors,
-            editInfoContent.context,
-            editInfoContent.object,
-        ])
-        : [];
-    $: selectedNode =
-        nodes.find((node) => node.id === selectedNodeId) ?? nodes[nodes.length - 1] ?? null;
+    $: ancestors = [];
+    $: selectedNode = findNodeById(localScoreDef, selectedNodeId) ?? localScoreDef;
     $: selectedAttributes = normalizeAttributes(selectedNode);
     $: selectedText =
         selectedNode?.text == null || selectedNode.text === ""
             ? ""
             : String(selectedNode.text);
+    $: isEdited = serializeScoreDef(localScoreDef) !== initialSerializedScoreDef;
 
     $: if (!open) {
         selectedNodeId = null;
-    } else if (nodes.length > 0 && !nodes.some((node) => node.id === selectedNodeId)) {
-        selectedNodeId = nodes[nodes.length - 1].id;
+        localScoreDef = null;
+        initialSerializedScoreDef = "";
+    } else if (!localScoreDef && scoreDef) {
+        localScoreDef = cloneScoreDef(scoreDef);
+        initialSerializedScoreDef = serializeScoreDef(localScoreDef);
+        selectedNodeId = localScoreDef?.id ?? null;
+    } else if (localScoreDef && !findNodeById(localScoreDef, selectedNodeId)) {
+        selectedNodeId = localScoreDef.id;
     }
 
     function handleOk() {
+        onConfirm?.(localScoreDef, isEdited);
         onOk?.();
         onClose?.();
     }
@@ -68,11 +114,6 @@
         onClose?.();
     }
 
-    function handleRowKeydown(event: KeyboardEvent, nodeId: string) {
-        if (event.key !== "Enter" && event.key !== " ") return;
-        event.preventDefault();
-        selectedNodeId = nodeId;
-    }
 </script>
 
 <Dialog
@@ -88,20 +129,15 @@
         <div class="vrv-dialog-score-props-column">
             <div class="vrv-dialog-score-props-title">Score structure</div>
             <div class="vrv-dialog-score-props-panel">
-                {#if nodes.length === 0}
+                {#if !localScoreDef}
                     <div>No score element selected.</div>
                 {:else}
-                    {#each nodes as node}
-                        <div
-                            class="vrv-dialog-score-tree-row {selectedNodeId === node.id ? 'selected' : ''}"
-                            role="button"
-                            tabindex="0"
-                            on:click={() => (selectedNodeId = node.id)}
-                            on:keydown={(event) => handleRowKeydown(event, node.id)}
-                        >
-                            {formatNodeLabel(node)}
-                        </div>
-                    {/each}
+                    <Tree
+                        {ancestors}
+                        context={localScoreDef}
+                        selectedId={selectedNodeId}
+                        onSelectElement={handleTreeSelect}
+                    />
                 {/if}
             </div>
         </div>
@@ -122,13 +158,22 @@
                             <input
                                 class="vrv-dialog-input"
                                 value={selectedText}
-                                disabled
+                                on:input={(event) =>
+                                    updateSelectedText((event.target as HTMLInputElement).value)}
                             />
                         {/if}
 
                         {#each Object.entries(selectedAttributes) as [name, value]}
                             <div class="vrv-dialog-label">{name}</div>
-                            <input class="vrv-dialog-input" value={value} disabled />
+                            <input
+                                class="vrv-dialog-input"
+                                value={value}
+                                on:input={(event) =>
+                                    updateSelectedAttribute(
+                                        name,
+                                        (event.target as HTMLInputElement).value,
+                                    )}
+                            />
                         {/each}
                     </div>
                 {:else}

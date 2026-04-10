@@ -605,8 +605,9 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             flex-direction: column;
 
             &.vrv-dialog-score-properties {
-                min-height: 60vh;
-                max-height: 80vh;
+                height: 75vh;
+                min-height: 75vh;
+                max-height: 75vh;
             }
 
             .vrv-dialog-btn {
@@ -718,8 +719,10 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
 
             &.vrv-dialog-score-properties {
                 .vrv-dialog-content {
+                    display: flex;
                     flex: 1 1 auto;
-                    overflow: auto;
+                    min-height: 0;
+                    overflow: hidden;
                 }
             }
 
@@ -1051,8 +1054,9 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             display: grid;
             grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
             gap: 12px;
-            min-height: 260px;
             height: 100%;
+            min-height: 0;
+            overflow: hidden;
         }
 
         &-column {
@@ -1074,7 +1078,8 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             background: $dialog-color;
             border: 1px solid $background-border;
             padding: 8px;
-            overflow: auto;
+            overflow-y: auto;
+            overflow-x: auto;
             flex: 1 1 auto;
             min-height: 0;
             min-width: 0;
@@ -1281,7 +1286,6 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
 
         .vrv-node-label.checked::after {
             content: url(../icons/editor/star-red.png);
-            vertical-align: middle;
             margin-left: 6px;
         }
 

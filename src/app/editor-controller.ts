@@ -5,6 +5,7 @@ import type {
     EditAction,
     MEIExportOptions,
     SelectionInfo,
+    TreeNodeData,
     ViewModel,
 } from "./types";
 import type { VerovioOptions } from "./worker/verovio-types";
@@ -175,6 +176,49 @@ export class EditorController {
             );
         } else {
             this.stores.editInfoContent.set(null);
+        }
+    }
+
+    async getScoreDefForDialog(): Promise<TreeNodeData | null> {
+        this.stores.workerBusy.set(true);
+        try {
+            const scoreDefContextOk = await this.bridge.verovio.edit({
+                action: "properties",
+                param: {},
+            });
+            if (!scoreDefContextOk) {
+                this.stores.workerBusy.set(false);
+                return null;
+            }
+            const scoreDef = await this.bridge.verovio.editInfoScoreDef();
+            this.stores.workerBusy.set(false);
+            return scoreDef;
+        } catch (error) {
+            console.error("Failed to load scoreDef", error);
+            this.stores.workerBusy.set(false);
+            return null;
+        }
+    }
+
+    async applyScoreDefFromDialog(scoreDef: TreeNodeData): Promise<boolean> {
+        this.stores.workerBusy.set(true);
+        let scoreDefStr = (scoreDef ? JSON.stringify(scoreDef) : "");
+        try {
+            let ok = await this.bridge.verovio.edit({
+                action: "properties",
+                param: { scoreDef: scoreDefStr },
+            });
+            if (!ok) {
+                this.stores.workerBusy.set(false);
+                return false;
+            }
+            await this.applyEditLayout(true);
+            await this.refreshContextFromSelection();
+            return true;
+        } catch (error) {
+            console.error("Failed to apply scoreDef", error);
+            this.stores.workerBusy.set(false);
+            return false;
         }
     }
 

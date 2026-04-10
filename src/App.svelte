@@ -12,7 +12,7 @@
     import StatusBar from "./components/StatusBar.svelte";
     import { EditorController } from "./app/editor-controller";
     import { RNGLoader } from "./app/rng-loader";
-    import type { MEIExportOptions } from "./app/types";
+    import type { MEIExportOptions, TreeNodeData } from "./app/types";
     import {
         dirty,
         editInfoContent,
@@ -26,7 +26,8 @@
     } from "./app/state";
 
     const VEROVIO_URL =
-        "https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js";
+        //"https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js";
+        "http://localhost:8001/build/verovio-toolkit-wasm.js";
     const MEI_ALL_SCHEMA_URL =
         "https://music-encoding.org/schema/5.1/mei-all.rng";
     const MEI_BASIC_SCHEMA_URL =
@@ -48,6 +49,7 @@
     let aboutOpen = false;
     let exportDialogOpen = false;
     let scorePropertiesOpen = false;
+    let dialogScoreDef: TreeNodeData | null = null;
     let xmlReloadDialogOpen = false;
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
     let xmlInitialContent = "";
@@ -239,16 +241,35 @@
         aboutOpen = true;
     }
 
-    function openScorePropertiesDialog() {
+    async function openScorePropertiesDialog() {
+        const scoreDef = await controller.getScoreDefForDialog();
+        if (!scoreDef) {
+            statusLine.set("Failed to load score properties.");
+            return;
+        }
+        dialogScoreDef = scoreDef;
         scorePropertiesOpen = true;
     }
 
     function closeScorePropertiesDialog() {
         scorePropertiesOpen = false;
+        dialogScoreDef = null;
     }
 
-    function confirmScorePropertiesDialog() {
+    async function confirmScorePropertiesDialog(
+        scoreDef: TreeNodeData | null,
+        edited: boolean,
+    ) {
+        if (edited && scoreDef) {
+            const ok = await controller.applyScoreDefFromDialog(scoreDef);
+            if (!ok) {
+                statusLine.set("Failed to apply score properties.");
+                return;
+            }
+            statusLine.set("Applied score properties.");
+        }
         scorePropertiesOpen = false;
+        dialogScoreDef = null;
     }
 </script>
 
@@ -337,8 +358,8 @@
 
     <DialogScoreProperties
         open={scorePropertiesOpen}
-        editInfoContent={$editInfoContent}
-        onOk={confirmScorePropertiesDialog}
+        scoreDef={dialogScoreDef}
+        onConfirm={confirmScorePropertiesDialog}
         onCancel={closeScorePropertiesDialog}
         onClose={closeScorePropertiesDialog}
     />

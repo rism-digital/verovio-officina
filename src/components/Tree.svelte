@@ -44,7 +44,7 @@
 
 <div class="vrv-tree-breadcrumbs-wrapper" bind:this={breadcrumbsWrapper}>
     <div class="vrv-tree-breadcrumbs">
-        <div class="vrv-tree-breadcrumb" />
+        <div class="vrv-tree-breadcrumb"></div>
         {#if ancestors}
             {#each [...ancestors].reverse() as ancestor}
                 <TreeCrumb
