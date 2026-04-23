@@ -30,10 +30,11 @@ export type VerovioToolkit = {
     getElementAttr: (id: string) => string;
     getElementsAtTime: (time: number) => string;
     getLog: () => string;
-    getOptions: () => string;
     getMEI: (options?: MEIExportOptions) => string;
+    getOptions: () => string;
     getPageCount: () => number;
     getPageWithElement: (id: string) => number;
+    getVersion: () => string;
     loadData: (mei: string) => void;
     redoLayout: () => void;
     redoPagePitchPosLayout: () => void;
@@ -42,7 +43,6 @@ export type VerovioToolkit = {
     renderToSVG: (page: number) => string;
     select: (id: string) => string;
     setOptions: (options: VerovioOptions) => void;
-    getVersion: () => string;
     onRuntimeInitialized: () => void;
 };
 
