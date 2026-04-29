@@ -60,7 +60,6 @@ export interface EditInfo {
     canUndo: boolean;
     canRedo: boolean;
     isMensuralMusicOnly: boolean;
-    chainedId: string;
 }
 
 export interface ReferenceObject extends TreeNodeData {

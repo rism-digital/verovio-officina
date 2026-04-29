@@ -289,7 +289,6 @@ export class EditorController {
         this.stores.workerBusy.set(true);
         try {
             const resolvedParam = this.replaceActionPlaceholder(param, context);
-            console.log(resolvedParam);
             const ok = await this.bridge.verovio.edit({
                 action,
                 param: resolvedParam ?? {},
@@ -297,6 +296,13 @@ export class EditorController {
             if (!ok) {
                 this.stores.workerBusy.set(false);
                 return false;
+            }
+            const editInfo = await this.bridge.verovio.editInfo();
+            if (editInfo.chainedId) {
+                await this.setSelection({
+                    type: "element",
+                    id: editInfo.chainedId,
+                });
             }
             await this.updateVerovioView();
             await this.refreshContextFromSelection();
