@@ -60,6 +60,7 @@ export interface EditInfo {
     canUndo: boolean;
     canRedo: boolean;
     isMensuralMusicOnly: boolean;
+    chainedId: string;
 }
 
 export interface ReferenceObject extends TreeNodeData {
@@ -86,6 +87,12 @@ export type EditActionInsertParam = {
     insertMode: "insertAfter" | "appendChild";
 };
 
+export type EditActionInsertControlParam = {
+    elementName: string;
+    startId: string;
+    endId?: string;
+};
+
 export type EditActionCommitParam = Record<string, never>;
 export type EditActionContextParam = {
     elementId: string;
@@ -98,13 +105,14 @@ export type EditActionPropertiesParam =
 
 export type EditActionChainStep = {
     action: "insert" | "set" | "commit";
-    param?: EditActionSetParam | EditActionInsertParam | EditActionCommitParam;
+    param?: EditActionSetParam | EditActionInsertParam | EditActionInsertControlParam| EditActionCommitParam;
 };
 
 export type EditActionChainParam = EditActionChainStep[];
 export type EditActionParam =
     | EditActionSetParam
     | EditActionInsertParam
+    | EditActionInsertControlParam
     | EditActionChainParam
     | EditActionCommitParam
     | EditActionContextParam

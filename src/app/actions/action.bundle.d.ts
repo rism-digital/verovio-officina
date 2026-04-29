@@ -6,7 +6,7 @@ export type ActionCatalogEntry = {
 };
 
 export type ActionDefinition = {
-    action: "insert" | "set" | "commit" | "chain";
+    action: "insert" | "insertControl" | "set" | "commit" | "chain";
     param?: EditActionParam;
 };
 

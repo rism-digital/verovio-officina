@@ -8,6 +8,10 @@ export const actionCatalog = {
             name: "Add articulation",
             action: "add-articulation",
         },
+        {
+            name: "Add ornam",
+            action: "add-ornam",
+        },
     ],
 };
 
@@ -56,6 +60,29 @@ export const actionDefinitions = {
                 },
             },
                         {
+                action: "set",
+                param: {
+                    elementId: "[chained-id]",
+                    attribute: "color",
+                    value: "blue",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+     "add-ornam": {
+        action: "chain",
+        param: [
+            {
+                action: "insertControl",
+                param: {
+                    elementName: "mordent",
+                    startId: "{{targetId}}",
+                },
+            },
+            {
                 action: "set",
                 param: {
                     elementId: "[chained-id]",
