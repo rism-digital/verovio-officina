@@ -117,7 +117,7 @@
 </script>
 
 <div class="vrv-attribute-list-wrapper">
-    {#if editInfoContent?.object && editInfoContent.object.text}
+    {#if editInfoContent?.object && editInfoContent.object.element === "text"}
         <input
             class="vrv-form-input"
             data-att-name="text"

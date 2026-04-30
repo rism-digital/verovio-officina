@@ -197,6 +197,14 @@ export const actionDefinitions = {
                 },
             },
             {
+                action: "set",
+                param: {
+                    elementId: "[chained-id]",
+                    attribute: "text",
+                    value: "1",
+                },
+            },
+            {
                 action: "commit",
             },
         ],
