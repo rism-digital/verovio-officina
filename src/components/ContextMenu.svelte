@@ -106,7 +106,7 @@
 
 <div
     class="vrv-context-menu open vrv-text-no-select"
-    style={`left: ${x}px; top: ${y}px;`}
+    style={`left: ${x}px; top: ${y}px; display: flex;`}
     role="menu"
     tabindex="-1"
     on:click|stopPropagation

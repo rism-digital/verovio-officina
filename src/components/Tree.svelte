@@ -58,7 +58,7 @@
     function openContextMenu(
         node: TreeNodeData,
         parentElement: string | null,
-        event: MouseEvent,
+        event: MouseEvent | PointerEvent,
     ) {
         contextMenu = {
             x: event.clientX,
@@ -70,15 +70,6 @@
 
     function closeContextMenu() {
         contextMenu = null;
-    }
-
-    function closeContextMenuOnClick(node: HTMLElement) {
-        node.addEventListener("click", closeContextMenu, { capture: true });
-        return {
-            destroy() {
-                node.removeEventListener("click", closeContextMenu, { capture: true });
-            },
-        };
     }
 
     function handleContextAction(action: string, label: string, param?: EditActionParam) {
@@ -111,7 +102,7 @@
         {/if}
     </div>
 </div>
-<div class="vrv-tree-root" bind:this={treeRoot} use:closeContextMenuOnClick>
+<div class="vrv-tree-root" bind:this={treeRoot}>
     {#if context}
         <TreeNode
             node={context}

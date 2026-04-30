@@ -8,8 +8,10 @@
     export let selectedId: string | null = null;
     export let onSelect: SelectElementHandler | null = null;
     export let onHover: HoverElementHandler | null = null;
+    type ContextMenuEvent = MouseEvent | PointerEvent;
+
     export let onContextMenu:
-        | ((node: TreeNodeData, parentElement: string | null, event: MouseEvent) => void)
+        | ((node: TreeNodeData, parentElement: string | null, event: ContextMenuEvent) => void)
         | null = null;
 
     let htmlTreeNode: HTMLDivElement | null = null;
@@ -36,7 +38,7 @@
         onHover?.(null);
     }
 
-    function handleContextMenu(event: MouseEvent) {
+    function handleContextMenu(event: ContextMenuEvent) {
         if (isRoot) return;
         event.preventDefault();
         if (node.id !== selectedId) return;
