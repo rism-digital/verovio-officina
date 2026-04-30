@@ -14,7 +14,7 @@
     import { withBaseUrl } from "./app/asset-url";
     import { EditorController } from "./app/editor-controller";
     import { RNGLoader } from "./app/rng-loader";
-    import type { MEIExportOptions, TreeContextAction, TreeNodeData } from "./app/types";
+    import type { EditActionParam, MEIExportOptions, TreeContextAction, TreeNodeData } from "./app/types";
     import {
         dirty,
         editInfoContent,
@@ -257,6 +257,20 @@
         }
     }
 
+    async function handleToolbarContextAction(action: string, label: string, param?: EditActionParam) {
+        const object = $editInfoContent?.object;
+        if (!object?.id || !object.element) return;
+        const parentElement = $editInfoContent?.ancestors?.[0]?.element ?? null;
+        await handleTreeContextAction({
+            action,
+            label,
+            param,
+            targetId: object.id,
+            targetElement: object.element,
+            parentElement,
+        });
+    }
+
     function openAboutDialog() {
         aboutOpen = true;
     }
@@ -291,6 +305,7 @@
         scorePropertiesOpen = false;
         dialogScoreDef = null;
     }
+
 </script>
 
 <input
@@ -335,6 +350,8 @@
         {xmlMode}
         workerBusy={$workerBusy}
         onValidateXml={validateXmlContent}
+        selectedElementName={$editInfoContent?.object?.element ?? null}
+        onContextAction={handleToolbarContextAction}
     />
 
     {#if xmlMode}

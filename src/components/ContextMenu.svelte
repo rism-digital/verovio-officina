@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { ContextMenuItem, EditActionParam } from "../app/types";
-    import { actionCatalog, actionDefinitions } from "../app/actions/action.bundle";
+    import { withBaseUrl } from "../app/asset-url";
+    import { actionCatalog, actionDefinitions, contextButtonBars } from "../app/actions/action.bundle";
 
     export let x = 0;
     export let y = 0;
@@ -26,8 +27,20 @@
     type ResolvedMenuEntry =
         | { kind: "action"; label: string; action: string; param?: EditActionParam }
         | { kind: "submenu"; label: string; items: ResolvedMenuEntry[] };
+    type ContextButtonEntry = {
+        name: string;
+        action: string;
+        icon: string;
+    };
+    type ResolvedContextButton = {
+        label: string;
+        action: ActionDefinition["action"];
+        param?: EditActionParam;
+        iconUrl: string;
+    };
 
     let items: ResolvedMenuEntry[] = [];
+    let buttonBars: ResolvedContextButton[][] = [];
 
     function isActionEntry(entry: ActionCatalogEntry): entry is ActionCatalogActionEntry {
         return "action" in entry;
@@ -63,8 +76,31 @@
         return resolveEntries(entries as ActionCatalogEntry[]);
     }
 
+    function buttonBarsFor(name: string): ResolvedContextButton[][] {
+        const bars = contextButtonBars[name] ?? [];
+        const resolvedBars: ResolvedContextButton[][] = [];
+        for (const bar of bars as ContextButtonEntry[][]) {
+            const resolvedBar: ResolvedContextButton[] = [];
+            for (const button of bar) {
+                const definition = actionDefinitions[button.action];
+                if (!definition) continue;
+                resolvedBar.push({
+                    label: button.name,
+                    action: definition.action,
+                    param: definition.param,
+                    iconUrl: withBaseUrl(button.icon),
+                });
+            }
+            if (resolvedBar.length > 0) {
+                resolvedBars.push(resolvedBar);
+            }
+        }
+        return resolvedBars;
+    }
+
     $: items = actionItemsFor(elementName);
-    $: if (elementName && items.length === 0) close();
+    $: buttonBars = buttonBarsFor(elementName);
+    $: if (elementName && items.length === 0 && buttonBars.length === 0) close();
 
     function close() {
         onClose?.();
@@ -113,6 +149,24 @@
     on:contextmenu|preventDefault|stopPropagation
     on:keydown={handleKeydown}
 >
+    {#if buttonBars.length > 0}
+        <div class="vrv-context-button-bars">
+            {#each buttonBars as bar}
+                <div class="vrv-context-button-bar">
+                    {#each bar as button}
+                        <button
+                            class="vrv-context-icon-btn"
+                            type="button"
+                            title={button.label}
+                            aria-label={button.label}
+                            style={`background-image: url("${button.iconUrl}");`}
+                            on:click={() => handleAction(button.action, button.label, button.param)}
+                        ></button>
+                    {/each}
+                </div>
+            {/each}
+        </div>
+    {/if}
     <div class="vrv-menu-content vrv-context-menu-content">
         {#each items as item}
             {#if item.kind === "action"}

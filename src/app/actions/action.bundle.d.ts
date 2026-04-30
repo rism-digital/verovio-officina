@@ -17,5 +17,12 @@ export type ActionDefinition = {
     param?: EditActionParam;
 };
 
+export type ContextButtonEntry = {
+    name: string;
+    action: string;
+    icon: string;
+};
+
 export const actionCatalog: Record<string, ActionCatalogEntry[]>;
+export const contextButtonBars: Record<string, ContextButtonEntry[][]>;
 export const actionDefinitions: Record<string, ActionDefinition>;
