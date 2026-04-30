@@ -256,6 +256,31 @@ export class EditorController {
         });
     }
 
+    async navigateSelection(direction: 37 | 39): Promise<boolean> {
+        const current = get(this.stores.selection);
+        if (current.type !== "element" || !current.id) return false;
+        this.stores.workerBusy.set(true);
+        try {
+            const ok = await this.bridge.verovio.edit({
+                action: "navigate",
+                param: {
+                    elementId: current.id,
+                    direction,
+                },
+            });
+            if (!ok) return false;
+            const editInfo = await this.bridge.verovio.editInfo();
+            if (!editInfo.chainedId) return false;
+            await this.handleSelect(editInfo.chainedId);
+            return true;
+        } catch (error) {
+            console.error("Failed to navigate selection", error);
+            return false;
+        } finally {
+            this.stores.workerBusy.set(false);
+        }
+    }
+
     async handleAttributeEdit(param: EditActionSetParam, commit: boolean): Promise<void> {
         this.stores.workerBusy.set(true);
         try {

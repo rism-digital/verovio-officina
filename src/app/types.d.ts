@@ -96,6 +96,10 @@ export type EditActionCommitParam = Record<string, never>;
 export type EditActionContextParam = {
     elementId: string;
 };
+export type EditActionNavigationParam = {
+    elementId: string;
+    direction: number;
+};
 export type EditActionPropertiesParam =
     | Record<string, never>
     | {
@@ -115,6 +119,7 @@ export type EditActionParam =
     | EditActionChainParam
     | EditActionCommitParam
     | EditActionContextParam
+    | EditActionNavigationParam
     | EditActionPropertiesParam;
 
 export type EditAction = {

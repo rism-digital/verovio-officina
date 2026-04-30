@@ -118,9 +118,58 @@
         }
     });
 
+    onMount(() => {
+        window.addEventListener("keydown", handleGlobalKeydown);
+        return () => window.removeEventListener("keydown", handleGlobalKeydown);
+    });
+
     onDestroy(() => {
         controller.destroy();
     });
+
+    function isInteractiveTarget(target: EventTarget | null): boolean {
+        if (!(target instanceof Element)) return false;
+        return Boolean(
+            target.closest(
+                "input, textarea, select, button, a[href], [contenteditable], [role='button'], [role='menuitem']",
+            ),
+        );
+    }
+
+    function isDialogOpen(): boolean {
+        return (
+            aboutOpen ||
+            exportDialogOpen ||
+            scorePropertiesOpen ||
+            xmlReloadDialogOpen
+        );
+    }
+
+    async function handleGlobalKeydown(event: KeyboardEvent) {
+        const direction = event.key === "ArrowRight"
+            ? 39
+            : event.key === "ArrowLeft"
+                ? 37
+                : null;
+        if (direction === null) return;
+        if (
+            event.defaultPrevented ||
+            event.altKey ||
+            event.ctrlKey ||
+            event.metaKey ||
+            xmlMode ||
+            isDialogOpen() ||
+            isInteractiveTarget(event.target)
+        ) {
+            return;
+        }
+
+        const currentSelection = get(selection);
+        if (currentSelection.type !== "element" || !currentSelection.id) return;
+        event.preventDefault();
+        if (get(workerBusy)) return;
+        await controller.navigateSelection(direction);
+    }
 
     function toggleMode() {
         mode.update((current) => (current === "insert" ? "edit" : "insert"));
