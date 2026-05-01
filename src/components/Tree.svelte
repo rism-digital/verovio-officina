@@ -4,6 +4,7 @@
     import TreeCrumb from "./TreeCrumb.svelte";
     import TreeNode from "./TreeNode.svelte";
     import type {
+        EditActionName,
         EditActionParam,
         HoverElementHandler,
         SelectElementHandler,
@@ -72,7 +73,7 @@
         contextMenu = null;
     }
 
-    function handleContextAction(action: string, label: string, param?: EditActionParam) {
+    function handleContextAction(action: EditActionName, label: string, param?: EditActionParam) {
         const currentContextMenu = contextMenu;
         if (!currentContextMenu) return;
         onContextAction?.({

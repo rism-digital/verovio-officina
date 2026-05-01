@@ -1,12 +1,12 @@
 <script lang="ts">
-    import type { ContextMenuItem, EditActionParam } from "../app/types";
+    import type { ContextMenuItem, EditActionName, EditActionParam } from "../app/types";
     import { withBaseUrl } from "../app/asset-url";
     import { actionCatalog, actionDefinitions, contextButtonBars } from "../app/actions/action.bundle";
 
     export let x = 0;
     export let y = 0;
     export let elementName = "";
-    export let onSelect: ((action: string, label: string, param?: EditActionParam) => void) | null = null;
+    export let onSelect: ((action: EditActionName, label: string, param?: EditActionParam) => void) | null = null;
     export let onClose: (() => void) | null = null;
 
     type ActionCatalogActionEntry = {
@@ -20,12 +20,12 @@
     type ActionCatalogEntry = ActionCatalogActionEntry | ActionCatalogSubmenuEntry;
 
     type ActionDefinition = {
-        action: string;
+        action: EditActionName;
         param?: EditActionParam;
     };
 
     type ResolvedMenuEntry =
-        | { kind: "action"; label: string; action: string; param?: EditActionParam }
+        | { kind: "action"; label: string; action: EditActionName; param?: EditActionParam }
         | { kind: "submenu"; label: string; items: ResolvedMenuEntry[] };
     type ContextButtonEntry = {
         name: string;
@@ -117,13 +117,13 @@
         }
     }
 
-    function handleAction(action: string, label: string, param?: EditActionParam) {
+    function handleAction(action: EditActionName, label: string, param?: EditActionParam) {
         onSelect?.(action, label, param);
     }
 
     function handleActionKeydown(
         event: KeyboardEvent,
-        action: string,
+        action: EditActionName,
         label: string,
         param?: EditActionParam,
     ) {

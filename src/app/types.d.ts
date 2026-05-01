@@ -5,8 +5,18 @@ export type HoverElementHandler = (id: string | null) => void;
 export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) => void;
 export type ActionHandler = () => void;
 
+export type EditActionName =
+    | "insert"
+    | "insertControl"
+    | "set"
+    | "commit"
+    | "chain"
+    | "context"
+    | "properties"
+    | "navigate";
+
 export type TreeContextAction = {
-    action: string;
+    action: EditActionName;
     param?: EditActionParam;
     label: string;
     targetId: string;
@@ -17,7 +27,7 @@ export type TreeContextAction = {
 
 export type TreeContextActionHandler = (action: TreeContextAction) => void;
 
-export type ContextMenuItem<TAction extends string = string> = {
+export type ContextMenuItem<TAction extends EditActionName = EditActionName> = {
     label: string;
     action: TAction;
     param?: EditActionParam;
@@ -108,7 +118,7 @@ export type EditActionPropertiesParam =
     };
 
 export type EditActionChainStep = {
-    action: "insert" | "set" | "commit";
+    action: "insert" | "insertControl" | "set" | "commit";
     param?: EditActionSetParam | EditActionInsertParam | EditActionInsertControlParam| EditActionCommitParam;
 };
 
@@ -124,6 +134,6 @@ export type EditActionParam =
     | EditActionPropertiesParam;
 
 export type EditAction = {
-    action: string;
+    action: EditActionName;
     param?: EditActionParam;
 };

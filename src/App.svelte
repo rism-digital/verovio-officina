@@ -15,7 +15,14 @@
     import { withBaseUrl } from "./app/asset-url";
     import { EditorController } from "./app/editor-controller";
     import { RNGLoader } from "./app/rng-loader";
-    import type { EditActionParam, MEIExportOptions, TreeContextAction, TreeNodeData } from "./app/types";
+    import {
+        beginToolbarAction,
+        DEFAULT_ENTER_VALUE_DIALOG,
+        resolveEnterValueDialog,
+        type EnterValueDialogState,
+        type ToolbarDispatchAction,
+    } from "./app/toolbar-actions";
+    import type { EditActionName, EditActionParam, MEIExportOptions, TreeContextAction, TreeNodeData } from "./app/types";
     import {
         dirty,
         editInfoContent,
@@ -53,13 +60,7 @@
     let scorePropertiesOpen = false;
     let dialogScoreDef: TreeNodeData | null = null;
     let xmlReloadDialogOpen = false;
-    let enterValueDialogOpen = false;
-    let enterValueDialogTitle = "Enter value";
-    let enterValueDialogLabel = "Value";
-    let enterValueDialogDefault = "1";
-    let pendingToolbarActionWithDialog:
-        | { action: string; label: string; param?: EditActionParam; dialog: string; actionKey?: string }
-        | null = null;
+    let enterValueDialogState: EnterValueDialogState | null = null;
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
     let xmlInitialContent = "";
 
@@ -150,9 +151,17 @@
             exportDialogOpen ||
             scorePropertiesOpen ||
             xmlReloadDialogOpen ||
-            enterValueDialogOpen
+            Boolean(enterValueDialogState)
         );
     }
+
+    $: menuInteractionEnabled = !xmlMode && !$workerBusy;
+    $: canMenuZoom = menuInteractionEnabled && $verovioState.pageCount > 0;
+    $: canMenuZoomIn = canMenuZoom && controller.canZoomIn($verovioState.zoom);
+    $: canMenuZoomOut = canMenuZoom && controller.canZoomOut($verovioState.zoom);
+    $: canMenuGoPrev = menuInteractionEnabled && $verovioState.currentPage > 1;
+    $: canMenuGoNext =
+        menuInteractionEnabled && $verovioState.currentPage < $verovioState.pageCount;
 
     async function handleGlobalKeydown(event: KeyboardEvent) {
         const direction = event.key === "ArrowRight"
@@ -298,61 +307,47 @@
         }
     }
 
-    async function dispatchToolbarContextAction(
-        action: string,
-        label: string,
-        param?: EditActionParam,
-        dialogValue?: string,
-    ) {
+    async function dispatchToolbarContextAction(toolbarAction: ToolbarDispatchAction) {
         const object = $editInfoContent?.object;
         if (!object?.id || !object.element) return;
         const parentElement = $editInfoContent?.ancestors?.[0]?.element ?? null;
         await handleTreeContextAction({
-            action,
-            label,
-            param,
+            action: toolbarAction.action,
+            label: toolbarAction.label,
+            param: toolbarAction.param,
             targetId: object.id,
             targetElement: object.element,
             parentElement,
-            dialogValue,
+            dialogValue: toolbarAction.dialogValue,
         });
     }
 
     async function handleToolbarContextAction(
-        action: string,
+        action: EditActionName,
         label: string,
         param?: EditActionParam,
-        actionKey?: string,
+        _actionKey?: string,
         dialog?: string,
     ) {
-        if (dialog === "enter-value") {
-            pendingToolbarActionWithDialog = { action, label, param, dialog, actionKey };
-            enterValueDialogTitle = "Enter value";
-            enterValueDialogLabel = "Value";
-            enterValueDialogDefault = "1";
-            enterValueDialogOpen = true;
+        const next = beginToolbarAction({ action, label, param, dialog });
+        if (next.kind === "prompt") {
+            enterValueDialogState = next.dialogState;
             return;
         }
-        await dispatchToolbarContextAction(action, label, param);
+        await dispatchToolbarContextAction(next.action);
     }
 
     async function confirmEnterValue(value: string) {
-        const pendingAction = pendingToolbarActionWithDialog;
-        enterValueDialogOpen = false;
-        pendingToolbarActionWithDialog = null;
+        const pendingAction = enterValueDialogState;
+        enterValueDialogState = null;
         if (!pendingAction) return;
-        const resolvedValue = value.trim() || enterValueDialogDefault;
         await dispatchToolbarContextAction(
-            pendingAction.action,
-            pendingAction.label,
-            pendingAction.param,
-            resolvedValue,
+            resolveEnterValueDialog(pendingAction, value),
         );
     }
 
     function cancelEnterValue() {
-        enterValueDialogOpen = false;
-        pendingToolbarActionWithDialog = null;
+        enterValueDialogState = null;
     }
 
     function openAboutDialog() {
@@ -413,17 +408,11 @@
             controller.setCurrentPage(get(verovioState).currentPage + 1)}
         onToggleXml={toggleXmlMode}
         onScoreProperties={openScorePropertiesDialog}
-        canZoom={!xmlMode && !$workerBusy && $verovioState.pageCount > 0}
-        canZoomIn={!xmlMode &&
-            !$workerBusy &&
-            controller.canZoomIn($verovioState.zoom)}
-        canZoomOut={!xmlMode &&
-            !$workerBusy &&
-            controller.canZoomOut($verovioState.zoom)}
-        canGoPrev={!xmlMode && !$workerBusy && $verovioState.currentPage > 1}
-        canGoNext={!xmlMode &&
-            !$workerBusy &&
-            $verovioState.currentPage < $verovioState.pageCount}
+        canZoom={canMenuZoom}
+        canZoomIn={canMenuZoomIn}
+        canZoomOut={canMenuZoomOut}
+        canGoPrev={canMenuGoPrev}
+        canGoNext={canMenuGoNext}
         onAbout={openAboutDialog}
         {xmlMode}
     ></Menu>
@@ -494,10 +483,10 @@
     />
 
     <DialogEnterValue
-        open={enterValueDialogOpen}
-        title={enterValueDialogTitle}
-        label={enterValueDialogLabel}
-        value={enterValueDialogDefault}
+        open={Boolean(enterValueDialogState)}
+        title={enterValueDialogState?.title ?? DEFAULT_ENTER_VALUE_DIALOG.title}
+        label={enterValueDialogState?.fieldLabel ?? DEFAULT_ENTER_VALUE_DIALOG.fieldLabel}
+        value={enterValueDialogState?.defaultValue ?? DEFAULT_ENTER_VALUE_DIALOG.defaultValue}
         onConfirm={confirmEnterValue}
         onCancel={cancelEnterValue}
     />

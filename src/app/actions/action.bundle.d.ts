@@ -1,4 +1,4 @@
-import type { EditActionParam } from "../types";
+import type { EditActionName, EditActionParam } from "../types";
 
 export type ActionCatalogActionEntry = {
     name: string;
@@ -13,7 +13,7 @@ export type ActionCatalogSubmenuEntry = {
 export type ActionCatalogEntry = ActionCatalogActionEntry | ActionCatalogSubmenuEntry;
 
 export type ActionDefinition = {
-    action: "insert" | "insertControl" | "set" | "commit" | "chain";
+    action: EditActionName;
     param?: EditActionParam;
 };
 

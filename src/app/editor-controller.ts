@@ -4,6 +4,7 @@ import type {
     EditActionParam,
     EditInfoContent,
     EditAction,
+    EditActionName,
     MEIExportOptions,
     SelectionInfo,
     TreeNodeData,
@@ -261,13 +262,11 @@ export class EditorController {
         if (current.type !== "element" || !current.id) return false;
         this.stores.workerBusy.set(true);
         try {
-            const ok = await this.bridge.verovio.edit({
+            const editAction: EditAction = {
                 action: "navigate",
-                param: {
-                    elementId: current.id,
-                    direction,
-                },
-            });
+                param: { elementId: current.id, direction },
+            };
+            const ok = await this.bridge.verovio.edit(editAction);
             if (!ok) return false;
             const editInfo = await this.bridge.verovio.editInfo();
             if (!editInfo.chainedId) return false;
@@ -307,7 +306,7 @@ export class EditorController {
     }
 
     async handleContextMenuEdit(
-        action: EditAction["action"],
+        action: EditActionName,
         param: EditActionParam | undefined,
         context: {
             targetId: string;

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { withBaseUrl } from "../app/asset-url";
     import { actionDefinitions, contextButtonBars } from "../app/actions/action.bundle";
-    import type { EditActionParam, Mode } from "../app/types";
+    import type { EditActionName, EditActionParam, Mode } from "../app/types";
 
     export let mode: Mode;
     export let onToggleMode: () => void;
@@ -10,7 +10,7 @@
     export let onValidateXml: (() => void) | null = null;
     export let selectedElementName: string | null = null;
     export let onContextAction:
-        | ((action: string, label: string, param?: EditActionParam, actionKey?: string, dialog?: string) => void)
+        | ((action: EditActionName, label: string, param?: EditActionParam, actionKey?: string, dialog?: string) => void)
         | null = null;
 
     const undoIconUrl = withBaseUrl("icons/editor/undo.png");
@@ -25,7 +25,7 @@
     type ResolvedContextButton = {
         actionKey: string;
         label: string;
-        action: string;
+        action: EditActionName;
         param?: EditActionParam;
         dialog?: string;
         iconUrl: string;
