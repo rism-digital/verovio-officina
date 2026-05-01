@@ -158,7 +158,11 @@ export class EditorController {
 
     async applyEditLayout(commit: boolean): Promise<void> {
         if (commit) {
-            await this.bridge.verovio.edit({ action: "commit", param: {} });
+            const editAction: EditAction = {
+                action: "commit",
+                param: {},
+            };
+            await this.bridge.verovio.edit(editAction);
         } else {
             await this.bridge.verovio.redoPagePitchPosLayout();
         }
@@ -168,10 +172,11 @@ export class EditorController {
     async refreshContextFromSelection(): Promise<void> {
         const current = get(this.stores.selection);
         if (current.type !== "element" || !current.id) return;
-        const contextOk = await this.bridge.verovio.edit({
+        const editAction: EditAction = {
             action: "context",
             param: { elementId: current.id },
-        });
+        };
+        const contextOk = await this.bridge.verovio.edit(editAction);
         if (contextOk) {
             this.stores.editInfoContent.set(
                 await this.bridge.verovio.editInfoContent(),
@@ -184,10 +189,11 @@ export class EditorController {
     async getScoreDefForDialog(): Promise<TreeNodeData | null> {
         this.stores.workerBusy.set(true);
         try {
-            const scoreDefContextOk = await this.bridge.verovio.edit({
+            const editAction: EditAction = {
                 action: "properties",
                 param: {},
-            });
+            };
+            const scoreDefContextOk = await this.bridge.verovio.edit(editAction);
             if (!scoreDefContextOk) {
                 this.stores.workerBusy.set(false);
                 return null;
@@ -206,10 +212,11 @@ export class EditorController {
         this.stores.workerBusy.set(true);
         let scoreDefStr = (scoreDef ? JSON.stringify(scoreDef) : "");
         try {
-            let ok = await this.bridge.verovio.edit({
+            const editAction: EditAction = {
                 action: "properties",
                 param: { scoreDef: scoreDefStr },
-            });
+            };
+            const ok = await this.bridge.verovio.edit(editAction);
             if (!ok) {
                 this.stores.workerBusy.set(false);
                 return false;
@@ -318,10 +325,11 @@ export class EditorController {
         this.stores.workerBusy.set(true);
         try {
             const resolvedParam = this.replaceActionPlaceholder(param, context);
-            const ok = await this.bridge.verovio.edit({
+            const editAction: EditAction = {
                 action,
                 param: resolvedParam ?? {},
-            });
+            };
+            const ok = await this.bridge.verovio.edit(editAction);
             if (!ok) {
                 this.stores.workerBusy.set(false);
                 return false;

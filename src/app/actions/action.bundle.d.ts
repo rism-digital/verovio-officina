@@ -1,4 +1,4 @@
-import type { EditActionName, EditActionParam } from "../types";
+import type { EditAction } from "../types";
 
 export type ActionCatalogActionEntry = {
     name: string;
@@ -12,11 +12,6 @@ export type ActionCatalogSubmenuEntry = {
 
 export type ActionCatalogEntry = ActionCatalogActionEntry | ActionCatalogSubmenuEntry;
 
-export type ActionDefinition = {
-    action: EditActionName;
-    param?: EditActionParam;
-};
-
 export type ContextButtonEntry = {
     name: string;
     action: string;
@@ -26,4 +21,4 @@ export type ContextButtonEntry = {
 
 export const actionCatalog: Record<string, ActionCatalogEntry[]>;
 export const contextButtonBars: Record<string, ContextButtonEntry[][]>;
-export const actionDefinitions: Record<string, ActionDefinition>;
+export const actionDefinitions: Record<string, EditAction>;
