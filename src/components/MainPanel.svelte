@@ -52,7 +52,6 @@
         y: number;
         targetId: string;
         targetElement: string;
-        parentElement: string | null;
     } | null = null;
 
     function emitSize(width: number, height: number) {
@@ -242,15 +241,12 @@
             return;
         }
 
-        const parentNode = getClosestMEIElement(node.parentElement);
-        const parentElement = getMEIElementName(parentNode);
         onElementSelect?.(node.id);
         overlayContextMenu = {
             x: event.clientX,
             y: event.clientY,
             targetId: node.id,
             targetElement,
-            parentElement,
         };
     }
 
@@ -261,7 +257,6 @@
             ...action,
             targetId: currentOverlayContextMenu.targetId,
             targetElement: currentOverlayContextMenu.targetElement,
-            parentElement: currentOverlayContextMenu.parentElement,
         });
         closeOverlayContextMenu();
     }

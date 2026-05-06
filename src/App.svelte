@@ -297,7 +297,6 @@
             {
                 targetId: action.targetId,
                 targetElement: action.targetElement,
-                parentElement: action.parentElement,
                 dialogValue: action.dialogValue,
             },
         );
@@ -329,7 +328,6 @@
     async function dispatchToolbarContextAction(toolbarAction: ToolbarDispatchAction) {
         const object = $editInfoContent?.object;
         if (!object?.id || !object.element) return;
-        const parentElement = $editInfoContent?.ancestors?.[0]?.element ?? null;
         await handleTreeContextAction({
             action: toolbarAction.action,
             label: toolbarAction.label,
@@ -337,7 +335,6 @@
             actionKey: toolbarAction.actionKey,
             targetId: object.id,
             targetElement: object.element,
-            parentElement,
             dialogValue: toolbarAction.dialogValue,
         });
     }

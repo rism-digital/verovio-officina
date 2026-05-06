@@ -318,7 +318,6 @@ export class EditorController {
         context: {
             targetId: string;
             targetElement: string;
-            parentElement: string | null;
             dialogValue?: string;
         },
     ): Promise<boolean> {
@@ -357,7 +356,6 @@ export class EditorController {
         context: {
             targetId: string;
             targetElement: string;
-            parentElement: string | null;
             dialogValue?: string;
         },
     ): EditActionParam | undefined {
@@ -365,7 +363,6 @@ export class EditorController {
         const placeholders: Record<string, string> = {
             targetId: context.targetId,
             targetElement: context.targetElement,
-            parentElement: context.parentElement ?? "",
             dialogValue: context.dialogValue ?? "",
         };
         const placeholderPattern = /^\{\{([a-zA-Z0-9_]+)\}\}$/;

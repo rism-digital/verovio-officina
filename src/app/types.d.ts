@@ -27,7 +27,6 @@ export type ContextAction = {
 export type TreeContextAction = ContextAction & {
     targetId: string;
     targetElement: string;
-    parentElement: string | null;
 };
 
 export type TreeContextActionHandler = (action: TreeContextAction) => void;

@@ -24,7 +24,6 @@
         x: number;
         y: number;
         node: TreeNodeData;
-        parentElement: string | null;
     } | null = null;
 
     async function scrollBreadcrumbsToEnd() {
@@ -57,14 +56,12 @@
 
     function openContextMenu(
         node: TreeNodeData,
-        parentElement: string | null,
         event: MouseEvent | PointerEvent,
     ) {
         contextMenu = {
             x: event.clientX,
             y: event.clientY,
             node,
-            parentElement,
         };
     }
 
@@ -79,7 +76,6 @@
             ...action,
             targetId: currentContextMenu.node.id,
             targetElement: currentContextMenu.node.element,
-            parentElement: currentContextMenu.parentElement,
         });
         closeContextMenu();
     }

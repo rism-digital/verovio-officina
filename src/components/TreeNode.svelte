@@ -4,14 +4,13 @@
 
     export let node: TreeNodeData;
     export let isRoot = false;
-    export let parentElement: string | null = null;
     export let selectedId: string | null = null;
     export let onSelect: SelectElementHandler | null = null;
     export let onHover: HoverElementHandler | null = null;
     type ContextMenuEvent = MouseEvent | PointerEvent;
 
     export let onContextMenu:
-        | ((node: TreeNodeData, parentElement: string | null, event: ContextMenuEvent) => void)
+        | ((node: TreeNodeData, event: ContextMenuEvent) => void)
         | null = null;
 
     let htmlTreeNode: HTMLDivElement | null = null;
@@ -43,7 +42,7 @@
         event.preventDefault();
         if (node.id !== selectedId) return;
         event.stopPropagation();
-        onContextMenu?.(node, parentElement, event);
+        onContextMenu?.(node, event);
     }
 </script>
 
@@ -73,7 +72,6 @@
             {#each node.children as child}
                 <svelte:self
                     node={child}
-                    parentElement={node.element}
                     {selectedId}
                     {onSelect}
                     {onHover}
