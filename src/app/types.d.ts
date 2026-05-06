@@ -99,7 +99,7 @@ export type EditActionSetParam = {
 export type EditActionInsertParam = {
     elementName: string;
     elementId: string;
-    insertMode: "insertAfter" | "appendChild";
+    insertMode: "insertAfter" | "inserBefore" | "appendChild" | "appenchChildNoDuplicate";
 };
 
 export type EditActionInsertControlParam = {

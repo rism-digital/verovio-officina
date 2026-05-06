@@ -112,7 +112,7 @@ export const actionDefinitions = {
                 param: {
                     elementName: "accid",
                     elementId: "{{targetId}}",
-                    insertMode: "appendChild",
+                    insertMode: "appendChildNoDuplicate",
                 },
             },
             {
@@ -136,7 +136,7 @@ export const actionDefinitions = {
                 param: {
                     elementName: "accid",
                     elementId: "{{targetId}}",
-                    insertMode: "appendChild",
+                    insertMode: "appendChildNoDuplicate",
                 },
             },
             {
@@ -160,7 +160,7 @@ export const actionDefinitions = {
                 param: {
                     elementName: "accid",
                     elementId: "{{targetId}}",
-                    insertMode: "appendChild",
+                    insertMode: "appendChildNoDuplicate",
                 },
             },
             {
