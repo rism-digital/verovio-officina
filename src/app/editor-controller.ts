@@ -4,8 +4,10 @@ import type {
     EditActionParam,
     EditInfoContent,
     EditAction,
+    EditActionContext,
     EditActionName,
     MEIExportOptions,
+    SelectElementOptions,
     SelectionInfo,
     TreeNodeData,
     ViewModel,
@@ -80,6 +82,22 @@ export class EditorController {
     async setSelection(next: SelectionInfo): Promise<void> {
         this.stores.selection.set(next);
         this.stores.viewModel.update((current) => ({ ...current, selection: next }));
+    }
+
+    async toggleAdditionalSelection(id: string): Promise<void> {
+        const current = get(this.stores.selection);
+        if (current.type !== "element") {
+            await this.handleSelect(id);
+            return;
+        }
+        if (id === current.id) return;
+        const additionalIds = current.additionalIds.includes(id)
+            ? current.additionalIds.filter((additionalId) => additionalId !== id)
+            : [...current.additionalIds, id];
+        await this.setSelection({
+            ...current,
+            additionalIds,
+        });
     }
 
     async updateVerovioView(): Promise<void> {
@@ -231,10 +249,14 @@ export class EditorController {
         }
     }
 
-    async handleSelect(id: string | null): Promise<void> {
+    async handleSelect(id: string | null, options?: SelectElementOptions): Promise<void> {
         if (!id) {
             await this.setSelection({ type: "none" });
             this.stores.editInfoContent.set(null);
+            return;
+        }
+        if (options?.additive) {
+            await this.toggleAdditionalSelection(id);
             return;
         }
         const page = await this.bridge.verovio.getPageWithElement(id);
@@ -261,6 +283,7 @@ export class EditorController {
         await this.setSelection({
             type: "element",
             id,
+            additionalIds: [],
         });
     }
 
@@ -315,11 +338,7 @@ export class EditorController {
     async handleContextMenuEdit(
         action: EditActionName,
         param: EditActionParam | undefined,
-        context: {
-            targetId: string;
-            targetElement: string;
-            dialogValue?: string;
-        },
+        context: EditActionContext,
     ): Promise<boolean> {
         this.stores.workerBusy.set(true);
         try {
@@ -338,6 +357,7 @@ export class EditorController {
                 await this.setSelection({
                     type: "element",
                     id: editInfo.chainedId,
+                    additionalIds: [],
                 });
             }
             await this.updateVerovioView();
@@ -353,16 +373,13 @@ export class EditorController {
 
     private replaceActionPlaceholder(
         param: EditActionParam | undefined,
-        context: {
-            targetId: string;
-            targetElement: string;
-            dialogValue?: string;
-        },
+        context: EditActionContext,
     ): EditActionParam | undefined {
         if (param === undefined) return undefined;
         const placeholders: Record<string, string> = {
             targetId: context.targetId,
             targetElement: context.targetElement,
+            secondaryId: context.secondaryId ?? "",
             dialogValue: context.dialogValue ?? "",
         };
         const placeholderPattern = /^\{\{([a-zA-Z0-9_]+)\}\}$/;

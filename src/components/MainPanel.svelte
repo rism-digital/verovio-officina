@@ -44,7 +44,7 @@
     let lastSize = { width: 0, height: 0 };
     let resizeTimer: ReturnType<typeof setTimeout> | null = null;
     let lastSvgId = 0;
-    let lastSelectedId: string | null = null;
+    let lastHighlightedIds: string[] = [];
     let filterMarkup: string = "";
     let mouseoverId: string = "";
     let overlayContextMenu: {
@@ -166,6 +166,23 @@
         }
     }
 
+    function selectionIds(): string[] {
+        if (view.selection?.type !== "element") return [];
+        return [view.selection.id, ...view.selection.additionalIds];
+    }
+
+    function syncSelectionHighlight() {
+        if (!svgWrapper) return;
+        const nextIds = selectionIds();
+        for (const id of lastHighlightedIds) {
+            if (!nextIds.includes(id)) clearSelected(id);
+        }
+        for (const id of nextIds) {
+            if (!lastHighlightedIds.includes(id)) highlightSelected(id);
+        }
+        lastHighlightedIds = nextIds;
+    }
+
     function highlightWithColor(g: SVGElement, color: string) {
         for (const node of Array.from(g.querySelectorAll("*:not(g)"))) {
             const parent = node.parentNode as SVGElement;
@@ -218,7 +235,7 @@
             return; // this should never happen, but as a safety
         }
 
-        onElementSelect?.(node.id);
+        onElementSelect?.(node.id, { additive: event.shiftKey });
     }
 
     function closeOverlayContextMenu() {
@@ -264,9 +281,8 @@
     async function refreshOverlay() {
         await tick();
         updateOverlay();
-        if (view.selection?.type === "element") {
-            highlightSelected(view.selection.id ?? null);
-        }
+        lastHighlightedIds = [];
+        syncSelectionHighlight();
     }
 
     $: if (view.svg && view.svgId !== lastSvgId) {
@@ -279,18 +295,7 @@
         if (svgOverlay) svgOverlay.innerHTML = "";
     }
 
-    $: if (view.selection?.type === "element") {
-        if (lastSelectedId && lastSelectedId !== view.selection.id) {
-            clearSelected(lastSelectedId);
-        }
-        highlightSelected(view.selection.id ?? null);
-        lastSelectedId = view.selection.id ?? null;
-    }
-
-    $: if (view.selection?.type === "none" && lastSelectedId) {
-        clearSelected(lastSelectedId);
-        lastSelectedId = null;
-    }
+    $: if (view.selection) syncSelectionHighlight();
 </script>
 
 <div class="vrv-main-panel">

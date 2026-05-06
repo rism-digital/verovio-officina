@@ -22,7 +22,7 @@
         type EnterValueDialogState,
         type ToolbarDispatchAction,
     } from "./app/toolbar-actions";
-    import type { ContextAction, MEIExportOptions, TreeContextAction, TreeNodeData } from "./app/types";
+    import type { ContextAction, EditActionContext, MEIExportOptions, TreeContextAction, TreeNodeData } from "./app/types";
     import {
         dirty,
         editInfoContent,
@@ -61,7 +61,10 @@
     let dialogScoreDef: TreeNodeData | null = null;
     let xmlReloadDialogOpen = false;
     let enterValueDialogState: EnterValueDialogState | null = null;
-    let pendingTreeContextAction: TreeContextAction | null = null;
+    let pendingTreeContextAction: {
+        action: TreeContextAction;
+        context: EditActionContext;
+    } | null = null;
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
     let xmlInitialContent = "";
 
@@ -290,15 +293,23 @@
         // Placeholder for XML validation logic
     }
 
-    async function applyTreeContextAction(action: TreeContextAction) {
+    function editActionContext(action: TreeContextAction): EditActionContext {
+        return {
+            targetId: action.targetId,
+            targetElement: action.targetElement,
+            secondaryId: $selection.type === "element" ? $selection.additionalIds[0] : undefined,
+            dialogValue: action.dialogValue,
+        };
+    }
+
+    async function applyTreeContextAction(
+        action: TreeContextAction,
+        context = editActionContext(action),
+    ) {
         const ok = await controller.handleContextMenuEdit(
             action.action,
             action.param,
-            {
-                targetId: action.targetId,
-                targetElement: action.targetElement,
-                dialogValue: action.dialogValue,
-            },
+            context,
         );
         if (ok) {
             statusLine.set(`${action.label} for <${action.targetElement}>.`);
@@ -308,6 +319,7 @@
     }
 
     async function handleTreeContextAction(action: TreeContextAction) {
+        const context = editActionContext(action);
         if (action.dialog && !action.dialogValue) {
             const next = beginToolbarAction({
                 action: action.action,
@@ -317,12 +329,12 @@
                 dialog: action.dialog,
             });
             if (next.kind === "prompt") {
-                pendingTreeContextAction = action;
+                pendingTreeContextAction = { action, context };
                 enterValueDialogState = next.dialogState;
                 return;
             }
         }
-        await applyTreeContextAction(action);
+        await applyTreeContextAction(action, context);
     }
 
     async function dispatchToolbarContextAction(toolbarAction: ToolbarDispatchAction) {
@@ -357,13 +369,19 @@
         const pendingContextAction = pendingTreeContextAction;
         if (pendingContextAction) {
             pendingTreeContextAction = null;
-            await applyTreeContextAction({
-                ...pendingContextAction,
-                action: resolvedAction.action,
-                label: resolvedAction.label,
-                param: resolvedAction.param,
-                dialogValue: resolvedAction.dialogValue,
-            });
+            await applyTreeContextAction(
+                {
+                    ...pendingContextAction.action,
+                    action: resolvedAction.action,
+                    label: resolvedAction.label,
+                    param: resolvedAction.param,
+                    dialogValue: resolvedAction.dialogValue,
+                },
+                {
+                    ...pendingContextAction.context,
+                    dialogValue: resolvedAction.dialogValue,
+                },
+            );
             return;
         }
 
@@ -463,7 +481,7 @@
         <MainPanel
             view={$viewModel}
             onResize={(size) => controller.applyLayoutForSize(size)}
-            onElementSelect={(id) => controller.handleSelect(id)}
+            onElementSelect={(id, options) => controller.handleSelect(id, options)}
             onAttributeEdit={(param, commit) =>
                 controller.handleAttributeEdit(param, commit)}
             onTreeContextAction={handleTreeContextAction}

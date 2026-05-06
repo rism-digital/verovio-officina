@@ -47,7 +47,7 @@
         <Tree
             ancestors={editInfoContent?.ancestors ?? null}
             context={editInfoContent?.context ?? null}
-            selectedId={$selection.id ?? null}
+            selectedId={$selection.type === "element" ? $selection.id : null}
             {onSelectElement}
             {onHoverElement}
             onContextAction={onTreeContextAction}

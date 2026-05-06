@@ -52,6 +52,10 @@ const controlEventPlace = [
     { name: "Place below", action: "set-place-below", icon: "icons/editor/place-below.png" },
 ]
 
+const insertControlEvent = [
+    { name: "Add hairpin", action: "add-hairpin", icon: "icons/mei/hairpin.png" },
+]
+
 export const contextButtonBars = {
     note: [
         [
@@ -73,6 +77,7 @@ export const contextButtonBars = {
             { name: "Stem down", action: "set-stem-down", icon: "icons/editor/stem-dir-down.png" },
             { name: "Stem up", action: "set-stem-up", icon: "icons/editor/stem-dir-up.png" },
         ],
+        insertControlEvent,
     ],
     dir: [
         controlEventPlace,
@@ -193,6 +198,38 @@ export const actionDefinitions = {
                     elementId: "[chained-id]",
                     attribute: "artic",
                     value: "acc",
+                },
+            },
+            {
+                action: "set",
+                param: {
+                    elementId: "[chained-id]",
+                    attribute: "color",
+                    value: "blue",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "add-hairpin": {
+        action: "chain",
+        param: [
+            {
+                action: "insertControl",
+                param: {
+                    elementName: "hairpin",
+                    startId: "{{secondaryId}}",
+                    endId: "{{targetId}}",
+                },
+            },
+            {
+                action: "set",
+                param: {
+                    elementId: "[chained-id]",
+                    attribute: "form",
+                    value: "dim",
                 },
             },
             {

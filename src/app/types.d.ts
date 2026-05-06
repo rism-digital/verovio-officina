@@ -1,6 +1,9 @@
 export type Mode = 'edit' | 'insert';
 
-export type SelectElementHandler = (id: string) => void;
+export type SelectElementOptions = {
+    additive?: boolean;
+};
+export type SelectElementHandler = (id: string, options?: SelectElementOptions) => void;
 export type HoverElementHandler = (id: string | null) => void;
 export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) => void;
 export type ActionHandler = () => void;
@@ -31,6 +34,13 @@ export type TreeContextAction = ContextAction & {
 
 export type TreeContextActionHandler = (action: TreeContextAction) => void;
 
+export type EditActionContext = {
+    targetId: string;
+    targetElement: string;
+    secondaryId?: string;
+    dialogValue?: string;
+};
+
 export type ContextMenuItem<TAction extends EditActionName = EditActionName> = {
     label: string;
     action: TAction;
@@ -43,11 +53,13 @@ export type MEIExportOptions = {
     ignoreHeader: boolean;
 };
 
-export interface SelectionInfo {
-    type: 'none' | 'element';
-    label?: string;
-    id?: string;
-};
+export type SelectionInfo =
+    | { type: "none" }
+    | {
+        type: "element";
+        id: string;
+        additionalIds: string[];
+    };
 
 export interface ViewModel {
     svg: string;
