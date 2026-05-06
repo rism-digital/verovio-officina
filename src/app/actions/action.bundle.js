@@ -220,8 +220,8 @@ export const actionDefinitions = {
                 action: "insertControl",
                 param: {
                     elementName: "hairpin",
-                    startId: "{{secondaryId}}",
-                    endId: "{{targetId}}",
+                    startId: "{{targetId}}",
+                    endId: "{{secondaryId}}",
                 },
             },
             {

@@ -9,7 +9,7 @@
         EditActionSetHandler,
         EditInfoContent,
         SelectElementHandler,
-        TreeContextActionHandler,
+        TargetedContextActionHandler,
         ViewModel,
     } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
@@ -18,7 +18,7 @@
     export let onResize: (size: { width: number; height: number }) => void;
     export let onElementSelect: SelectElementHandler | null = null;
     export let onAttributeEdit: EditActionSetHandler | null = null;
-    export let onTreeContextAction: TreeContextActionHandler | null = null;
+    export let onTargetedContextAction: TargetedContextActionHandler | null = null;
     export let editInfoContent: EditInfoContent| null = null;
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
@@ -270,7 +270,7 @@
     function handleOverlayContextAction(action: ContextAction) {
         const currentOverlayContextMenu = overlayContextMenu;
         if (!currentOverlayContextMenu) return;
-        onTreeContextAction?.({
+        onTargetedContextAction?.({
             ...action,
             targetId: currentOverlayContextMenu.targetId,
             targetElement: currentOverlayContextMenu.targetElement,
@@ -307,7 +307,7 @@
             onSelectElement={handleSelect}
             onHoverElement={handleHover}
             onEditAttribute={handleEditAttribute}
-            {onTreeContextAction}
+            {onTargetedContextAction}
             {editInfoContent}
             {rngMEIAll}
             {rngMEIBasic}

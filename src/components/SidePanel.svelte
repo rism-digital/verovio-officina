@@ -7,7 +7,7 @@
         HoverElementHandler,
         SelectElementHandler,
         Tab,
-        TreeContextActionHandler,
+        TargetedContextActionHandler,
     } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
@@ -23,7 +23,7 @@
     export let onSelectElement: SelectElementHandler | null = null;
     export let onHoverElement: HoverElementHandler | null = null;
     export let onEditAttribute: EditActionSetHandler | null = null;
-    export let onTreeContextAction: TreeContextActionHandler | null = null;
+    export let onTargetedContextAction: TargetedContextActionHandler | null = null;
 
     const handleClick = (tabValue: number) => () => {
         activeTabValue = tabValue;
@@ -53,7 +53,7 @@
                             {onSelectElement}
                             {onHoverElement}
                             {onEditAttribute}
-                            {onTreeContextAction}
+                            {onTargetedContextAction}
                             editInfoContent={editInfoContent}
                             {rngMEIAll}
                             {rngMEIBasic}

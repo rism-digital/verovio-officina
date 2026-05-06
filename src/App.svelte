@@ -22,7 +22,7 @@
         type EnterValueDialogState,
         type ToolbarDispatchAction,
     } from "./app/toolbar-actions";
-    import type { ContextAction, EditActionContext, MEIExportOptions, TreeContextAction, TreeNodeData } from "./app/types";
+    import type { ContextAction, EditActionInput, MEIExportOptions, TargetedContextAction, TreeNodeData } from "./app/types";
     import {
         dirty,
         editInfoContent,
@@ -289,20 +289,23 @@
         // Placeholder for XML validation logic
     }
 
-    function editActionContext(action: TreeContextAction): EditActionContext {
+    function selectedSecondaryId(): string | undefined {
+        return $selection.type === "element" ? $selection.additionalIds[0] : undefined;
+    }
+
+    function treeEditActionInput(action: TargetedContextAction): EditActionInput {
         return {
             targetId: action.targetId,
             targetElement: action.targetElement,
-            secondaryId: $selection.type === "element" ? $selection.additionalIds[0] : undefined,
-            dialogValue: action.dialogValue,
+            secondaryId: selectedSecondaryId(),
         };
     }
 
-    async function handleTreeContextAction(action: TreeContextAction) {
-        const ok = await controller.handleContextMenuEdit(
+    async function handleTargetedContextAction(action: TargetedContextAction) {
+        const ok = await controller.handleEditAction(
             action.action,
             action.param,
-            editActionContext(action),
+            treeEditActionInput(action),
         );
         if (ok) {
             statusLine.set(`${action.label} for <${action.targetElement}>.`);
@@ -311,27 +314,34 @@
         }
     }
 
-    async function dispatchToolbarContextAction(toolbarAction: ToolbarDispatchAction) {
+    async function dispatchToolbarAction(toolbarAction: ToolbarDispatchAction) {
         const object = $editInfoContent?.object;
         if (!object?.id || !object.element) return;
-        await handleTreeContextAction({
-            action: toolbarAction.action,
-            label: toolbarAction.label,
-            param: toolbarAction.param,
-            actionKey: toolbarAction.actionKey,
-            targetId: object.id,
-            targetElement: object.element,
-            dialogValue: toolbarAction.dialogValue,
-        });
+
+        const ok = await controller.handleEditAction(
+            toolbarAction.action,
+            toolbarAction.param,
+            {
+                targetId: object.id,
+                targetElement: object.element,
+                secondaryId: selectedSecondaryId(),
+                dialogValue: toolbarAction.dialogValue,
+            },
+        );
+        if (ok) {
+            statusLine.set(`${toolbarAction.label} for <${object.element}>.`);
+        } else {
+            statusLine.set(`Failed: ${toolbarAction.label} for <${object.element}>.`);
+        }
     }
 
-    async function handleToolbarContextAction(action: ContextAction) {
+    async function handleToolbarAction(action: ContextAction) {
         const next = beginToolbarAction(action);
         if (next.kind === "prompt") {
             enterValueDialogState = next.dialogState;
             return;
         }
-        await dispatchToolbarContextAction(next.action);
+        await dispatchToolbarAction(next.action);
     }
 
     async function confirmEnterValue(value: string) {
@@ -339,7 +349,7 @@
         enterValueDialogState = null;
         if (!pendingAction) return;
         const resolvedAction = resolveEnterValueDialog(pendingAction, value);
-        await dispatchToolbarContextAction(resolvedAction);
+        await dispatchToolbarAction(resolvedAction);
     }
 
     function cancelEnterValue() {
@@ -420,7 +430,7 @@
         workerBusy={$workerBusy}
         onValidateXml={validateXmlContent}
         selectedElementName={$editInfoContent?.object?.element ?? null}
-        onContextAction={handleToolbarContextAction}
+        onContextAction={handleToolbarAction}
     />
 
     {#if xmlMode}
@@ -437,7 +447,7 @@
             onElementSelect={(id, options) => controller.handleSelect(id, options)}
             onAttributeEdit={(param, commit) =>
                 controller.handleAttributeEdit(param, commit)}
-            onTreeContextAction={handleTreeContextAction}
+            onTargetedContextAction={handleTargetedContextAction}
             editInfoContent={$editInfoContent}
             {rngMEIAll}
             {rngMEIBasic}

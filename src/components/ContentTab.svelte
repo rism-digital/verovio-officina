@@ -8,7 +8,7 @@
         EditInfoContent,
         HoverElementHandler,
         SelectElementHandler,
-        TreeContextActionHandler,
+        TargetedContextActionHandler,
     } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
@@ -18,7 +18,7 @@
     export let onSelectElement: SelectElementHandler | null = null;
     export let onHoverElement: HoverElementHandler | null = null;
     export let onEditAttribute: EditActionSetHandler | null = null;
-    export let onTreeContextAction: TreeContextActionHandler | null = null;
+    export let onTargetedContextAction: TargetedContextActionHandler | null = null;
 
     let closedSections = {
         structure: false,
@@ -50,7 +50,7 @@
             selectedId={$selection.type === "element" ? $selection.id : null}
             {onSelectElement}
             {onHoverElement}
-            onContextAction={onTreeContextAction}
+            onContextAction={onTargetedContextAction}
         />
     </div>
 </div>

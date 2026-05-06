@@ -4,7 +4,7 @@ import type {
     EditActionParam,
     EditInfoContent,
     EditAction,
-    EditActionContext,
+    EditActionInput,
     EditActionName,
     MEIExportOptions,
     SelectElementOptions,
@@ -335,10 +335,10 @@ export class EditorController {
         }
     }
 
-    async handleContextMenuEdit(
+    async handleEditAction(
         action: EditActionName,
         param: EditActionParam | undefined,
-        context: EditActionContext,
+        context: EditActionInput,
     ): Promise<boolean> {
         this.stores.workerBusy.set(true);
         try {
@@ -365,7 +365,7 @@ export class EditorController {
             this.stores.dirty.set(true);
             return true;
         } catch (error) {
-            console.error("Failed to apply context menu action", error);
+            console.error("Failed to apply edit action", error);
             this.stores.workerBusy.set(false);
             return false;
         }
@@ -373,7 +373,7 @@ export class EditorController {
 
     private replaceActionPlaceholder(
         param: EditActionParam | undefined,
-        context: EditActionContext,
+        context: EditActionInput,
     ): EditActionParam | undefined {
         if (param === undefined) return undefined;
         const placeholders: Record<string, string> = {

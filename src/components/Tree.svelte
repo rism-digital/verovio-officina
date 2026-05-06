@@ -7,7 +7,7 @@
         ContextAction,
         HoverElementHandler,
         SelectElementHandler,
-        TreeContextActionHandler,
+        TargetedContextActionHandler,
         TreeNodeData,
     } from "../app/types";
 
@@ -16,7 +16,7 @@
     export let selectedId: string | null = null;
     export let onSelectElement: SelectElementHandler | null = null;
     export let onHoverElement: HoverElementHandler | null = null;
-    export let onContextAction: TreeContextActionHandler | null = null;
+    export let onContextAction: TargetedContextActionHandler | null = null;
 
     let breadcrumbsWrapper: HTMLDivElement | null = null;
     let treeRoot: HTMLDivElement | null = null;

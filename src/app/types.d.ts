@@ -27,14 +27,14 @@ export type ContextAction = {
     dialogValue?: string;
 };
 
-export type TreeContextAction = ContextAction & {
+export type TargetedContextAction = ContextAction & {
     targetId: string;
     targetElement: string;
 };
 
-export type TreeContextActionHandler = (action: TreeContextAction) => void;
+export type TargetedContextActionHandler = (action: TargetedContextAction) => void;
 
-export type EditActionContext = {
+export type EditActionInput = {
     targetId: string;
     targetElement: string;
     secondaryId?: string;
