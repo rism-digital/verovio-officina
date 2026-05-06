@@ -45,6 +45,7 @@
         const resolvedItems: ResolvedMenuEntry[] = [];
         for (const entry of entries) {
             if (isActionEntry(entry)) {
+                if (entry.dialog) continue;
                 const definition = actionDefinitions[entry.action];
                 if (!definition) continue;
                 resolvedItems.push({
@@ -53,7 +54,6 @@
                     action: definition.action,
                     param: definition.param,
                     actionKey: entry.action,
-                    dialog: entry.dialog,
                 });
                 continue;
             }
@@ -79,6 +79,7 @@
         for (const bar of bars as ContextButtonEntry[][]) {
             const resolvedBar: ResolvedContextButton[] = [];
             for (const button of bar) {
+                if (button.dialog) continue;
                 const definition = actionDefinitions[button.action];
                 if (!definition) continue;
                 resolvedBar.push({
@@ -86,7 +87,6 @@
                     action: definition.action,
                     param: definition.param,
                     actionKey: button.action,
-                    dialog: button.dialog,
                     iconUrl: withBaseUrl(button.icon),
                 });
             }

@@ -61,10 +61,6 @@
     let dialogScoreDef: TreeNodeData | null = null;
     let xmlReloadDialogOpen = false;
     let enterValueDialogState: EnterValueDialogState | null = null;
-    let pendingTreeContextAction: {
-        action: TreeContextAction;
-        context: EditActionContext;
-    } | null = null;
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
     let xmlInitialContent = "";
 
@@ -302,39 +298,17 @@
         };
     }
 
-    async function applyTreeContextAction(
-        action: TreeContextAction,
-        context = editActionContext(action),
-    ) {
+    async function handleTreeContextAction(action: TreeContextAction) {
         const ok = await controller.handleContextMenuEdit(
             action.action,
             action.param,
-            context,
+            editActionContext(action),
         );
         if (ok) {
             statusLine.set(`${action.label} for <${action.targetElement}>.`);
         } else {
             statusLine.set(`Failed: ${action.label} for <${action.targetElement}>.`);
         }
-    }
-
-    async function handleTreeContextAction(action: TreeContextAction) {
-        const context = editActionContext(action);
-        if (action.dialog && !action.dialogValue) {
-            const next = beginToolbarAction({
-                action: action.action,
-                label: action.label,
-                param: action.param,
-                actionKey: action.actionKey,
-                dialog: action.dialog,
-            });
-            if (next.kind === "prompt") {
-                pendingTreeContextAction = { action, context };
-                enterValueDialogState = next.dialogState;
-                return;
-            }
-        }
-        await applyTreeContextAction(action, context);
     }
 
     async function dispatchToolbarContextAction(toolbarAction: ToolbarDispatchAction) {
@@ -365,32 +339,11 @@
         enterValueDialogState = null;
         if (!pendingAction) return;
         const resolvedAction = resolveEnterValueDialog(pendingAction, value);
-
-        const pendingContextAction = pendingTreeContextAction;
-        if (pendingContextAction) {
-            pendingTreeContextAction = null;
-            await applyTreeContextAction(
-                {
-                    ...pendingContextAction.action,
-                    action: resolvedAction.action,
-                    label: resolvedAction.label,
-                    param: resolvedAction.param,
-                    dialogValue: resolvedAction.dialogValue,
-                },
-                {
-                    ...pendingContextAction.context,
-                    dialogValue: resolvedAction.dialogValue,
-                },
-            );
-            return;
-        }
-
         await dispatchToolbarContextAction(resolvedAction);
     }
 
     function cancelEnterValue() {
         enterValueDialogState = null;
-        pendingTreeContextAction = null;
     }
 
     function openAboutDialog() {
