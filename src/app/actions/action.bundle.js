@@ -202,14 +202,6 @@ export const actionDefinitions = {
                 },
             },
             {
-                action: "set",
-                param: {
-                    elementId: "[chained-id]",
-                    attribute: "color",
-                    value: "blue",
-                },
-            },
-            {
                 action: "commit",
             },
         ],
@@ -234,14 +226,6 @@ export const actionDefinitions = {
                 },
             },
             {
-                action: "set",
-                param: {
-                    elementId: "[chained-id]",
-                    attribute: "color",
-                    value: "blue",
-                },
-            },
-            {
                 action: "commit",
             },
         ],
@@ -257,11 +241,19 @@ export const actionDefinitions = {
                 },
             },
             {
-                action: "set",
+                action: "commit",
+            },
+        ],
+    },
+    "add-slur": {
+        action: "chain",
+        param: [
+            {
+                action: "insertControl",
                 param: {
-                    elementId: "[chained-id]",
-                    attribute: "color",
-                    value: "blue",
+                    elementName: "slur",
+                    startId: "{{targetId}}",
+                    endId: "{{secondaryId}}",
                 },
             },
             {
@@ -277,14 +269,6 @@ export const actionDefinitions = {
                 param: {
                     elementName: "trill",
                     startId: "{{targetId}}",
-                },
-            },
-            {
-                action: "set",
-                param: {
-                    elementId: "[chained-id]",
-                    attribute: "color",
-                    value: "red",
                 },
             },
             {
