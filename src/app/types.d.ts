@@ -9,6 +9,7 @@ export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) 
 export type ActionHandler = () => void;
 
 export type EditActionName =
+    | "delete"
     | "insert"
     | "insertControl"
     | "set"
@@ -101,6 +102,10 @@ export interface EditInfoContent {
     referringElements: ReferenceObject[];
 }
 
+export type EditActionDeleteParam = {
+    elementId: string;    
+}
+
 export type EditActionSetParam = {
     elementId: string;
     attribute: string;
@@ -134,12 +139,13 @@ export type EditActionPropertiesParam =
     };
 
 export type EditActionChainStep = {
-    action: "insert" | "insertControl" | "set" | "commit";
-    param?: EditActionSetParam | EditActionInsertParam | EditActionInsertControlParam| EditActionCommitParam;
+    action: "delete" | "insert" | "insertControl" | "set" | "commit";
+    param?: EditActionDeleteParam | EditActionSetParam | EditActionInsertParam | EditActionInsertControlParam| EditActionCommitParam;
 };
 
 export type EditActionChainParam = EditActionChainStep[];
 export type EditActionParam =
+    | EditActionDeleteParam
     | EditActionSetParam
     | EditActionInsertParam
     | EditActionInsertControlParam

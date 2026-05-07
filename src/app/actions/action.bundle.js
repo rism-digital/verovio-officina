@@ -43,6 +43,10 @@ export const actionCatalog = {
             action: "add-tempo",
             dialog: "enter-value",
         },
+        {
+            name: "Delete",
+            action: "delete",
+        },
     ]
 };
 
@@ -383,6 +387,20 @@ export const actionDefinitions = {
                 action: "commit",
             },
         ],
+    },
+    "delete": {
+        action: "chain",
+        param: [
+            {
+                action: "delete",
+                param: {
+                    elementId: "{{targetId}}",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ], 
     },
     "set-stem-auto": {
         action: "chain",
