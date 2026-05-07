@@ -1,7 +1,11 @@
 <script lang="ts">
     import type { ContextAction } from "../app/types";
-    import { withBaseUrl } from "../app/asset-url";
-    import { actionCatalog, actionDefinitions, contextButtonBars } from "../app/actions/action.bundle";
+    import {
+        resolveContextButtonBars,
+        resolveContextMenuItems,
+        type ResolvedContextButton,
+        type ResolvedMenuEntry,
+    } from "../app/action-resolver";
 
     export let x = 0;
     export let y = 0;
@@ -9,98 +13,11 @@
     export let onSelect: ((action: ContextAction) => void) | null = null;
     export let onClose: (() => void) | null = null;
 
-    type ActionCatalogActionEntry = {
-        name: string;
-        action: string;
-        dialog?: string;
-    };
-    type ActionCatalogSubmenuEntry = {
-        name: string;
-        submenu: ActionCatalogEntry[];
-    };
-    type ActionCatalogEntry = ActionCatalogActionEntry | ActionCatalogSubmenuEntry;
-
-    type ResolvedMenuEntry =
-        | (ContextAction & { kind: "action"; actionKey: string })
-        | { kind: "submenu"; label: string; items: ResolvedMenuEntry[] };
-    type ContextButtonEntry = {
-        name: string;
-        action: string;
-        icon: string;
-        dialog?: string;
-        secondary?: boolean;
-    };
-    type ResolvedContextButton = ContextAction & {
-        actionKey: string;
-        iconUrl: string;
-    };
-
     let items: ResolvedMenuEntry[] = [];
     let buttonBars: ResolvedContextButton[][] = [];
 
-    function isActionEntry(entry: ActionCatalogEntry): entry is ActionCatalogActionEntry {
-        return "action" in entry;
-    }
-
-    function resolveEntries(entries: ActionCatalogEntry[]): ResolvedMenuEntry[] {
-        const resolvedItems: ResolvedMenuEntry[] = [];
-        for (const entry of entries) {
-            if (isActionEntry(entry)) {
-                if (entry.dialog) continue;
-                const definition = actionDefinitions[entry.action];
-                if (!definition) continue;
-                resolvedItems.push({
-                    kind: "action",
-                    label: entry.name,
-                    action: definition.action,
-                    param: definition.param,
-                    actionKey: entry.action,
-                });
-                continue;
-            }
-            const submenuItems = resolveEntries(entry.submenu);
-            if (submenuItems.length === 0) continue;
-            resolvedItems.push({
-                kind: "submenu",
-                label: entry.name,
-                items: submenuItems,
-            });
-        }
-        return resolvedItems;
-    }
-
-    function actionItemsFor(name: string): ResolvedMenuEntry[] {
-        const entries = actionCatalog[name] ?? [];
-        return resolveEntries(entries as ActionCatalogEntry[]);
-    }
-
-    function buttonBarsFor(name: string): ResolvedContextButton[][] {
-        const bars = contextButtonBars[name] ?? [];
-        const resolvedBars: ResolvedContextButton[][] = [];
-        for (const bar of bars as ContextButtonEntry[][]) {
-            const resolvedBar: ResolvedContextButton[] = [];
-            for (const button of bar) {
-                if (button.dialog) continue;
-                if (button.secondary) continue;
-                const definition = actionDefinitions[button.action];
-                if (!definition) continue;
-                resolvedBar.push({
-                    label: button.name,
-                    action: definition.action,
-                    param: definition.param,
-                    actionKey: button.action,
-                    iconUrl: withBaseUrl(button.icon),
-                });
-            }
-            if (resolvedBar.length > 0) {
-                resolvedBars.push(resolvedBar);
-            }
-        }
-        return resolvedBars;
-    }
-
-    $: items = actionItemsFor(elementName);
-    $: buttonBars = buttonBarsFor(elementName);
+    $: items = resolveContextMenuItems(elementName);
+    $: buttonBars = resolveContextButtonBars(elementName);
     $: if (elementName && items.length === 0 && buttonBars.length === 0) close();
 
     function close() {

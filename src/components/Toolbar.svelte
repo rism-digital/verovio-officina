@@ -1,6 +1,9 @@
 <script lang="ts">
     import { withBaseUrl } from "../app/asset-url";
-    import { actionDefinitions, contextButtonBars } from "../app/actions/action.bundle";
+    import {
+        resolveContextButtonBars,
+        type ResolvedContextButton,
+    } from "../app/action-resolver";
     import type { ContextAction, Mode } from "../app/types";
 
     export let mode: Mode;
@@ -15,43 +18,12 @@
     const undoIconUrl = withBaseUrl("icons/editor/undo.png");
     const redoIconUrl = withBaseUrl("icons/editor/redo.png");
 
-    type ContextButtonEntry = {
-        name: string;
-        action: string;
-        icon: string;
-        dialog?: string;
-        secondary?: boolean;
-    };
-    type ResolvedContextButton = ContextAction & {
-        iconUrl: string;
-    };
     let contextBars: ResolvedContextButton[][] = [];
 
-    function buttonBarsFor(name: string | null, secondaryId: string | null): ResolvedContextButton[][] {
-        if (!name) return [];
-        const bars = contextButtonBars[name] ?? [];
-        const resolvedBars: ResolvedContextButton[][] = [];
-        for (const bar of bars as ContextButtonEntry[][]) {
-            const resolvedBar: ResolvedContextButton[] = [];
-            for (const button of bar) {
-                if (button.secondary && !secondaryId) continue;
-                const definition = actionDefinitions[button.action];
-                if (!definition) continue;
-                resolvedBar.push({
-                    actionKey: button.action,
-                    label: button.name,
-                    action: definition.action,
-                    param: definition.param,
-                    dialog: button.dialog,
-                    iconUrl: withBaseUrl(button.icon),
-                });
-            }
-            if (resolvedBar.length > 0) resolvedBars.push(resolvedBar);
-        }
-        return resolvedBars;
-    }
-
-    $: contextBars = buttonBarsFor(selectedElementName, secondarySelection);
+    $: contextBars = resolveContextButtonBars(selectedElementName, {
+        includeDialogs: true,
+        secondarySelection,
+    });
 </script>
 
 <section class="vrv-editor-toolbar vrv-text-no-select">
