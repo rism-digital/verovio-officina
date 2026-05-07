@@ -18,6 +18,7 @@ export type ContextButtonEntry = {
     action: string;
     icon: string;
     dialog?: string;
+    secondary?: boolean;
 };
 
 export const actionCatalog: Record<string, ActionCatalogEntry[]>;

@@ -9,6 +9,7 @@
     export let workerBusy = false;
     export let onValidateXml: (() => void) | null = null;
     export let selectedElementName: string | null = null;
+    export let secondarySelection: string | null = null;
     export let onContextAction: ((action: ContextAction) => void) | null = null;
 
     const undoIconUrl = withBaseUrl("icons/editor/undo.png");
@@ -19,19 +20,21 @@
         action: string;
         icon: string;
         dialog?: string;
+        secondary?: boolean;
     };
     type ResolvedContextButton = ContextAction & {
         iconUrl: string;
     };
     let contextBars: ResolvedContextButton[][] = [];
 
-    function buttonBarsFor(name: string | null): ResolvedContextButton[][] {
+    function buttonBarsFor(name: string | null, secondaryId: string | null): ResolvedContextButton[][] {
         if (!name) return [];
         const bars = contextButtonBars[name] ?? [];
         const resolvedBars: ResolvedContextButton[][] = [];
         for (const bar of bars as ContextButtonEntry[][]) {
             const resolvedBar: ResolvedContextButton[] = [];
             for (const button of bar) {
+                if (button.secondary && !secondaryId) continue;
                 const definition = actionDefinitions[button.action];
                 if (!definition) continue;
                 resolvedBar.push({
@@ -48,7 +51,7 @@
         return resolvedBars;
     }
 
-    $: contextBars = buttonBarsFor(selectedElementName);
+    $: contextBars = buttonBarsFor(selectedElementName, secondarySelection);
 </script>
 
 <section class="vrv-editor-toolbar vrv-text-no-select">

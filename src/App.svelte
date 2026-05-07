@@ -63,6 +63,7 @@
     let enterValueDialogState: EnterValueDialogState | null = null;
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
     let xmlInitialContent = "";
+    let secondarySelection: string | null = null;
 
     const ABOUT_LIBRARIES_HTML = `Libraries used in this application:\n\n\
 * [html-midi-player](https://github.com/cifkao/html-midi-player)\n\
@@ -293,6 +294,10 @@
         return $selection.type === "element" ? $selection.additionalIds[0] : undefined;
     }
 
+    $: secondarySelection = $selection.type === "element"
+        ? ($selection.additionalIds[0] ?? null)
+        : null;
+
     function treeEditActionInput(action: TargetedContextAction): EditActionInput {
         return {
             targetId: action.targetId,
@@ -430,6 +435,7 @@
         workerBusy={$workerBusy}
         onValidateXml={validateXmlContent}
         selectedElementName={$editInfoContent?.object?.element ?? null}
+        {secondarySelection}
         onContextAction={handleToolbarAction}
     />
 

@@ -53,7 +53,8 @@ const controlEventPlace = [
 ]
 
 const insertControlEvent = [
-    { name: "Add hairpin", action: "add-hairpin", icon: "icons/mei/hairpin.png" },
+    { name: "Add hairpin", action: "add-hairpin", icon: "icons/mei/hairpin.png", secondary: true},
+    { name: "Add slur", action: "add-slur", icon: "icons/mei/slur.png", secondary: true },
 ]
 
 export const contextButtonBars = {
