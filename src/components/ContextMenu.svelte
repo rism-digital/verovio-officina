@@ -28,6 +28,7 @@
         action: string;
         icon: string;
         dialog?: string;
+        secondary?: boolean;
     };
     type ResolvedContextButton = ContextAction & {
         actionKey: string;
@@ -80,6 +81,7 @@
             const resolvedBar: ResolvedContextButton[] = [];
             for (const button of bar) {
                 if (button.dialog) continue;
+                if (button.secondary) continue;
                 const definition = actionDefinitions[button.action];
                 if (!definition) continue;
                 resolvedBar.push({
