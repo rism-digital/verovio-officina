@@ -103,7 +103,8 @@ export interface EditInfoContent {
 }
 
 export type EditActionDeleteParam = {
-    elementId: string;    
+    elementId: string;   
+    backspace?: boolean; 
 }
 
 export type EditActionSetParam = {

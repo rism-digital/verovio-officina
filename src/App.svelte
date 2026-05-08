@@ -13,6 +13,7 @@
     import StatusBar from "./components/StatusBar.svelte";
     import workerUrl from "./app/worker/worker.ts?worker&url";
     import { withBaseUrl } from "./app/asset-url";
+    import { actionDefinitions } from "./app/actions/action.bundle";
     import { EditorController } from "./app/editor-controller";
     import { RNGLoader } from "./app/rng-loader";
     import {
@@ -43,6 +44,7 @@
     const MEI_BASIC_SCHEMA_URL = "https://music-encoding.org/schema/5.1/mei-basic.rng";
     const STORAGE_KEY = "verovio-editor";
     const MEI_EXPORT_OPTIONS_STORAGE_KEY = "verovio-mei-export-options";
+    const NON_DELETABLE_ELEMENTS = new Set(["staff", "layer"]);
     const DEFAULT_MEI_EXPORT_OPTIONS: MEIExportOptions = {
         basic: false,
         removeIds: false,
@@ -170,7 +172,10 @@
             : event.key === "ArrowLeft"
                 ? 37
                 : null;
-        if (direction === null) return;
+        const deleteKey = event.key === "Delete" || event.key === "Backspace"
+            ? event.key
+            : null;
+        if (direction === null && deleteKey === null) return;
         if (
             event.defaultPrevented ||
             event.altKey ||
@@ -187,7 +192,34 @@
         if (currentSelection.type !== "element" || !currentSelection.id) return;
         event.preventDefault();
         if (get(workerBusy)) return;
-        await controller.navigateSelection(direction);
+        if (direction !== null) {
+            await controller.navigateSelection(direction);
+            return;
+        }
+        await deleteSelectedElement(currentSelection.id, deleteKey === "Backspace");
+    }
+
+    async function deleteSelectedElement(id: string, backspace: boolean) {
+        const elementName = get(editInfoContent)?.object?.element;
+        if (!elementName || NON_DELETABLE_ELEMENTS.has(elementName)) {
+            statusLine.set(elementName
+                ? `Cannot delete <${elementName}>.`
+                : "Cannot delete selected element.");
+            return;
+        }
+        const definition = actionDefinitions[backspace ? "delete-backspace" : "delete"];
+        if (!definition) {
+            statusLine.set("Failed: delete action is not available.");
+            return;
+        }
+        const ok = await controller.handleEditAction(definition.action, definition.param, {
+            targetId: id,
+            targetElement: elementName,
+            secondaryId: selectedSecondaryId(),
+        });
+        statusLine.set(ok
+            ? `Deleted <${elementName}>.`
+            : `Failed: delete <${elementName}>.`);
     }
 
     function toggleMode() {

@@ -394,7 +394,22 @@ export const actionDefinitions = {
             {
                 action: "delete",
                 param: {
+                    elementId: "{{targetId}}"
+                },
+            },
+            {
+                action: "commit",
+            },
+        ], 
+    },
+    "delete-backspace": {
+        action: "chain",
+        param: [
+            {
+                action: "delete",
+                param: {
                     elementId: "{{targetId}}",
+                    backspace: true,
                 },
             },
             {
