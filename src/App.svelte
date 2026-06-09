@@ -23,7 +23,7 @@
         type EnterValueDialogState,
         type ToolbarDispatchAction,
     } from "./app/toolbar-actions";
-    import type { Action, ActionInput, MEIExportOptions, TargetedContextAction, TreeNodeData } from "./app/types";
+    import type { Action, MEIExportOptions, TargetedContextAction, TreeNodeData } from "./app/types";
     import {
         dirty,
         editResponseContent,
@@ -193,11 +193,11 @@
             await controller.navigateSelection(direction);
             return;
         }
-        await deleteSelectedElement(currentSelection.id, deleteKey === "Backspace");
+        await deleteSelectedElement(deleteKey === "Backspace");
     }
 
-    async function deleteSelectedElement(id: string, backspace: boolean) {
-        const elementName = get(editResponseContent)?.object?.element;
+    async function deleteSelectedElement(backspace: boolean) {
+        const elementName = get(editStatus).selection?.element;
         if (!elementName || NON_DELETABLE_ELEMENTS.has(elementName)) {
             statusLine.set(elementName
                 ? `Cannot delete <${elementName}>.`
@@ -209,10 +209,7 @@
             statusLine.set("Failed: delete action is not available.");
             return;
         }
-        const ok = await controller.handleEditAction(definition.action, definition.param, {
-            targetId: id,
-            targetElement: elementName,
-        });
+        const ok = await controller.handleEditAction(definition.action, definition.param);
         statusLine.set(ok
             ? `Deleted <${elementName}>.`
             : `Failed: delete <${elementName}>.`);
@@ -318,18 +315,10 @@
         // Placeholder for XML validation logic
     }
 
-    function treeEditActionInput(action: TargetedContextAction): ActionInput {
-        return {
-            targetId: action.targetId,
-            targetElement: action.targetElement,
-        };
-    }
-
     async function handleTargetedContextAction(action: TargetedContextAction) {
         const ok = await controller.handleEditAction(
             action.action,
             action.param,
-            treeEditActionInput(action),
         );
         if (ok) {
             statusLine.set(`${action.label} for <${action.targetElement}>.`);
@@ -339,22 +328,18 @@
     }
 
     async function dispatchToolbarAction(toolbarAction: ToolbarDispatchAction) {
-        const object = $editResponseContent?.object;
-        if (!object?.id || !object.element) return;
+        const elementName = $editStatus.selection?.element;
+        if (!elementName) return;
 
         const ok = await controller.handleEditAction(
             toolbarAction.action,
             toolbarAction.param,
-            {
-                targetId: object.id,
-                targetElement: object.element,
-                dialogValue: toolbarAction.dialogValue,
-            },
+            toolbarAction.dialogValue,
         );
         if (ok) {
-            statusLine.set(`${toolbarAction.label} for <${object.element}>.`);
+            statusLine.set(`${toolbarAction.label} for <${elementName}>.`);
         } else {
-            statusLine.set(`Failed: ${toolbarAction.label} for <${object.element}>.`);
+            statusLine.set(`Failed: ${toolbarAction.label} for <${elementName}>.`);
         }
     }
 
@@ -454,6 +439,7 @@
         workerBusy={$workerBusy}
         onValidateXml={validateXmlContent}
         selectedElementName={$editResponseContent?.object?.element ?? null}
+        hasSecondarySelection={Boolean($editStatus.selection?.secondaryId)}
         onContextAction={handleToolbarAction}
     />
 
@@ -470,6 +456,7 @@
             selection={$editStatus.selection}
             onResize={(size) => controller.applyLayoutForSize(size)}
             onElementSelect={(id) => controller.handleSelect(id)}
+            onElementSecondarySelect={(id) => controller.handleSecondarySelect(id)}
             onAttributeEdit={(param, commit) =>
                 controller.handleAttributeEdit(param, commit)}
             onTargetedContextAction={handleTargetedContextAction}

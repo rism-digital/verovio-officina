@@ -12,6 +12,7 @@
     export let workerBusy = false;
     export let onValidateXml: (() => void) | null = null;
     export let selectedElementName: string | null = null;
+    export let hasSecondarySelection = false;
     export let onContextAction: ((action: Action) => void) | null = null;
 
     const undoIconUrl = withBaseUrl("icons/editor/undo.png");
@@ -21,6 +22,7 @@
 
     $: contextBars = resolveContextButtonBars(selectedElementName, {
         includeDialogs: true,
+        includeSecondary: hasSecondarySelection,
     });
 </script>
 

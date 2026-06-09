@@ -1,6 +1,6 @@
 export type Mode = 'edit' | 'insert';
 
-export type SelectElementHandler = (id: string) => void;
+export type SelectElementHandler = (id: string) => void | Promise<void>;
 export type HoverElementHandler = (id: string | null) => void;
 export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) => void;
 export type ActionHandler = () => void;
@@ -20,12 +20,6 @@ export type TargetedContextAction = Action & {
 };
 
 export type TargetedContextActionHandler = (action: TargetedContextAction) => void;
-
-export type ActionInput = {
-    targetId: string;
-    targetElement: string;
-    dialogValue?: string;
-};
 
 export type ContextMenuItem<TAction extends EditActionName = EditActionName> = {
     label: string;
@@ -67,6 +61,7 @@ export interface EditStatus {
     selection: {
         id: string;
         element: string;
+        secondaryId?: string;
     } | null;
 }
 
@@ -96,6 +91,7 @@ export type EditActionName =
     | "insertMeasures"
     | "insertMeaure"
     | "insertNote"    
+    | "select"
     | "set"
     | "commit"
     | "chain"
@@ -111,6 +107,7 @@ export type EditActionParam =
     | EditActionInsertControlParam
     | EditActionNavigationParam
     | EditActionPropertiesParam
+    | EditActionSelectParam
     | EditActionSetParam;
 
 // ActionParams
@@ -146,6 +143,11 @@ export type EditActionPropertiesParam =
     | {
         scoreDef: string;
     };
+
+export type EditActionSelectParam = {
+    elementId: string;
+    secondary?: boolean;
+};
 
 export type EditActionSetParam = {
     elementId: string;

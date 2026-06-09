@@ -19,14 +19,15 @@
     export let selection: EditStatus["selection"] = null;
     export let onResize: (size: { width: number; height: number }) => void;
     export let onElementSelect: SelectElementHandler | null = null;
+    export let onElementSecondarySelect: SelectElementHandler | null = null;
     export let onAttributeEdit: EditActionSetHandler | null = null;
     export let onTargetedContextAction: TargetedContextActionHandler | null = null;
     export let editResponseContent: EditResponseContent| null = null;
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
 
-    function handleSelect(id: string | null) {
-        if (id) onElementSelect?.(id);
+    async function handleSelect(id: string | null) {
+        if (id) await onElementSelect?.(id);
     }
 
     function handleHover(id: string | null) {
@@ -46,7 +47,7 @@
     let lastSize = { width: 0, height: 0 };
     let resizeTimer: ReturnType<typeof setTimeout> | null = null;
     let lastSvgId = 0;
-    let lastHighlightedIds: string[] = [];
+    let lastHighlights: Array<{ id: string; color: string }> = [];
     let filterMarkup: string = "";
     let mouseoverId: string = "";
     let overlayContextMenu: {
@@ -160,28 +161,37 @@
         }
     }
 
-    function highlightSelected(id: string | null) {
+    function highlightSelected(id: string | null, color: string) {
         if (!svgWrapper || !id) return;
         let element = <SVGElement>svgWrapper.querySelector("#" + id);
         if (element) {
-            highlightWithColor(element, "#cd0000");
+            highlightWithColor(element, color);
         }
     }
 
-    function selectionIds(): string[] {
-        return selection?.id ? [selection.id] : [];
+    function selectionHighlights(): Array<{ id: string; color: string }> {
+        if (!selection?.id) return [];
+        const highlights = [{ id: selection.id, color: "#cd0000" }];
+        if (selection.secondaryId && selection.secondaryId !== selection.id) {
+            highlights.push({ id: selection.secondaryId, color: "#f28c28" });
+        }
+        return highlights;
     }
 
     function syncSelectionHighlight() {
         if (!svgWrapper) return;
-        const nextIds = selectionIds();
-        for (const id of lastHighlightedIds) {
-            if (!nextIds.includes(id)) clearSelected(id);
+        const nextHighlights = selectionHighlights();
+        for (const previous of lastHighlights) {
+            const next = nextHighlights.find((highlight) => highlight.id === previous.id);
+            if (!next || next.color !== previous.color) clearSelected(previous.id);
         }
-        for (const id of nextIds) {
-            if (!lastHighlightedIds.includes(id)) highlightSelected(id);
+        for (const next of nextHighlights) {
+            const previous = lastHighlights.find((highlight) => highlight.id === next.id);
+            if (!previous || previous.color !== next.color) {
+                highlightSelected(next.id, next.color);
+            }
         }
-        lastHighlightedIds = nextIds;
+        lastHighlights = nextHighlights;
     }
 
     function highlightWithColor(g: SVGElement, color: string) {
@@ -221,7 +231,7 @@
         return null;
     }
 
-    function onSVGOverlayMouseDown(event: MouseEvent) {
+    async function onSVGOverlayMouseDown(event: MouseEvent) {
         event.stopPropagation();
 
         // Clicking on the overlay - nothing to do
@@ -236,14 +246,19 @@
             return; // this should never happen, but as a safety
         }
 
-        onElementSelect?.(node.id);
+        if (event.shiftKey && selection?.id) {
+            await onElementSecondarySelect?.(node.id);
+            return;
+        }
+
+        await onElementSelect?.(node.id);
     }
 
     function closeOverlayContextMenu() {
         overlayContextMenu = null;
     }
 
-    function onSVGOverlayContextMenu(event: MouseEvent) {
+    async function onSVGOverlayContextMenu(event: MouseEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -259,7 +274,7 @@
             return;
         }
 
-        onElementSelect?.(node.id);
+        await onElementSelect?.(node.id);
         overlayContextMenu = {
             x: event.clientX,
             y: event.clientY,
@@ -282,7 +297,7 @@
     async function refreshOverlay() {
         await tick();
         updateOverlay();
-        lastHighlightedIds = [];
+        lastHighlights = [];
         syncSelectionHighlight();
     }
 

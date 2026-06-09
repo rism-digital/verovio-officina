@@ -125,7 +125,7 @@ export const actionDefinitions = {
                 action: "insert",
                 param: {
                     elementName: "accid",
-                    elementId: "{{targetId}}",
+                    elementId: "[selection-id]",
                     insertMode: "appendChildNoDuplicate",
                 },
             },
@@ -149,7 +149,7 @@ export const actionDefinitions = {
                 action: "insert",
                 param: {
                     elementName: "accid",
-                    elementId: "{{targetId}}",
+                    elementId: "[selection-id]",
                     insertMode: "appendChildNoDuplicate",
                 },
             },
@@ -173,7 +173,7 @@ export const actionDefinitions = {
                 action: "insert",
                 param: {
                     elementName: "accid",
-                    elementId: "{{targetId}}",
+                    elementId: "[selection-id]",
                     insertMode: "appendChildNoDuplicate",
                 },
             },
@@ -197,7 +197,7 @@ export const actionDefinitions = {
                 action: "insert",
                 param: {
                     elementName: "artic",
-                    elementId: "{{targetId}}",
+                    elementId: "[selection-id]",
                     insertMode: "appendChild",
                 },
             },
@@ -221,8 +221,8 @@ export const actionDefinitions = {
                 action: "insertControl",
                 param: {
                     elementName: "hairpin",
-                    startId: "{{targetId}}",
-                    endId: "{{secondaryId}}",
+                    startId: "[selection-id]",
+                    endId: "[selection-secondary-id]",
                 },
             },
             {
@@ -245,7 +245,7 @@ export const actionDefinitions = {
                 action: "insertControl",
                 param: {
                     elementName: "mordent",
-                    startId: "{{targetId}}",
+                    startId: "[selection-id]",
                 },
             },
             {
@@ -260,8 +260,8 @@ export const actionDefinitions = {
                 action: "insertControl",
                 param: {
                     elementName: "slur",
-                    startId: "{{targetId}}",
-                    endId: "{{secondaryId}}",
+                    startId: "[selection-id]",
+                    endId: "[selection-secondary-id]",
                 },
             },
             {
@@ -276,7 +276,7 @@ export const actionDefinitions = {
                 action: "insertControl",
                 param: {
                     elementName: "trill",
-                    startId: "{{targetId}}",
+                    startId: "[selection-id]",
                 },
             },
             {
@@ -291,7 +291,7 @@ export const actionDefinitions = {
                 action: "insertControl",
                 param: {
                     elementName: "mordent",
-                    startId: "{{targetId}}",
+                    startId: "[selection-id]",
                 },
             },
             {
@@ -306,7 +306,7 @@ export const actionDefinitions = {
                 action: "insertControl",
                 param: {
                     elementName: "fing",
-                    startId: "{{targetId}}",
+                    startId: "[selection-id]",
                 },
             },
             {
@@ -337,7 +337,7 @@ export const actionDefinitions = {
                 action: "insertControl",
                 param: {
                     elementName: "dir",
-                    startId: "{{targetId}}",
+                    startId: "[selection-id]",
                 },
             },
             {
@@ -368,7 +368,7 @@ export const actionDefinitions = {
                 action: "insertControl",
                 param: {
                     elementName: "tempo",
-                    startId: "{{targetId}}",
+                    startId: "[selection-id]",
                 },
             },
             {
@@ -398,7 +398,7 @@ export const actionDefinitions = {
             {
                 action: "delete",
                 param: {
-                    elementId: "{{targetId}}"
+                    elementId: "[selection-id]"
                 },
             },
             {
@@ -412,7 +412,7 @@ export const actionDefinitions = {
             {
                 action: "delete",
                 param: {
-                    elementId: "{{targetId}}",
+                    elementId: "[selection-id]",
                     backspace: true,
                 },
             },
@@ -427,7 +427,7 @@ export const actionDefinitions = {
             {
                 action: "set",
                 param: {
-                    elementId: "{{targetId}}",
+                    elementId: "[selection-id]",
                     attribute: "stem.dir",
                     value: "",
                 },
@@ -443,7 +443,7 @@ export const actionDefinitions = {
             {
                 action: "set",
                 param: {
-                    elementId: "{{targetId}}",
+                    elementId: "[selection-id]",
                     attribute: "stem.dir",
                     value: "down",
                 },
@@ -459,7 +459,7 @@ export const actionDefinitions = {
             {
                 action: "set",
                 param: {
-                    elementId: "{{targetId}}",
+                    elementId: "[selection-id]",
                     attribute: "stem.dir",
                     value: "up",
                 },
@@ -475,7 +475,7 @@ export const actionDefinitions = {
             {
                 action: "set",
                 param: {
-                    elementId: "{{targetId}}",
+                    elementId: "[selection-id]",
                     attribute: "place",
                     value: "",
                 },
@@ -491,7 +491,7 @@ export const actionDefinitions = {
             {
                 action: "set",
                 param: {
-                    elementId: "{{targetId}}",
+                    elementId: "[selection-id]",
                     attribute: "place",
                     value: "above",
                 },
@@ -507,7 +507,7 @@ export const actionDefinitions = {
             {
                 action: "set",
                 param: {
-                    elementId: "{{targetId}}",
+                    elementId: "[selection-id]",
                     attribute: "place",
                     value: "below",
                 },
@@ -523,9 +523,9 @@ export const actionDefinitions = {
             {
                 action: "insertMeasures",
                 param: {
-                    elementId: "{{targetId}}",
+                    elementId: "[selection-id]",
                     attribute: "place",
-                    value: "1",
+                    value: "{{dialogValue}}",
                 },
             },
             {

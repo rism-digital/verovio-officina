@@ -4,7 +4,6 @@ import type {
     EditActionParam,
     EditResponseContent,
     EditAction,
-    ActionInput,
     EditActionName,
     EditStatus,
     MEIExportOptions,
@@ -77,15 +76,10 @@ export class EditorController {
         await this.applyLayoutForSize(this.lastLayoutSize);
     }
 
-    private async refreshEditStatus(selection?: EditStatus["selection"]): Promise<EditStatus> {
-        const current = get(this.stores.editStatus);
+    private async refreshEditStatus(): Promise<EditStatus> {
         const editStatus = await this.bridge.verovio.editStatus();
-        const nextEditStatus: EditStatus = {
-            ...editStatus,
-            selection: editStatus.selection ?? selection ?? current.selection,
-        };
-        this.stores.editStatus.set(nextEditStatus);
-        return nextEditStatus;
+        this.stores.editStatus.set(editStatus);
+        return editStatus;
     }
 
     async updateVerovioView(): Promise<void> {
@@ -249,17 +243,19 @@ export class EditorController {
             await this.setCurrentPage(page);
         }
         try {
-            const editAction: EditAction = {
+            const editActionSelect: EditAction = {
+                action: "select",
+                param: { elementId: id },
+            }
+            const selectOk = await this.bridge.verovio.edit(editActionSelect);
+            const editActionContext: EditAction = {
                 action: "context",
                 param: { elementId: id },
             };
-            const contextOk = await this.bridge.verovio.edit(editAction);
-            if (contextOk) {
+            const contextOk = await this.bridge.verovio.edit(editActionContext);
+            if (selectOk && contextOk) {
                 const editResponseContent = await this.bridge.verovio.editResponseContent();
-                await this.refreshEditStatus({
-                    id,
-                    element: editResponseContent.object.element,
-                });
+                await this.refreshEditStatus();
                 this.stores.editResponseContent.set(
                     editResponseContent,
                 );
@@ -269,6 +265,25 @@ export class EditorController {
         } catch (error) {
             console.error("Failed to load context data", error);
             this.stores.editResponseContent.set(null);
+        }
+    }
+
+    async handleSecondarySelect(id: string | null): Promise<void> {
+        if (!id || !get(this.stores.editStatus).selection?.id) return;
+        try {
+            const editActionSelect: EditAction = {
+                action: "select",
+                param: {
+                    elementId: id,
+                    secondary: true,
+                },
+            };
+            const selectOk = await this.bridge.verovio.edit(editActionSelect);
+            if (selectOk) {
+                await this.refreshEditStatus();
+            }
+        } catch (error) {
+            console.error("Failed to update secondary selection", error);
         }
     }
 
@@ -323,14 +338,15 @@ export class EditorController {
     async handleEditAction(
         action: EditActionName,
         param: EditActionParam | undefined,
-        context: ActionInput,
+        dialogValue?: string,
     ): Promise<boolean> {
         this.stores.workerBusy.set(true);
         try {
-            const resolvedParam = this.replaceActionPlaceholder(param, context);
             const editAction: EditAction = {
                 action,
-                param: resolvedParam ?? {},
+                param: param
+                    ? this.resolveDialogValuePlaceholder(param, dialogValue)
+                    : {},
             };
             const ok = await this.bridge.verovio.edit(editAction);
             if (!ok) {
@@ -354,37 +370,22 @@ export class EditorController {
         }
     }
 
-    private replaceActionPlaceholder(
-        param: EditActionParam | undefined,
-        context: ActionInput,
-    ): EditActionParam | undefined {
-        if (param === undefined) return undefined;
-        const placeholders: Record<string, string> = {
-            targetId: context.targetId,
-            targetElement: context.targetElement,
-            dialogValue: context.dialogValue ?? "",
-        };
-        const placeholderPattern = /^\{\{([a-zA-Z0-9_]+)\}\}$/;
-
-        const replaceValue = (value: unknown): unknown => {
-            if (typeof value === "string") {
-                const match = value.match(placeholderPattern);
-                if (match) {
-                    const key = match[1];
-                    return placeholders[key] ?? value;
-                }
-            }
-            if (Array.isArray(value)) {
-                return value.map((entry) => replaceValue(entry));
-            }
-            if (value && typeof value === "object") {
-                const entries = Object.entries(value as Record<string, unknown>);
-                return Object.fromEntries(entries.map(([k, v]) => [k, replaceValue(v)]));
-            }
-            return value;
-        };
-
-        return replaceValue(param) as EditActionParam;
+    private resolveDialogValuePlaceholder<T>(value: T, dialogValue = ""): T {
+        if (typeof value === "string") {
+            return value.split("{{dialogValue}}").join(dialogValue) as T;
+        }
+        if (Array.isArray(value)) {
+            return value.map((item) => this.resolveDialogValuePlaceholder(item, dialogValue)) as T;
+        }
+        if (value && typeof value === "object") {
+            return Object.fromEntries(
+                Object.entries(value).map(([key, entry]) => [
+                    key,
+                    this.resolveDialogValuePlaceholder(entry, dialogValue),
+                ]),
+            ) as T;
+        }
+        return value;
     }
 
     async saveDoc(): Promise<string> {
