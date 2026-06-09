@@ -5,7 +5,7 @@ export type HoverElementHandler = (id: string | null) => void;
 export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) => void;
 export type ActionHandler = () => void;
 
-export type ContextAction = {
+export type Action = {
     action: EditActionName;
     label: string;
     param?: EditActionParam;
@@ -14,14 +14,14 @@ export type ContextAction = {
     dialogValue?: string;
 };
 
-export type TargetedContextAction = ContextAction & {
+export type TargetedContextAction = Action & {
     targetId: string;
     targetElement: string;
 };
 
 export type TargetedContextActionHandler = (action: TargetedContextAction) => void;
 
-export type EditActionInput = {
+export type ActionInput = {
     targetId: string;
     targetElement: string;
     dialogValue?: string;

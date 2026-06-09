@@ -23,7 +23,7 @@
         type EnterValueDialogState,
         type ToolbarDispatchAction,
     } from "./app/toolbar-actions";
-    import type { ContextAction, EditActionInput, MEIExportOptions, TargetedContextAction, TreeNodeData } from "./app/types";
+    import type { Action, ActionInput, MEIExportOptions, TargetedContextAction, TreeNodeData } from "./app/types";
     import {
         dirty,
         editResponseContent,
@@ -318,7 +318,7 @@
         // Placeholder for XML validation logic
     }
 
-    function treeEditActionInput(action: TargetedContextAction): EditActionInput {
+    function treeEditActionInput(action: TargetedContextAction): ActionInput {
         return {
             targetId: action.targetId,
             targetElement: action.targetElement,
@@ -358,7 +358,7 @@
         }
     }
 
-    async function handleToolbarAction(action: ContextAction) {
+    async function handleToolbarAction(action: Action) {
         const next = beginToolbarAction(action);
         if (next.kind === "prompt") {
             enterValueDialogState = next.dialogState;

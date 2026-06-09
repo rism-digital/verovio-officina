@@ -4,7 +4,7 @@ import type {
     EditActionParam,
     EditResponseContent,
     EditAction,
-    EditActionInput,
+    ActionInput,
     EditActionName,
     EditStatus,
     MEIExportOptions,
@@ -323,7 +323,7 @@ export class EditorController {
     async handleEditAction(
         action: EditActionName,
         param: EditActionParam | undefined,
-        context: EditActionInput,
+        context: ActionInput,
     ): Promise<boolean> {
         this.stores.workerBusy.set(true);
         try {
@@ -356,7 +356,7 @@ export class EditorController {
 
     private replaceActionPlaceholder(
         param: EditActionParam | undefined,
-        context: EditActionInput,
+        context: ActionInput,
     ): EditActionParam | undefined {
         if (param === undefined) return undefined;
         const placeholders: Record<string, string> = {

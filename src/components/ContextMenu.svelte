@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { ContextAction } from "../app/types";
+    import type { Action } from "../app/types";
     import {
         resolveContextButtonBars,
         resolveContextMenuItems,
@@ -10,7 +10,7 @@
     export let x = 0;
     export let y = 0;
     export let elementName = "";
-    export let onSelect: ((action: ContextAction) => void) | null = null;
+    export let onSelect: ((action: Action) => void) | null = null;
     export let onClose: (() => void) | null = null;
 
     let items: ResolvedMenuEntry[] = [];
@@ -35,13 +35,13 @@
         }
     }
 
-    function handleAction(action: ContextAction) {
+    function handleAction(action: Action) {
         onSelect?.(action);
     }
 
     function handleActionKeydown(
         event: KeyboardEvent,
-        action: ContextAction,
+        action: Action,
     ) {
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();

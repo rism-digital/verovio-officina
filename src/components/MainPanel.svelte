@@ -4,7 +4,7 @@
     import SidePanel from "./SidePanel.svelte";
     import { withBaseUrl } from "../app/asset-url";
     import type {
-        ContextAction,
+        Action,
         EditActionSetParam,
         EditActionSetHandler,
         EditResponseContent,
@@ -268,7 +268,7 @@
         };
     }
 
-    function handleOverlayContextAction(action: ContextAction) {
+    function handleOverlayContextAction(action: Action) {
         const currentOverlayContextMenu = overlayContextMenu;
         if (!currentOverlayContextMenu) return;
         onTargetedContextAction?.({

@@ -1,19 +1,19 @@
 import { withBaseUrl } from "./asset-url";
 import { actionCatalog, actionDefinitions, contextButtonBars, menuActions } from "./actions/action.bundle";
 import type { ActionCatalogEntry, ContextButtonEntry, MenuActionEntry } from "./actions/action.bundle";
-import type { ContextAction } from "./types";
+import type { Action } from "./types";
 
-export type ResolvedContextButton = ContextAction & {
+export type ResolvedContextButton = Action & {
     actionKey: string;
     iconUrl: string;
 };
 
-export type ResolvedMenuAction = ContextAction & {
+export type ResolvedMenuAction = Action & {
     actionKey: string;
 };
 
 export type ResolvedMenuEntry =
-    | (ContextAction & { kind: "action"; actionKey: string })
+    | (Action & { kind: "action"; actionKey: string })
     | { kind: "submenu"; label: string; items: ResolvedMenuEntry[] };
 
 type ResolveContextButtonBarsOptions = {

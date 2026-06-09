@@ -4,7 +4,7 @@
         type ResolvedMenuAction,
     } from "../app/action-resolver";
     import { withBaseUrl } from "../app/asset-url";
-    import type { ActionHandler, ContextAction } from "../app/types";
+    import type { ActionHandler, Action } from "../app/types";
     export let canZoom = false;
     export let canZoomIn = true;
     export let canZoomOut = true;
@@ -21,7 +21,7 @@
     export let onNextPage: ActionHandler | null = null;
     export let onToggleXml: ActionHandler | null = null;
     export let onScoreProperties: ActionHandler | null = null;
-    export let onContextAction: ((action: ContextAction) => void) | null = null;
+    export let onContextAction: ((action: Action) => void) | null = null;
     export let onAbout: ActionHandler | null = null;
 
     const prevIconUrl = withBaseUrl("icons/toolbar/arrow-left.png");

@@ -4,7 +4,7 @@
         resolveContextButtonBars,
         type ResolvedContextButton,
     } from "../app/action-resolver";
-    import type { ContextAction, Mode } from "../app/types";
+    import type { Action, Mode } from "../app/types";
 
     export let mode: Mode;
     export let onToggleMode: () => void;
@@ -12,7 +12,7 @@
     export let workerBusy = false;
     export let onValidateXml: (() => void) | null = null;
     export let selectedElementName: string | null = null;
-    export let onContextAction: ((action: ContextAction) => void) | null = null;
+    export let onContextAction: ((action: Action) => void) | null = null;
 
     const undoIconUrl = withBaseUrl("icons/editor/undo.png");
     const redoIconUrl = withBaseUrl("icons/editor/redo.png");
