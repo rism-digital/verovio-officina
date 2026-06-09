@@ -57,7 +57,7 @@ const controlEventPlace = [
 ]
 
 const insertControlEvent = [
-    { name: "Add hairpin", action: "add-hairpin", icon: "icons/mei/hairpin.png", secondary: true},
+    { name: "Add hairpin", action: "add-hairpin", icon: "icons/mei/hairpin.png", secondary: true },
     { name: "Add slur", action: "add-slur", icon: "icons/mei/slur.png", secondary: true },
 ]
 
@@ -112,6 +112,10 @@ export const contextButtonBars = {
         controlEventPlace,
     ]
 };
+
+export const menuActions = [
+    { name: "At the end of the score", action: "add-measures-end", dialog: "enter-value" },
+]
 
 export const actionDefinitions = {
     "add-accidental-flat": {
@@ -513,4 +517,20 @@ export const actionDefinitions = {
             },
         ],
     },
+    "add-measures-end": {
+        action: "chain",
+        param: [
+            {
+                action: "insertMeasures",
+                param: {
+                    elementId: "{{targetId}}",
+                    attribute: "place",
+                    value: "1",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    }
 };

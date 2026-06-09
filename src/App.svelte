@@ -451,6 +451,7 @@
             controller.setCurrentPage(get(verovioState).currentPage + 1)}
         onToggleXml={toggleXmlMode}
         onScoreProperties={openScorePropertiesDialog}
+        onContextAction={handleToolbarAction}
         canZoom={canMenuZoom}
         canZoomIn={canMenuZoomIn}
         canZoomOut={canMenuZoomOut}

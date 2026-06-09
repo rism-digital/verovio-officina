@@ -21,6 +21,13 @@ export type ContextButtonEntry = {
     secondary?: boolean;
 };
 
+export type MenuActionEntry = {
+    name: string;
+    action: string;
+    dialog?: string;
+};
+
 export const actionCatalog: Record<string, ActionCatalogEntry[]>;
 export const contextButtonBars: Record<string, ContextButtonEntry[][]>;
+export const menuActions: MenuActionEntry[];
 export const actionDefinitions: Record<string, EditAction>;

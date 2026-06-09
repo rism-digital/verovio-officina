@@ -1,11 +1,15 @@
 import { withBaseUrl } from "./asset-url";
-import { actionCatalog, actionDefinitions, contextButtonBars } from "./actions/action.bundle";
-import type { ActionCatalogEntry, ContextButtonEntry } from "./actions/action.bundle";
+import { actionCatalog, actionDefinitions, contextButtonBars, menuActions } from "./actions/action.bundle";
+import type { ActionCatalogEntry, ContextButtonEntry, MenuActionEntry } from "./actions/action.bundle";
 import type { ContextAction } from "./types";
 
 export type ResolvedContextButton = ContextAction & {
     actionKey: string;
     iconUrl: string;
+};
+
+export type ResolvedMenuAction = ContextAction & {
+    actionKey: string;
 };
 
 export type ResolvedMenuEntry =
@@ -24,6 +28,22 @@ function isActionEntry(entry: ActionCatalogEntry): entry is Extract<ActionCatalo
 export function resolveContextMenuItems(name: string): ResolvedMenuEntry[] {
     const entries = actionCatalog[name] ?? [];
     return resolveMenuEntries(entries as ActionCatalogEntry[]);
+}
+
+export function resolveMenuActions(): ResolvedMenuAction[] {
+    const resolvedActions: ResolvedMenuAction[] = [];
+    for (const entry of menuActions as MenuActionEntry[]) {
+        const definition = actionDefinitions[entry.action];
+        if (!definition) continue;
+        resolvedActions.push({
+            label: entry.name,
+            action: definition.action,
+            param: definition.param,
+            actionKey: entry.action,
+            dialog: entry.dialog,
+        });
+    }
+    return resolvedActions;
 }
 
 function resolveMenuEntries(entries: ActionCatalogEntry[]): ResolvedMenuEntry[] {

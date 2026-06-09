@@ -1,6 +1,10 @@
 <script lang="ts">
+    import {
+        resolveMenuActions,
+        type ResolvedMenuAction,
+    } from "../app/action-resolver";
     import { withBaseUrl } from "../app/asset-url";
-    import type { ActionHandler } from "../app/types";
+    import type { ActionHandler, ContextAction } from "../app/types";
     export let canZoom = false;
     export let canZoomIn = true;
     export let canZoomOut = true;
@@ -17,12 +21,17 @@
     export let onNextPage: ActionHandler | null = null;
     export let onToggleXml: ActionHandler | null = null;
     export let onScoreProperties: ActionHandler | null = null;
+    export let onContextAction: ((action: ContextAction) => void) | null = null;
     export let onAbout: ActionHandler | null = null;
 
     const prevIconUrl = withBaseUrl("icons/toolbar/arrow-left.png");
     const nextIconUrl = withBaseUrl("icons/toolbar/arrow-right.png");
     const zoomOutIconUrl = withBaseUrl("icons/toolbar/zoom-out.png");
     const zoomInIconUrl = withBaseUrl("icons/toolbar/zoom-in.png");
+
+    let addMeasureItems: ResolvedMenuAction[] = [];
+
+    $: addMeasureItems = resolveMenuActions();
 </script>
 
 <nav class="vrv-toolbar vrv-text-no-select">
@@ -57,6 +66,23 @@
                 data-before="Score properties"
                 on:click={() => onScoreProperties?.()}
             ></div>
+        </div>
+    </div>
+    <div class="vrv-menu">
+        <div class="vrv-btn-text" data-before="Add"></div>
+        <div class="vrv-menu-content">
+            <div class="vrv-submenu">
+                <div class="vrv-submenu-text" data-before="Measure"></div>
+                <div class="vrv-submenu-content">
+                    {#each addMeasureItems as item}
+                        <div
+                            class="vrv-menu-text"
+                            data-before={item.label}
+                            on:click={() => onContextAction?.(item)}
+                        ></div>
+                    {/each}
+                </div>
+            </div>
         </div>
     </div>
     <div class="vrv-btn-group">
