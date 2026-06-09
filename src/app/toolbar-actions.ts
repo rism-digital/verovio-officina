@@ -1,14 +1,6 @@
-import type { Action, EditActionName, EditActionParam } from "./types";
+import type { Action } from "./types";
 
-export type ToolbarDispatchAction = Action;
-
-export type EnterValueDialogState = {
-    action: EditActionName;
-    actionLabel: string;
-    param?: EditActionParam;
-    actionKey?: string;
-    valueType?: "text" | "number";
-    redoLayout?: boolean;
+export type EnterValueDialogState = Action & {
     title: string;
     fieldLabel: string;
     defaultValue: string;
@@ -32,28 +24,15 @@ function resolveDefaultValue(actionKey?: string): string {
 }
 
 type BeginToolbarActionResult =
-    | { kind: "dispatch"; action: ToolbarDispatchAction }
+    | { kind: "dispatch"; action: Action }
     | { kind: "prompt"; dialogState: EnterValueDialogState };
 
-export function beginToolbarAction(input: {
-    action: EditActionName;
-    label: string;
-    param?: EditActionParam;
-    actionKey?: string;
-    dialog?: string;
-    valueType?: "text" | "number";
-    redoLayout?: boolean;
-}): BeginToolbarActionResult {
+export function beginToolbarAction(input: Action): BeginToolbarActionResult {
     if (input.dialog === "enter-value") {
         return {
             kind: "prompt",
             dialogState: {
-                action: input.action,
-                actionLabel: input.label,
-                param: input.param,
-                actionKey: input.actionKey,
-                valueType: input.valueType,
-                redoLayout: input.redoLayout,
+                ...input,
                 title: DEFAULT_ENTER_VALUE_DIALOG.title,
                 fieldLabel: DEFAULT_ENTER_VALUE_DIALOG.fieldLabel,
                 defaultValue: resolveDefaultValue(input.actionKey),
@@ -62,21 +41,14 @@ export function beginToolbarAction(input: {
     }
     return {
         kind: "dispatch",
-        action: {
-            action: input.action,
-            label: input.label,
-            param: input.param,
-            actionKey: input.actionKey,
-            valueType: input.valueType,
-            redoLayout: input.redoLayout,
-        },
+        action: input,
     };
 }
 
 export function resolveEnterValueDialog(
     dialogState: EnterValueDialogState,
     enteredValue: string | number,
-): ToolbarDispatchAction {
+): Action {
     const resolvedValue = typeof enteredValue === "number"
         ? enteredValue
         : enteredValue.trim() || dialogState.defaultValue;
@@ -87,7 +59,7 @@ export function resolveEnterValueDialog(
         : resolvedValue;
     return {
         action: dialogState.action,
-        label: dialogState.actionLabel,
+        label: dialogState.label,
         param: dialogState.param,
         actionKey: dialogState.actionKey,
         dialogValue,

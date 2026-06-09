@@ -5,15 +5,20 @@ export type HoverElementHandler = (id: string | null) => void;
 export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) => void;
 export type ActionHandler = () => void;
 
-export type Action = {
+export type ActionValueType = "text" | "number";
+
+export type ActionMetadata = {
+    dialog?: string;
+    dialogValue?: string | number;
+    valueType?: ActionValueType;
+    redoLayout?: boolean;
+};
+
+export type Action = ActionMetadata & {
     action: EditActionName;
     label: string;
     param?: EditActionParam;
     actionKey?: string;
-    dialog?: string;
-    dialogValue?: string | number;
-    valueType?: "text" | "number";
-    redoLayout?: boolean;
 };
 
 export type TargetedContextAction = Action & {

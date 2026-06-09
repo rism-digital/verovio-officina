@@ -1,11 +1,8 @@
-import type { EditAction } from "../types";
+import type { ActionMetadata, EditAction } from "../types";
 
-export type ActionCatalogActionEntry = {
+export type ActionEntry = ActionMetadata & {
     name: string;
     action: string;
-    dialog?: string;
-    valueType?: "text" | "number";
-    redoLayout?: boolean;
 };
 
 export type ActionCatalogSubmenuEntry = {
@@ -13,27 +10,14 @@ export type ActionCatalogSubmenuEntry = {
     submenu: ActionCatalogEntry[];
 };
 
-export type ActionCatalogEntry = ActionCatalogActionEntry | ActionCatalogSubmenuEntry;
+export type ActionCatalogEntry = ActionEntry | ActionCatalogSubmenuEntry;
 
-export type ContextButtonEntry = {
-    name: string;
-    action: string;
+export type ContextButtonEntry = ActionEntry & {
     icon: string;
-    dialog?: string;
-    valueType?: "text" | "number";
     secondary?: boolean;
-    redoLayout?: boolean;
-};
-
-export type MenuActionEntry = {
-    name: string;
-    action: string;
-    dialog?: string;
-    valueType?: "text" | "number";
-    redoLayout?: boolean;
 };
 
 export const actionCatalog: Record<string, ActionCatalogEntry[]>;
 export const contextButtonBars: Record<string, ContextButtonEntry[][]>;
-export const menuActions: MenuActionEntry[];
+export const menuActions: ActionEntry[];
 export const actionDefinitions: Record<string, EditAction>;

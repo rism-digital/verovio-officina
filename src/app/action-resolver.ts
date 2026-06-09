@@ -1,19 +1,16 @@
 import { withBaseUrl } from "./asset-url";
 import { actionCatalog, actionDefinitions, contextButtonBars, menuActions } from "./actions/action.bundle";
-import type { ActionCatalogEntry, ContextButtonEntry, MenuActionEntry } from "./actions/action.bundle";
+import type { ActionCatalogEntry, ActionEntry, ContextButtonEntry } from "./actions/action.bundle";
 import type { Action } from "./types";
 
-export type ResolvedContextButton = Action & {
-    actionKey: string;
-    iconUrl: string;
-};
+type ResolvedAction = Action & { actionKey: string };
 
-export type ResolvedMenuAction = Action & {
-    actionKey: string;
-};
+export type ResolvedContextButton = ResolvedAction & { iconUrl: string };
+
+export type ResolvedMenuAction = ResolvedAction;
 
 export type ResolvedMenuEntry =
-    | (Action & { kind: "action"; actionKey: string })
+    | (ResolvedAction & { kind: "action" })
     | { kind: "submenu"; label: string; items: ResolvedMenuEntry[] };
 
 type ResolveContextButtonBarsOptions = {
@@ -21,29 +18,34 @@ type ResolveContextButtonBarsOptions = {
     includeSecondary?: boolean;
 };
 
-function isActionEntry(entry: ActionCatalogEntry): entry is Extract<ActionCatalogEntry, { action: string }> {
+function isActionEntry(entry: ActionCatalogEntry): entry is ActionEntry {
     return "action" in entry;
+}
+
+function resolveActionEntry(entry: ActionEntry): ResolvedAction | null {
+    const definition = actionDefinitions[entry.action];
+    if (!definition) return null;
+    return {
+        label: entry.name,
+        action: definition.action,
+        param: definition.param,
+        actionKey: entry.action,
+        dialog: entry.dialog,
+        valueType: entry.valueType,
+        redoLayout: entry.redoLayout,
+    };
 }
 
 export function resolveContextMenuItems(name: string): ResolvedMenuEntry[] {
     const entries = actionCatalog[name] ?? [];
-    return resolveMenuEntries(entries as ActionCatalogEntry[]);
+    return resolveMenuEntries(entries);
 }
 
 export function resolveMenuActions(): ResolvedMenuAction[] {
     const resolvedActions: ResolvedMenuAction[] = [];
-    for (const entry of menuActions as MenuActionEntry[]) {
-        const definition = actionDefinitions[entry.action];
-        if (!definition) continue;
-        resolvedActions.push({
-            label: entry.name,
-            action: definition.action,
-            param: definition.param,
-            actionKey: entry.action,
-            dialog: entry.dialog,
-            valueType: entry.valueType,
-            redoLayout: entry.redoLayout,
-        });
+    for (const entry of menuActions) {
+        const resolvedAction = resolveActionEntry(entry);
+        if (resolvedAction) resolvedActions.push(resolvedAction);
     }
     return resolvedActions;
 }
@@ -53,16 +55,11 @@ function resolveMenuEntries(entries: ActionCatalogEntry[]): ResolvedMenuEntry[] 
     for (const entry of entries) {
         if (isActionEntry(entry)) {
             if (entry.dialog) continue;
-            const definition = actionDefinitions[entry.action];
-            if (!definition) continue;
+            const resolvedAction = resolveActionEntry(entry);
+            if (!resolvedAction) continue;
             resolvedItems.push({
+                ...resolvedAction,
                 kind: "action",
-                label: entry.name,
-                action: definition.action,
-                param: definition.param,
-                actionKey: entry.action,
-                valueType: entry.valueType,
-                redoLayout: entry.redoLayout,
             });
             continue;
         }
@@ -84,21 +81,15 @@ export function resolveContextButtonBars(
     if (!name) return [];
     const bars = contextButtonBars[name] ?? [];
     const resolvedBars: ResolvedContextButton[][] = [];
-    for (const bar of bars as ContextButtonEntry[][]) {
+    for (const bar of bars) {
         const resolvedBar: ResolvedContextButton[] = [];
         for (const button of bar) {
             if (!options.includeDialogs && button.dialog) continue;
             if (button.secondary && !options.includeSecondary) continue;
-            const definition = actionDefinitions[button.action];
-            if (!definition) continue;
+            const resolvedAction = resolveActionEntry(button);
+            if (!resolvedAction) continue;
             resolvedBar.push({
-                label: button.name,
-                action: definition.action,
-                param: definition.param,
-                actionKey: button.action,
-                dialog: button.dialog,
-                valueType: button.valueType,
-                redoLayout: button.redoLayout,
+                ...resolvedAction,
                 iconUrl: withBaseUrl(button.icon),
             });
         }

@@ -20,8 +20,7 @@
         beginToolbarAction,
         DEFAULT_ENTER_VALUE_DIALOG,
         resolveEnterValueDialog,
-        type EnterValueDialogState,
-        type ToolbarDispatchAction,
+        type EnterValueDialogState
     } from "./app/toolbar-actions";
     import type { Action, MEIExportOptions, TargetedContextAction, TreeNodeData } from "./app/types";
     import {
@@ -327,13 +326,13 @@
         }
     }
 
-    function actionRequiresSelection(action: ToolbarDispatchAction): boolean {
+    function actionRequiresSelection(action: Action): boolean {
         const encodedParam = action.param ? JSON.stringify(action.param) : "";
         return encodedParam.includes("[selection-id]")
             || encodedParam.includes("[selection-secondary-id]");
     }
 
-    async function dispatchToolbarAction(toolbarAction: ToolbarDispatchAction) {
+    async function dispatchToolbarAction(toolbarAction: Action) {
         const elementName = $editStatus.selection?.element;
         if (!elementName && actionRequiresSelection(toolbarAction)) return;
 
