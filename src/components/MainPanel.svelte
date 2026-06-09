@@ -9,12 +9,14 @@
         EditActionSetHandler,
         EditResponseContent,
         SelectElementHandler,
+        SelectionInfo,
         TargetedContextActionHandler,
         ViewModel,
     } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
     export let view: ViewModel;
+    export let selection: SelectionInfo = { type: "none" };
     export let onResize: (size: { width: number; height: number }) => void;
     export let onElementSelect: SelectElementHandler | null = null;
     export let onAttributeEdit: EditActionSetHandler | null = null;
@@ -167,8 +169,8 @@
     }
 
     function selectionIds(): string[] {
-        if (view.selection?.type !== "element") return [];
-        return [view.selection.id];
+        if (selection.type !== "element") return [];
+        return [selection.id];
     }
 
     function syncSelectionHighlight() {
@@ -295,7 +297,7 @@
         if (svgOverlay) svgOverlay.innerHTML = "";
     }
 
-    $: if (view.selection) syncSelectionHighlight();
+    $: if (selection) syncSelectionHighlight();
 </script>
 
 <div class="vrv-main-panel">

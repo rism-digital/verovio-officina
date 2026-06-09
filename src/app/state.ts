@@ -5,8 +5,7 @@ export const mode = writable<Mode>('insert');
 export const selection = writable<SelectionInfo>({ type: 'none' });
 export const viewModel = writable<ViewModel>({
   svg: '',
-  svgId: 0,
-  selection: { type: 'none' }
+  svgId: 0
 });
 export const editResponseContent = writable<EditResponseContent | null>(null);
 export const verovioState = writable({

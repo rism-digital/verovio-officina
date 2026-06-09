@@ -49,7 +49,6 @@ export type SelectionInfo =
 export interface ViewModel {
     svg: string;
     svgId: number;
-    selection: SelectionInfo;
 };
 
 export interface TreeNodeData {

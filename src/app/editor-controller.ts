@@ -80,7 +80,6 @@ export class EditorController {
 
     async setSelection(next: SelectionInfo): Promise<void> {
         this.stores.selection.set(next);
-        this.stores.viewModel.update((current) => ({ ...current, selection: next }));
     }
 
     async updateVerovioView(): Promise<void> {

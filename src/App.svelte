@@ -469,6 +469,7 @@
     {:else}
         <MainPanel
             view={$viewModel}
+            selection={$selection}
             onResize={(size) => controller.applyLayoutForSize(size)}
             onElementSelect={(id) => controller.handleSelect(id)}
             onAttributeEdit={(param, commit) =>
