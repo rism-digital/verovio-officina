@@ -1,8 +1,14 @@
 import { writable } from 'svelte/store';
-import type { EditResponseContent, Mode, SelectionInfo, ViewModel } from './types';
+import type { EditResponseContent, EditStatus, Mode, ViewModel } from './types';
 
 export const mode = writable<Mode>('insert');
-export const selection = writable<SelectionInfo>({ type: 'none' });
+export const editStatus = writable<EditStatus>({
+  chainedId: '',
+  canUndo: false,
+  canRedo: false,
+  isMensuralMusicOnly: false,
+  selection: null
+});
 export const viewModel = writable<ViewModel>({
   svg: '',
   svgId: 0
@@ -16,4 +22,3 @@ export const verovioState = writable({
 export const workerBusy = writable(false);
 export const dirty = writable(false);
 export const statusLine = writable('Ready');
-export const isMensuralMusicOnly = writable(false);

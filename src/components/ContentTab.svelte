@@ -2,7 +2,7 @@
     import AttributeList from "./AttributeList.svelte";
     import ElementReference from "./ElementReference.svelte";
     import Tree from "./Tree.svelte";
-    import { selection } from "../app/state";
+    import { editStatus } from "../app/state";
     import type {
         EditActionSetHandler,
         EditResponseContent,
@@ -47,7 +47,7 @@
         <Tree
             ancestors={editResponseContent?.ancestors ?? null}
             context={editResponseContent?.context ?? null}
-            selectedId={$selection.type === "element" ? $selection.id : null}
+            selectedId={$editStatus.selection?.id ?? null}
             {onSelectElement}
             {onHoverElement}
             onContextAction={onTargetedContextAction}

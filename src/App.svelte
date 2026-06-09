@@ -27,10 +27,9 @@
     import {
         dirty,
         editResponseContent,
+        editStatus,
         mode,
-        selection,
         statusLine,
-        isMensuralMusicOnly,
         verovioState,
         viewModel,
         workerBusy,
@@ -96,12 +95,11 @@
         {
             verovioState,
             viewModel,
-            selection,
+            editStatus,
             statusLine,
             workerBusy,
             dirty,
             editResponseContent,
-            isMensuralMusicOnly,
         },
     );
 
@@ -187,8 +185,8 @@
             return;
         }
 
-        const currentSelection = get(selection);
-        if (currentSelection.type !== "element" || !currentSelection.id) return;
+        const currentSelection = get(editStatus).selection;
+        if (!currentSelection?.id) return;
         event.preventDefault();
         if (get(workerBusy)) return;
         if (direction !== null) {
@@ -232,7 +230,7 @@
         const target = event.target as HTMLInputElement;
         const file = target.files?.[0];
         if (!file) return;
-        selection.set({ type: "none" });
+        editStatus.update((current) => ({ ...current, selection: null }));
         const content = await file.text();
         localStorage.setItem(STORAGE_KEY, content);
         await controller.loadData(content);
@@ -276,7 +274,7 @@
     async function confirmXmlReload() {
         xmlReloadDialogOpen = false;
         try {
-            selection.set({ type: "none" });
+            editStatus.update((current) => ({ ...current, selection: null }));
             localStorage.setItem(STORAGE_KEY, xmlContent);
             await controller.loadData(xmlContent);
             xmlInitialContent = xmlContent;
@@ -463,13 +461,13 @@
         <XmlPanel
             value={xmlContent}
             workerBusy={$workerBusy}
-            selectedId={$selection.type === "element" ? $selection.id : null}
+            selectedId={$editStatus.selection?.id ?? null}
             onChange={(value) => (xmlContent = value)}
         />
     {:else}
         <MainPanel
             view={$viewModel}
-            selection={$selection}
+            selection={$editStatus.selection}
             onResize={(size) => controller.applyLayoutForSize(size)}
             onElementSelect={(id) => controller.handleSelect(id)}
             onAttributeEdit={(param, commit) =>

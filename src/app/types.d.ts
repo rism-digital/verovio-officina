@@ -39,13 +39,6 @@ export type MEIExportOptions = {
     ignoreHeader: boolean;
 };
 
-export type SelectionInfo =
-    | { type: "none" }
-    | {
-        type: "element";
-        id: string;
-    };
-
 export interface ViewModel {
     svg: string;
     svgId: number;
@@ -71,6 +64,10 @@ export interface EditStatus {
     canUndo: boolean;
     canRedo: boolean;
     isMensuralMusicOnly: boolean;
+    selection: {
+        id: string;
+        element: string;
+    } | null;
 }
 
 export interface ReferenceObject extends TreeNodeData {
