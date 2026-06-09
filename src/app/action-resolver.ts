@@ -18,7 +18,6 @@ export type ResolvedMenuEntry =
 
 type ResolveContextButtonBarsOptions = {
     includeDialogs?: boolean;
-    secondarySelection?: string | null;
 };
 
 function isActionEntry(entry: ActionCatalogEntry): entry is Extract<ActionCatalogEntry, { action: string }> {
@@ -84,7 +83,7 @@ export function resolveContextButtonBars(
         const resolvedBar: ResolvedContextButton[] = [];
         for (const button of bar) {
             if (!options.includeDialogs && button.dialog) continue;
-            if (button.secondary && !options.secondarySelection) continue;
+            if (button.secondary) continue;
             const definition = actionDefinitions[button.action];
             if (!definition) continue;
             resolvedBar.push({

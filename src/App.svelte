@@ -65,7 +65,6 @@
     let enterValueDialogState: EnterValueDialogState | null = null;
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
     let xmlInitialContent = "";
-    let secondarySelection: string | null = null;
 
     const ABOUT_LIBRARIES_HTML = `Libraries used in this application:\n\n\
 * [html-midi-player](https://github.com/cifkao/html-midi-player)\n\
@@ -215,7 +214,6 @@
         const ok = await controller.handleEditAction(definition.action, definition.param, {
             targetId: id,
             targetElement: elementName,
-            secondaryId: selectedSecondaryId(),
         });
         statusLine.set(ok
             ? `Deleted <${elementName}>.`
@@ -322,19 +320,10 @@
         // Placeholder for XML validation logic
     }
 
-    function selectedSecondaryId(): string | undefined {
-        return $selection.type === "element" ? $selection.additionalIds[0] : undefined;
-    }
-
-    $: secondarySelection = $selection.type === "element"
-        ? ($selection.additionalIds[0] ?? null)
-        : null;
-
     function treeEditActionInput(action: TargetedContextAction): EditActionInput {
         return {
             targetId: action.targetId,
             targetElement: action.targetElement,
-            secondaryId: selectedSecondaryId(),
         };
     }
 
@@ -361,7 +350,6 @@
             {
                 targetId: object.id,
                 targetElement: object.element,
-                secondaryId: selectedSecondaryId(),
                 dialogValue: toolbarAction.dialogValue,
             },
         );
@@ -468,7 +456,6 @@
         workerBusy={$workerBusy}
         onValidateXml={validateXmlContent}
         selectedElementName={$editInfoContent?.object?.element ?? null}
-        {secondarySelection}
         onContextAction={handleToolbarAction}
     />
 
@@ -483,7 +470,7 @@
         <MainPanel
             view={$viewModel}
             onResize={(size) => controller.applyLayoutForSize(size)}
-            onElementSelect={(id, options) => controller.handleSelect(id, options)}
+            onElementSelect={(id) => controller.handleSelect(id)}
             onAttributeEdit={(param, commit) =>
                 controller.handleAttributeEdit(param, commit)}
             onTargetedContextAction={handleTargetedContextAction}

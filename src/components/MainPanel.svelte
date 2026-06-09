@@ -168,7 +168,7 @@
 
     function selectionIds(): string[] {
         if (view.selection?.type !== "element") return [];
-        return [view.selection.id, ...view.selection.additionalIds];
+        return [view.selection.id];
     }
 
     function syncSelectionHighlight() {
@@ -235,7 +235,7 @@
             return; // this should never happen, but as a safety
         }
 
-        onElementSelect?.(node.id, { additive: event.shiftKey });
+        onElementSelect?.(node.id);
     }
 
     function closeOverlayContextMenu() {

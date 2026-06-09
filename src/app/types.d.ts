@@ -1,9 +1,6 @@
 export type Mode = 'edit' | 'insert';
 
-export type SelectElementOptions = {
-    additive?: boolean;
-};
-export type SelectElementHandler = (id: string, options?: SelectElementOptions) => void;
+export type SelectElementHandler = (id: string) => void;
 export type HoverElementHandler = (id: string | null) => void;
 export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) => void;
 export type ActionHandler = () => void;
@@ -27,7 +24,6 @@ export type TargetedContextActionHandler = (action: TargetedContextAction) => vo
 export type EditActionInput = {
     targetId: string;
     targetElement: string;
-    secondaryId?: string;
     dialogValue?: string;
 };
 
@@ -48,7 +44,6 @@ export type SelectionInfo =
     | {
         type: "element";
         id: string;
-        additionalIds: string[];
     };
 
 export interface ViewModel {
