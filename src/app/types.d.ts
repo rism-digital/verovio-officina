@@ -8,17 +8,6 @@ export type HoverElementHandler = (id: string | null) => void;
 export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) => void;
 export type ActionHandler = () => void;
 
-export type EditActionName =
-    | "delete"
-    | "insert"
-    | "insertControl"
-    | "set"
-    | "commit"
-    | "chain"
-    | "context"
-    | "properties"
-    | "navigate";
-
 export type ContextAction = {
     action: EditActionName;
     label: string;
@@ -102,16 +91,47 @@ export interface EditInfoContent {
     referringElements: ReferenceObject[];
 }
 
+// Action names and params
+
+export type EditAction = {
+    action: EditActionName;
+    param?: EditActionParam;
+};
+
+export type EditActionName =
+    | "delete"
+    | "insert"
+    | "insertControl"
+    | "insertMeasures"
+    | "insertMeaure"
+    | "insertNote"    
+    | "set"
+    | "commit"
+    | "chain"
+    | "context"
+    | "properties"
+    | "navigate";
+
+export type EditActionParam =
+    | EditActionChainParam
+    | EditActionContextParam
+    | EditActionDeleteParam
+    | EditActionInsertParam
+    | EditActionInsertControlParam
+    | EditActionNavigationParam
+    | EditActionPropertiesParam
+    | EditActionSetParam;
+
+// ActionParams
+
+export type EditActionContextParam = {
+    elementId: string;
+};
+
 export type EditActionDeleteParam = {
     elementId: string;   
     backspace?: boolean; 
 }
-
-export type EditActionSetParam = {
-    elementId: string;
-    attribute: string;
-    value: string;
-};
 
 export type EditActionInsertParam = {
     elementName: string;
@@ -125,38 +145,28 @@ export type EditActionInsertControlParam = {
     endId?: string;
 };
 
-export type EditActionCommitParam = Record<string, never>;
-export type EditActionContextParam = {
-    elementId: string;
-};
 export type EditActionNavigationParam = {
     elementId: string;
     direction: number;
 };
+
 export type EditActionPropertiesParam =
     | Record<string, never>
     | {
         scoreDef: string;
     };
 
-export type EditActionChainStep = {
-    action: "delete" | "insert" | "insertControl" | "set" | "commit";
-    param?: EditActionDeleteParam | EditActionSetParam | EditActionInsertParam | EditActionInsertControlParam| EditActionCommitParam;
+export type EditActionSetParam = {
+    elementId: string;
+    attribute: string;
+    value: string;
 };
 
-export type EditActionChainParam = EditActionChainStep[];
-export type EditActionParam =
-    | EditActionDeleteParam
-    | EditActionSetParam
-    | EditActionInsertParam
-    | EditActionInsertControlParam
-    | EditActionChainParam
-    | EditActionCommitParam
-    | EditActionContextParam
-    | EditActionNavigationParam
-    | EditActionPropertiesParam;
+// Chained action
 
-export type EditAction = {
+export type EditActionChainStep = {
     action: EditActionName;
     param?: EditActionParam;
 };
+
+export type EditActionChainParam = EditActionChainStep[];
