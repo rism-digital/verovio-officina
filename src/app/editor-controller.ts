@@ -2,7 +2,7 @@ import { get, type Writable } from "svelte/store";
 import type {
     EditActionSetParam,
     EditActionParam,
-    EditInfoContent,
+    EditResponseContent,
     EditAction,
     EditActionInput,
     EditActionName,
@@ -23,7 +23,7 @@ type ControllerStores = {
     statusLine: Writable<string>;
     workerBusy: Writable<boolean>;
     dirty: Writable<boolean>;
-    editInfoContent: Writable<EditInfoContent | null>;
+    editResponseContent: Writable<EditResponseContent | null>;
     isMensuralMusicOnly: Writable<boolean>;
 };
 
@@ -119,8 +119,8 @@ export class EditorController {
             await this.applyCurrentOptions();
         }
         await this.bridge.verovio.loadData(data);
-        const editInfo = await this.bridge.verovio.editInfo();
-        const isMensuralMusicOnly = editInfo.isMensuralMusicOnly;
+        const editStatus = await this.bridge.verovio.editStatus();
+        const isMensuralMusicOnly = editStatus.isMensuralMusicOnly;
         this.stores.isMensuralMusicOnly.set(isMensuralMusicOnly);
         this.updateVerovioOptions({
             adjustPageHeight: !isMensuralMusicOnly,
@@ -179,11 +179,11 @@ export class EditorController {
         };
         const contextOk = await this.bridge.verovio.edit(editAction);
         if (contextOk) {
-            this.stores.editInfoContent.set(
-                await this.bridge.verovio.editInfoContent(),
+            this.stores.editResponseContent.set(
+                await this.bridge.verovio.editResponseContent(),
             );
         } else {
-            this.stores.editInfoContent.set(null);
+            this.stores.editResponseContent.set(null);
         }
     }
 
@@ -199,7 +199,7 @@ export class EditorController {
                 this.stores.workerBusy.set(false);
                 return null;
             }
-            const scoreDef = await this.bridge.verovio.editInfoScoreDef();
+            const scoreDef = await this.bridge.verovio.editResponseScoreDef();
             this.stores.workerBusy.set(false);
             return scoreDef;
         } catch (error) {
@@ -235,7 +235,7 @@ export class EditorController {
     async handleSelect(id: string | null): Promise<void> {
         if (!id) {
             await this.setSelection({ type: "none" });
-            this.stores.editInfoContent.set(null);
+            this.stores.editResponseContent.set(null);
             return;
         }
         const page = await this.bridge.verovio.getPageWithElement(id);
@@ -249,15 +249,15 @@ export class EditorController {
             };
             const contextOk = await this.bridge.verovio.edit(editAction);
             if (contextOk) {
-                this.stores.editInfoContent.set(
-                    await this.bridge.verovio.editInfoContent(),
+                this.stores.editResponseContent.set(
+                    await this.bridge.verovio.editResponseContent(),
                 );
             } else {
-                this.stores.editInfoContent.set(null);
+                this.stores.editResponseContent.set(null);
             }
         } catch (error) {
             console.error("Failed to load context data", error);
-            this.stores.editInfoContent.set(null);
+            this.stores.editResponseContent.set(null);
         }
         await this.setSelection({
             type: "element",
@@ -276,9 +276,9 @@ export class EditorController {
             };
             const ok = await this.bridge.verovio.edit(editAction);
             if (!ok) return false;
-            const editInfo = await this.bridge.verovio.editInfo();
-            if (!editInfo.chainedId) return false;
-            await this.handleSelect(editInfo.chainedId);
+            const editStatus = await this.bridge.verovio.editStatus();
+            if (!editStatus.chainedId) return false;
+            await this.handleSelect(editStatus.chainedId);
             return true;
         } catch (error) {
             console.error("Failed to navigate selection", error);
@@ -297,8 +297,8 @@ export class EditorController {
             };
             const ok = await this.bridge.verovio.edit(editorAction);
             if (ok) {
-                this.stores.editInfoContent.set(
-                    await this.bridge.verovio.editInfoContent(),
+                this.stores.editResponseContent.set(
+                    await this.bridge.verovio.editResponseContent(),
                 );
                 await this.applyEditLayout(commit);
                 if (commit) {
@@ -330,11 +330,11 @@ export class EditorController {
                 this.stores.workerBusy.set(false);
                 return false;
             }
-            const editInfo = await this.bridge.verovio.editInfo();
-            if (editInfo.chainedId) {
+            const editStatus = await this.bridge.verovio.editStatus();
+            if (editStatus.chainedId) {
                 await this.setSelection({
                     type: "element",
-                    id: editInfo.chainedId,
+                    id: editStatus.chainedId,
                 });
             }
             await this.updateVerovioView();

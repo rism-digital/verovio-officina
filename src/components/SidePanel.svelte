@@ -3,7 +3,7 @@
     import ScoreTab from "./ScoreTab.svelte";
     import type {
         EditActionSetHandler,
-        EditInfoContent,
+        EditResponseContent,
         HoverElementHandler,
         SelectElementHandler,
         Tab,
@@ -17,7 +17,7 @@
     ];
 
     export let activeTabValue = 2;
-    export let editInfoContent: EditInfoContent | null = null;
+    export let editResponseContent: EditResponseContent | null = null;
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
     export let onSelectElement: SelectElementHandler | null = null;
@@ -54,7 +54,7 @@
                             {onHoverElement}
                             {onEditAttribute}
                             {onTargetedContextAction}
-                            editInfoContent={editInfoContent}
+                            {editResponseContent}
                             {rngMEIAll}
                             {rngMEIBasic}
                         />

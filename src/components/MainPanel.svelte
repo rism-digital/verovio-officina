@@ -7,7 +7,7 @@
         ContextAction,
         EditActionSetParam,
         EditActionSetHandler,
-        EditInfoContent,
+        EditResponseContent,
         SelectElementHandler,
         TargetedContextActionHandler,
         ViewModel,
@@ -19,7 +19,7 @@
     export let onElementSelect: SelectElementHandler | null = null;
     export let onAttributeEdit: EditActionSetHandler | null = null;
     export let onTargetedContextAction: TargetedContextActionHandler | null = null;
-    export let editInfoContent: EditInfoContent| null = null;
+    export let editResponseContent: EditResponseContent| null = null;
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
 
@@ -308,7 +308,7 @@
             onHoverElement={handleHover}
             onEditAttribute={handleEditAttribute}
             {onTargetedContextAction}
-            {editInfoContent}
+            {editResponseContent}
             {rngMEIAll}
             {rngMEIBasic}
         />

@@ -1,17 +1,17 @@
 <script lang="ts">
     import AttributeRow from "./AttributeRow.svelte";
-    import type { EditActionSetParam, EditActionSetHandler as EditSetHandler, EditInfoContent } from "../app/types";
+    import type { EditActionSetParam, EditActionSetHandler as EditSetHandler, EditResponseContent } from "../app/types";
     import type { ElementDef, RNGLoader } from "../app/rng-loader";
 
-    export let editInfoContent: EditInfoContent | null = null;
+    export let editResponseContent: EditResponseContent | null = null;
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
     export let onEditSet: EditSetHandler | null = null;
 
-    $: elementName = editInfoContent?.object?.element ?? "";
+    $: elementName = editResponseContent?.object?.element ?? "";
     $: attributes = {
-        ...(editInfoContent?.object?.attributes ?? {}),
-        ...(editInfoContent?.object?.id ? { "xml:id": editInfoContent.object.id } : {}),
+        ...(editResponseContent?.object?.attributes ?? {}),
+        ...(editResponseContent?.object?.id ? { "xml:id": editResponseContent.object.id } : {}),
     } as Record<string, string>;
 
     function isElementDef(value: unknown): value is ElementDef {
@@ -93,7 +93,7 @@
     }
 
     function emitTextEdit(attValue: string, commit: boolean) {
-        const elementId = editInfoContent?.object?.id ?? null;
+        const elementId = editResponseContent?.object?.id ?? null;
         if (!elementId) return;
         const param: EditActionSetParam = {
             elementId,
@@ -117,11 +117,11 @@
 </script>
 
 <div class="vrv-attribute-list-wrapper">
-    {#if editInfoContent?.object && editInfoContent.object.element === "text"}
+    {#if editResponseContent?.object && editResponseContent.object.element === "text"}
         <input
             class="vrv-form-input"
             data-att-name="text"
-            value={editInfoContent.object.text}
+            value={editResponseContent.object.text}
             on:input={handleTextInput}
             on:blur={handleTextBlur}
         >
@@ -131,7 +131,7 @@
         <tbody>
             {#each Object.entries(attributes) as [name, value]}
                 <AttributeRow
-                    elementId={editInfoContent?.object?.id ?? null}
+                    elementId={editResponseContent?.object?.id ?? null}
                     {name}
                     value={String(value)}
                     optionsAll={allAttrs?.[name] ?? null}
@@ -157,7 +157,7 @@
             <tbody style="display: {showBasic ? 'table-row-group' : 'none'};">
                 {#each basicNames as name}
                     <AttributeRow
-                        elementId={editInfoContent?.object?.id ?? null}
+                        elementId={editResponseContent?.object?.id ?? null}
                         {name}
                         value=""
                         optionsAll={allAttrs?.[name] ?? null}
@@ -184,7 +184,7 @@
             <tbody style="display: {showAll ? 'table-row-group' : 'none'};">
                 {#each allNames as name}
                     <AttributeRow
-                        elementId={editInfoContent?.object?.id ?? null}
+                        elementId={editResponseContent?.object?.id ?? null}
                         {name}
                         value=""
                         optionsAll={allAttrs?.[name] ?? null}

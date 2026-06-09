@@ -67,7 +67,7 @@ export interface Tab {
     component: any;
 }
 
-export interface EditInfo {
+export interface EditStatus {
     chainedId: string;
     canUndo: boolean;
     canRedo: boolean;
@@ -78,7 +78,7 @@ export interface ReferenceObject extends TreeNodeData {
     referenceAttribute: string;
 }
 
-export interface EditInfoContent {
+export interface EditResponseContent {
     ancestors: TreeNodeData[];
     context: TreeNodeData;
     object: TreeNodeData;

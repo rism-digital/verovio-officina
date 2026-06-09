@@ -26,7 +26,7 @@
     import type { ContextAction, EditActionInput, MEIExportOptions, TargetedContextAction, TreeNodeData } from "./app/types";
     import {
         dirty,
-        editInfoContent,
+        editResponseContent,
         mode,
         selection,
         statusLine,
@@ -100,7 +100,7 @@
             statusLine,
             workerBusy,
             dirty,
-            editInfoContent,
+            editResponseContent,
             isMensuralMusicOnly,
         },
     );
@@ -199,7 +199,7 @@
     }
 
     async function deleteSelectedElement(id: string, backspace: boolean) {
-        const elementName = get(editInfoContent)?.object?.element;
+        const elementName = get(editResponseContent)?.object?.element;
         if (!elementName || NON_DELETABLE_ELEMENTS.has(elementName)) {
             statusLine.set(elementName
                 ? `Cannot delete <${elementName}>.`
@@ -341,7 +341,7 @@
     }
 
     async function dispatchToolbarAction(toolbarAction: ToolbarDispatchAction) {
-        const object = $editInfoContent?.object;
+        const object = $editResponseContent?.object;
         if (!object?.id || !object.element) return;
 
         const ok = await controller.handleEditAction(
@@ -455,7 +455,7 @@
         {xmlMode}
         workerBusy={$workerBusy}
         onValidateXml={validateXmlContent}
-        selectedElementName={$editInfoContent?.object?.element ?? null}
+        selectedElementName={$editResponseContent?.object?.element ?? null}
         onContextAction={handleToolbarAction}
     />
 
@@ -474,7 +474,7 @@
             onAttributeEdit={(param, commit) =>
                 controller.handleAttributeEdit(param, commit)}
             onTargetedContextAction={handleTargetedContextAction}
-            editInfoContent={$editInfoContent}
+            editResponseContent={$editResponseContent}
             {rngMEIAll}
             {rngMEIBasic}
         />

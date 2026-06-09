@@ -5,14 +5,14 @@
     import { selection } from "../app/state";
     import type {
         EditActionSetHandler,
-        EditInfoContent,
+        EditResponseContent,
         HoverElementHandler,
         SelectElementHandler,
         TargetedContextActionHandler,
     } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
 
-    export let editInfoContent: EditInfoContent | null = null;
+    export let editResponseContent: EditResponseContent | null = null;
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
     export let onSelectElement: SelectElementHandler | null = null;
@@ -45,8 +45,8 @@
 >
     <div class="vrv-field-set-panel" style="display: flex;">
         <Tree
-            ancestors={editInfoContent?.ancestors ?? null}
-            context={editInfoContent?.context ?? null}
+            ancestors={editResponseContent?.ancestors ?? null}
+            context={editResponseContent?.context ?? null}
             selectedId={$selection.type === "element" ? $selection.id : null}
             {onSelectElement}
             {onHoverElement}
@@ -68,7 +68,7 @@
 >
     <div class="vrv-field-set-panel" style="display: flex;">
         <AttributeList
-            {editInfoContent}
+            {editResponseContent}
             {rngMEIAll}
             {rngMEIBasic}
             onEditSet={onEditAttribute}
@@ -86,7 +86,7 @@
 <div class="vrv-field-set vrv-collapsible" class:close={closedSections.referencing}>
     <div class="vrv-field-set-panel" style="display: flex;">
         <ElementReference
-            references={editInfoContent?.referringElements ?? null}
+            references={editResponseContent?.referringElements ?? null}
             direction="to"
             {onSelectElement}
             {onHoverElement}
@@ -104,7 +104,7 @@
 <div class="vrv-field-set vrv-collapsible" class:close={closedSections.referenced}>
     <div class="vrv-field-set-panel">
         <ElementReference
-            references={editInfoContent?.referencedElements ?? null}
+            references={editResponseContent?.referencedElements ?? null}
             direction="from"
             {onSelectElement}
             {onHoverElement}
