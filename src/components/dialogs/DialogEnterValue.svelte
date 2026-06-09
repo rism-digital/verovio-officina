@@ -6,7 +6,8 @@
     export let title = "Enter Value";
     export let label = "Value";
     export let value = "";
-    export let onConfirm: ((value: string) => void) | null = null;
+    export let inputType: "text" | "number" = "text";
+    export let onConfirm: ((value: string | number) => void) | null = null;
     export let onCancel: (() => void) | null = null;
 
     let localValue = value;
@@ -65,7 +66,7 @@
         <div class="vrv-dialog-label">{label}</div>
         <input
             class="vrv-dialog-input"
-            type="text"
+            type={inputType}
             bind:value={localValue}
             bind:this={inputEl}
             on:keydown={handleInputKeydown}

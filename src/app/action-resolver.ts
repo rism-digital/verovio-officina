@@ -41,6 +41,8 @@ export function resolveMenuActions(): ResolvedMenuAction[] {
             param: definition.param,
             actionKey: entry.action,
             dialog: entry.dialog,
+            valueType: entry.valueType,
+            redoLayout: entry.redoLayout,
         });
     }
     return resolvedActions;
@@ -59,6 +61,8 @@ function resolveMenuEntries(entries: ActionCatalogEntry[]): ResolvedMenuEntry[] 
                 action: definition.action,
                 param: definition.param,
                 actionKey: entry.action,
+                valueType: entry.valueType,
+                redoLayout: entry.redoLayout,
             });
             continue;
         }
@@ -93,6 +97,8 @@ export function resolveContextButtonBars(
                 param: definition.param,
                 actionKey: button.action,
                 dialog: button.dialog,
+                valueType: button.valueType,
+                redoLayout: button.redoLayout,
                 iconUrl: withBaseUrl(button.icon),
             });
         }

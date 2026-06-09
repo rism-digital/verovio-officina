@@ -4,6 +4,8 @@ export type ActionCatalogActionEntry = {
     name: string;
     action: string;
     dialog?: string;
+    valueType?: "text" | "number";
+    redoLayout?: boolean;
 };
 
 export type ActionCatalogSubmenuEntry = {
@@ -18,13 +20,17 @@ export type ContextButtonEntry = {
     action: string;
     icon: string;
     dialog?: string;
+    valueType?: "text" | "number";
     secondary?: boolean;
+    redoLayout?: boolean;
 };
 
 export type MenuActionEntry = {
     name: string;
     action: string;
     dialog?: string;
+    valueType?: "text" | "number";
+    redoLayout?: boolean;
 };
 
 export const actionCatalog: Record<string, ActionCatalogEntry[]>;

@@ -327,19 +327,27 @@
         }
     }
 
+    function actionRequiresSelection(action: ToolbarDispatchAction): boolean {
+        const encodedParam = action.param ? JSON.stringify(action.param) : "";
+        return encodedParam.includes("[selection-id]")
+            || encodedParam.includes("[selection-secondary-id]");
+    }
+
     async function dispatchToolbarAction(toolbarAction: ToolbarDispatchAction) {
         const elementName = $editStatus.selection?.element;
-        if (!elementName) return;
+        if (!elementName && actionRequiresSelection(toolbarAction)) return;
 
         const ok = await controller.handleEditAction(
             toolbarAction.action,
             toolbarAction.param,
             toolbarAction.dialogValue,
+            { redoLayout: toolbarAction.redoLayout },
         );
+        const targetLabel = elementName ? ` for <${elementName}>` : "";
         if (ok) {
-            statusLine.set(`${toolbarAction.label} for <${elementName}>.`);
+            statusLine.set(`${toolbarAction.label}${targetLabel}.`);
         } else {
-            statusLine.set(`Failed: ${toolbarAction.label} for <${elementName}>.`);
+            statusLine.set(`Failed: ${toolbarAction.label}${targetLabel}.`);
         }
     }
 
@@ -352,7 +360,7 @@
         await dispatchToolbarAction(next.action);
     }
 
-    async function confirmEnterValue(value: string) {
+    async function confirmEnterValue(value: string | number) {
         const pendingAction = enterValueDialogState;
         enterValueDialogState = null;
         if (!pendingAction) return;
@@ -504,6 +512,7 @@
         title={enterValueDialogState?.title ?? DEFAULT_ENTER_VALUE_DIALOG.title}
         label={enterValueDialogState?.fieldLabel ?? DEFAULT_ENTER_VALUE_DIALOG.fieldLabel}
         value={enterValueDialogState?.defaultValue ?? DEFAULT_ENTER_VALUE_DIALOG.defaultValue}
+        inputType={enterValueDialogState?.valueType ?? "text"}
         onConfirm={confirmEnterValue}
         onCancel={cancelEnterValue}
     />

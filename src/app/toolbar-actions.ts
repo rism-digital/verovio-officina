@@ -7,6 +7,8 @@ export type EnterValueDialogState = {
     actionLabel: string;
     param?: EditActionParam;
     actionKey?: string;
+    valueType?: "text" | "number";
+    redoLayout?: boolean;
     title: string;
     fieldLabel: string;
     defaultValue: string;
@@ -39,6 +41,8 @@ export function beginToolbarAction(input: {
     param?: EditActionParam;
     actionKey?: string;
     dialog?: string;
+    valueType?: "text" | "number";
+    redoLayout?: boolean;
 }): BeginToolbarActionResult {
     if (input.dialog === "enter-value") {
         return {
@@ -48,6 +52,8 @@ export function beginToolbarAction(input: {
                 actionLabel: input.label,
                 param: input.param,
                 actionKey: input.actionKey,
+                valueType: input.valueType,
+                redoLayout: input.redoLayout,
                 title: DEFAULT_ENTER_VALUE_DIALOG.title,
                 fieldLabel: DEFAULT_ENTER_VALUE_DIALOG.fieldLabel,
                 defaultValue: resolveDefaultValue(input.actionKey),
@@ -61,20 +67,31 @@ export function beginToolbarAction(input: {
             label: input.label,
             param: input.param,
             actionKey: input.actionKey,
+            valueType: input.valueType,
+            redoLayout: input.redoLayout,
         },
     };
 }
 
 export function resolveEnterValueDialog(
     dialogState: EnterValueDialogState,
-    enteredValue: string,
+    enteredValue: string | number,
 ): ToolbarDispatchAction {
-    const resolvedValue = enteredValue.trim() || dialogState.defaultValue;
+    const resolvedValue = typeof enteredValue === "number"
+        ? enteredValue
+        : enteredValue.trim() || dialogState.defaultValue;
+    const dialogValue = dialogState.valueType === "number"
+        ? Number.isFinite(Number(resolvedValue))
+            ? Number(resolvedValue)
+            : Number(dialogState.defaultValue)
+        : resolvedValue;
     return {
         action: dialogState.action,
         label: dialogState.actionLabel,
         param: dialogState.param,
         actionKey: dialogState.actionKey,
-        dialogValue: resolvedValue,
+        dialogValue,
+        valueType: dialogState.valueType,
+        redoLayout: dialogState.redoLayout,
     };
 }

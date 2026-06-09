@@ -11,7 +11,9 @@ export type Action = {
     param?: EditActionParam;
     actionKey?: string;
     dialog?: string;
-    dialogValue?: string;
+    dialogValue?: string | number;
+    valueType?: "text" | "number";
+    redoLayout?: boolean;
 };
 
 export type TargetedContextAction = Action & {
@@ -88,8 +90,7 @@ export type EditActionName =
     | "delete"
     | "insert"
     | "insertControl"
-    | "insertMeasures"
-    | "insertMeaure"
+    | "insertMeasure"
     | "insertNote"    
     | "select"
     | "set"
@@ -105,6 +106,8 @@ export type EditActionParam =
     | EditActionDeleteParam
     | EditActionInsertParam
     | EditActionInsertControlParam
+    | EditActionInsertMeasureParam
+    | EditActionInsertNoteParam
     | EditActionNavigationParam
     | EditActionPropertiesParam
     | EditActionSelectParam
@@ -128,6 +131,18 @@ export type EditActionInsertParam = {
 };
 
 export type EditActionInsertControlParam = {
+    elementName: string;
+    startId: string;
+    endId?: string;
+};
+
+export type EditActionInsertMeasureParam = {
+    elementId?: string;
+    number: number;
+    insertMode?: string;
+};
+
+export type EditActionInsertNoteParam = {
     elementName: string;
     startId: string;
     endId?: string;

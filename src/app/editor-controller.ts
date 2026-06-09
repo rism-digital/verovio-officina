@@ -338,7 +338,8 @@ export class EditorController {
     async handleEditAction(
         action: EditActionName,
         param: EditActionParam | undefined,
-        dialogValue?: string,
+        dialogValue?: string | number,
+        options: { redoLayout?: boolean } = {},
     ): Promise<boolean> {
         this.stores.workerBusy.set(true);
         try {
@@ -357,6 +358,15 @@ export class EditorController {
             if (editStatus.chainedId) {
                 await this.handleSelect(editStatus.chainedId);
             }
+            if (options.redoLayout) {
+                await this.bridge.verovio.redoLayout();
+                const pageCount = await this.bridge.verovio.getPageCount();
+                this.stores.verovioState.update((current) => ({
+                    ...current,
+                    pageCount,
+                    currentPage: Math.min(current.currentPage, Math.max(1, pageCount)),
+                }));
+            }
             await this.updateVerovioView();
             if (!editStatus.chainedId) {
                 await this.refreshContextFromSelection();
@@ -370,9 +380,10 @@ export class EditorController {
         }
     }
 
-    private resolveDialogValuePlaceholder<T>(value: T, dialogValue = ""): T {
+    private resolveDialogValuePlaceholder<T>(value: T, dialogValue: string | number = ""): T {
         if (typeof value === "string") {
-            return value.split("{{dialogValue}}").join(dialogValue) as T;
+            if (value === "{{dialogValue}}") return dialogValue as T;
+            return value.split("{{dialogValue}}").join(String(dialogValue)) as T;
         }
         if (Array.isArray(value)) {
             return value.map((item) => this.resolveDialogValuePlaceholder(item, dialogValue)) as T;

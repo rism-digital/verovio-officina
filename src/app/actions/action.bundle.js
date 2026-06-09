@@ -114,7 +114,7 @@ export const contextButtonBars = {
 };
 
 export const menuActions = [
-    { name: "At the end of the score", action: "add-measures-end", dialog: "enter-value" },
+    { name: "At the end of the score", action: "add-measures-end", dialog: "enter-value", valueType: "number", redoLayout: true },
 ]
 
 export const actionDefinitions = {
@@ -521,11 +521,11 @@ export const actionDefinitions = {
         action: "chain",
         param: [
             {
-                action: "insertMeasures",
+                action: "insertMeasure",
                 param: {
-                    elementId: "[selection-id]",
-                    attribute: "place",
-                    value: "{{dialogValue}}",
+                    targetId: "",
+                    number: "{{dialogValue}}",
+                    insertMode: "",
                 },
             },
             {
