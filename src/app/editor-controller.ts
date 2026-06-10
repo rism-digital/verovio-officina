@@ -1,10 +1,8 @@
 import { get, type Writable } from "svelte/store";
 import type {
     EditActionSetParam,
-    EditActionParam,
     EditResponseContent,
     EditAction,
-    EditActionName,
     EditStatus,
     MEIExportOptions,
     TreeNodeData,
@@ -157,8 +155,7 @@ export class EditorController {
     async applyEditLayout(commit: boolean): Promise<void> {
         if (commit) {
             const editAction: EditAction = {
-                action: "commit",
-                param: {},
+                action: "commit"
             };
             await this.bridge.verovio.edit(editAction);
         } else {
@@ -336,19 +333,13 @@ export class EditorController {
     }
 
     async handleEditAction(
-        action: EditActionName,
-        param: EditActionParam | undefined,
+        action: EditAction,
         dialogValue?: string | number,
         options: { redoLayout?: boolean } = {},
     ): Promise<boolean> {
         this.stores.workerBusy.set(true);
         try {
-            const editAction: EditAction = {
-                action,
-                param: param
-                    ? this.resolveDialogValuePlaceholder(param, dialogValue)
-                    : {},
-            };
+            const editAction = this.resolveEditAction(action, dialogValue);
             const ok = await this.bridge.verovio.edit(editAction);
             if (!ok) {
                 this.stores.workerBusy.set(false);
@@ -378,6 +369,16 @@ export class EditorController {
             this.stores.workerBusy.set(false);
             return false;
         }
+    }
+
+    private resolveEditAction(action: EditAction, dialogValue?: string | number): EditAction {
+        if (!("param" in action)) {
+            return { action: action.action } as EditAction;
+        }
+        return {
+            action: action.action,
+            param: this.resolveDialogValuePlaceholder(action.param, dialogValue),
+        } as EditAction;
     }
 
     private resolveDialogValuePlaceholder<T>(value: T, dialogValue: string | number = ""): T {

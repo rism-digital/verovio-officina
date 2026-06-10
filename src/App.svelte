@@ -208,7 +208,7 @@
             statusLine.set("Failed: delete action is not available.");
             return;
         }
-        const ok = await controller.handleEditAction(definition.action, definition.param);
+        const ok = await controller.handleEditAction(definition);
         statusLine.set(ok
             ? `Deleted <${elementName}>.`
             : `Failed: delete <${elementName}>.`);
@@ -315,10 +315,7 @@
     }
 
     async function handleTargetedContextAction(action: TargetedContextAction) {
-        const ok = await controller.handleEditAction(
-            action.action,
-            action.param,
-        );
+        const ok = await controller.handleEditAction(action);
         if (ok) {
             statusLine.set(`${action.label} for <${action.targetElement}>.`);
         } else {
@@ -327,7 +324,7 @@
     }
 
     function actionRequiresSelection(action: Action): boolean {
-        const encodedParam = action.param ? JSON.stringify(action.param) : "";
+        const encodedParam = "param" in action ? JSON.stringify(action.param) : "";
         return encodedParam.includes("[selection-id]")
             || encodedParam.includes("[selection-secondary-id]");
     }
@@ -337,8 +334,7 @@
         if (!elementName && actionRequiresSelection(toolbarAction)) return;
 
         const ok = await controller.handleEditAction(
-            toolbarAction.action,
-            toolbarAction.param,
+            toolbarAction,
             toolbarAction.dialogValue,
             { redoLayout: toolbarAction.redoLayout },
         );

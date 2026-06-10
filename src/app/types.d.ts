@@ -14,10 +14,8 @@ export type ActionMetadata = {
     redoLayout?: boolean;
 };
 
-export type Action = ActionMetadata & {
-    action: EditActionName;
+export type Action = ActionMetadata & EditAction & {
     label: string;
-    param?: EditActionParam;
     actionKey?: string;
 };
 
@@ -28,10 +26,8 @@ export type TargetedContextAction = Action & {
 
 export type TargetedContextActionHandler = (action: TargetedContextAction) => void;
 
-export type ContextMenuItem<TAction extends EditActionName = EditActionName> = {
+export type ContextMenuItem = EditAction & {
     label: string;
-    action: TAction;
-    param?: EditActionParam;
 };
 
 export type MEIExportOptions = {
@@ -84,26 +80,7 @@ export interface EditResponseContent {
     referringElements: ReferenceObject[];
 }
 
-// Action names and params
-
-export type EditAction = {
-    action: EditActionName;
-    param?: EditActionParam;
-};
-
-export type EditActionName =
-    | "delete"
-    | "insert"
-    | "insertControl"
-    | "insertMeasure"
-    | "insertNote"    
-    | "select"
-    | "set"
-    | "commit"
-    | "chain"
-    | "context"
-    | "properties"
-    | "navigate";
+// Action param and action unions
 
 export type EditActionParam =
     | EditActionChainParam
@@ -118,7 +95,84 @@ export type EditActionParam =
     | EditActionSelectParam
     | EditActionSetParam;
 
+export type EditAction =
+    | EditActionChain
+    | EditActionCommit
+    | EditActionContext
+    | EditActionDelete
+    | EditActionInsert
+    | EditActionInsertControl
+    | EditActionInsertMeasure
+    | EditActionInsertNote
+    | EditActionNavigate
+    | EditActionProperties
+    | EditActionSelect
+    | EditActionSet;
+
+// Actions
+
+export type EditActionChain = {
+    action: "chain";
+    param: EditActionChainParam;
+};
+
+export type EditActionCommit = {
+    action: "commit";
+};
+
+export type EditActionContext = {
+    action: "context";
+    param: EditActionContextParam;
+};
+
+export type EditActionDelete = {
+    action: "delete";
+    param: EditActionDeleteParam;
+};
+
+export type EditActionInsert = {
+    action: "insert";
+    param: EditActionInsertParam;
+};
+
+export type EditActionInsertControl = {
+    action: "insertControl";
+    param: EditActionInsertControlParam;
+};
+
+export type EditActionInsertMeasure = {
+    action: "insertMeasure";
+    param: EditActionInsertMeasureParam;
+};
+
+export type EditActionInsertNote = {
+    action: "insertNote";
+    param: EditActionInsertNoteParam;
+};
+
+export type EditActionNavigate = {
+    action: "navigate";
+    param: EditActionNavigationParam;
+};
+
+export type EditActionProperties = {
+    action: "properties";
+    param: EditActionPropertiesParam;
+};
+
+export type EditActionSelect = {
+    action: "select";
+    param: EditActionSelectParam;
+};
+
+export type EditActionSet = {
+    action: "set";
+    param: EditActionSetParam;
+};
+
 // ActionParams
+
+export type EditActionChainParam = EditAction[];
 
 export type EditActionContextParam = {
     elementId: string;
@@ -132,7 +186,13 @@ export type EditActionDeleteParam = {
 export type EditActionInsertParam = {
     elementName: string;
     elementId: string;
-    insertMode: "insertAfter" | "inserBefore" | "appendChild" | "appenchChildNoDuplicate";
+    insertMode:
+        | "insertAfter"
+        | "insertBefore"
+        | "inserBefore"
+        | "appendChild"
+        | "appendChildNoDuplicate"
+        | "appenchChildNoDuplicate";
 };
 
 export type EditActionInsertControlParam = {
@@ -174,12 +234,3 @@ export type EditActionSetParam = {
     attribute: string;
     value: string;
 };
-
-// Chained action
-
-export type EditActionChainStep = {
-    action: EditActionName;
-    param?: EditActionParam;
-};
-
-export type EditActionChainParam = EditActionChainStep[];

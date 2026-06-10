@@ -58,12 +58,7 @@ export function resolveEnterValueDialog(
             : Number(dialogState.defaultValue)
         : resolvedValue;
     return {
-        action: dialogState.action,
-        label: dialogState.label,
-        param: dialogState.param,
-        actionKey: dialogState.actionKey,
+        ...dialogState,
         dialogValue,
-        valueType: dialogState.valueType,
-        redoLayout: dialogState.redoLayout,
     };
 }

@@ -26,9 +26,8 @@ function resolveActionEntry(entry: ActionEntry): ResolvedAction | null {
     const definition = actionDefinitions[entry.action];
     if (!definition) return null;
     return {
+        ...definition,
         label: entry.name,
-        action: definition.action,
-        param: definition.param,
         actionKey: entry.action,
         dialog: entry.dialog,
         valueType: entry.valueType,
