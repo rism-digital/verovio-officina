@@ -12,10 +12,35 @@ export type KeyShortcut = {
     altKey?: boolean;
     ctrlKey?: boolean;
     metaKey?: boolean;
+    primaryKey?: boolean;
     shiftKey?: boolean;
     requiresSelection?: boolean;
     run: KeyShortcutHandler;
 };
+
+function isMacPlatform(): boolean {
+    return typeof navigator !== "undefined"
+        && /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+}
+
+function shortcutModifierState(shortcut: Pick<
+    KeyShortcut,
+    "altKey" | "ctrlKey" | "metaKey" | "primaryKey" | "shiftKey"
+>): {
+    altKey: boolean;
+    ctrlKey: boolean;
+    metaKey: boolean;
+    shiftKey: boolean;
+} {
+    const primaryKey = shortcut.primaryKey === true;
+    const isMac = isMacPlatform();
+    return {
+        altKey: shortcut.altKey === true,
+        ctrlKey: shortcut.ctrlKey === true || (primaryKey && !isMac),
+        metaKey: shortcut.metaKey === true || (primaryKey && isMac),
+        shiftKey: shortcut.shiftKey === true,
+    };
+}
 
 export function createKeyShortcuts(controller: EditorController): KeyShortcut[] {
     return [
@@ -28,6 +53,28 @@ export function createKeyShortcuts(controller: EditorController): KeyShortcut[] 
             key: "ArrowLeft",
             requiresSelection: true,
             run: async () => controller.navigateSelection(37),
+        },
+        {
+            key: "ArrowUp",
+            requiresSelection: true,
+            run: async () => controller.handleKeydown(38),
+        },
+        {
+            key: "ArrowDown",
+            requiresSelection: true,
+            run: async () => controller.handleKeydown(40),
+        },
+        {
+            key: "ArrowUp",
+            primaryKey: true,
+            requiresSelection: true,
+            run: async () => controller.handleKeydown(38, { ctrlKey: true }),
+        },
+        {
+            key: "ArrowDown",
+            primaryKey: true,
+            requiresSelection: true,
+            run: async () => controller.handleKeydown(40, { ctrlKey: true }),
         },
         {
             key: "Delete",
@@ -44,11 +91,9 @@ export function createKeyShortcuts(controller: EditorController): KeyShortcut[] 
 
 export function keyShortcutMap({
     key,
-    altKey = false,
-    ctrlKey = false,
-    metaKey = false,
-    shiftKey = false,
-}: Pick<KeyShortcut, "key" | "altKey" | "ctrlKey" | "metaKey" | "shiftKey">): string {
+    ...shortcut
+}: Pick<KeyShortcut, "key" | "altKey" | "ctrlKey" | "metaKey" | "primaryKey" | "shiftKey">): string {
+    const { altKey, ctrlKey, metaKey, shiftKey } = shortcutModifierState(shortcut);
     return [
         altKey ? "Alt" : "",
         ctrlKey ? "Ctrl" : "",

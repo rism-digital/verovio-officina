@@ -229,6 +229,39 @@ export class EditorController {
         }
     }
 
+    async handleKeydown(
+        key: 38 | 40,
+        options: { ctrlKey?: boolean; shiftKey?: boolean } = {},
+    ): Promise<void> {
+        const current = get(this.stores.editStatus).selection;
+        if (!current?.id) return;
+        this.stores.workerBusy.set(true);
+        try {
+            const editAction: EditAction = {
+                action: "keyDown",
+                param: {
+                    elementId: current.id,
+                    key,
+                    ...(options.ctrlKey ? { ctrlKey: true } : {}),
+                    ...(options.shiftKey ? { shiftKey: true } : {}),
+                },
+            };
+            const ok = await this.bridge.verovio.edit(editAction);
+            if (ok) {
+                this.stores.editResponseContent.set(
+                    await this.bridge.verovio.editResponseContent(),
+                );
+                await this.applyEditLayout(true);
+                await this.refreshContextFromSelection();
+            } else {
+                this.stores.workerBusy.set(false);
+            }
+        } catch (error) {
+            console.error("Failed to perform the key action", error);
+            this.stores.workerBusy.set(false);
+        }
+    }
+
     async handleSelect(id: string | null): Promise<void> {
         if (!id) {
             this.stores.editStatus.update((current) => ({

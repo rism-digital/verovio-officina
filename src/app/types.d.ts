@@ -90,6 +90,7 @@ export type EditActionParam =
     | EditActionInsertControlParam
     | EditActionInsertMeasureParam
     | EditActionInsertNoteParam
+    | EditActionKeyDownParam
     | EditActionNavigationParam
     | EditActionPropertiesParam
     | EditActionSelectParam
@@ -104,6 +105,7 @@ export type EditAction =
     | EditActionInsertControl
     | EditActionInsertMeasure
     | EditActionInsertNote
+    | EditActionKeyDown
     | EditActionNavigate
     | EditActionProperties
     | EditActionSelect
@@ -148,6 +150,11 @@ export type EditActionInsertMeasure = {
 export type EditActionInsertNote = {
     action: "insertNote";
     param: EditActionInsertNoteParam;
+};
+
+export type EditActionKeyDown = {
+    action: "keyDown";
+    param: EditActionKeyDownParam;
 };
 
 export type EditActionNavigate = {
@@ -211,6 +218,13 @@ export type EditActionInsertNoteParam = {
     elementName: string;
     startId: string;
     endId?: string;
+};
+
+export type EditActionKeyDownParam = {
+    elementId: string;
+    key: number;
+    shiftKey?: boolean;
+    ctrlKey?: boolean;
 };
 
 export type EditActionNavigationParam = {
