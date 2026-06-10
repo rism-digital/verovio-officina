@@ -15,6 +15,16 @@ import { createWorkerBridge, type WorkerBridge } from "./worker/bridge";
 const zoomLevels = [10, 20, 35, 75, 100, 150, 200];
 const NON_DELETABLE_ELEMENTS = new Set(["staff", "layer"]);
 
+export const finaleSpeedyDurationToMEI: Record<number, string> = {
+    55: "1",
+    54: "2",
+    53: "4",
+    52: "8",
+    51: "16",
+    50: "32",
+    49: "64",
+};
+
 type ControllerStores = {
     verovioState: Writable<{ zoom: number; pageCount: number; currentPage: number }>;
     viewModel: Writable<ViewModel>;
@@ -93,6 +103,8 @@ export class EditorController {
     }
 
     async setCurrentPage(nextPage: number): Promise<void> {
+        await this.resetInsertMode();
+        await this.refreshEditStatus();
         const { pageCount } = get(this.stores.verovioState);
         const clamped = Math.min(Math.max(1, nextPage), Math.max(1, pageCount));
         this.stores.verovioState.update((current) => ({
@@ -248,14 +260,92 @@ export class EditorController {
             };
             const ok = await this.bridge.verovio.edit(editAction);
             if (ok) {
-                this.stores.editResponseContent.set(
-                    await this.bridge.verovio.editResponseContent(),
-                );
                 await this.applyEditLayout(true);
                 await this.refreshContextFromSelection();
             } else {
                 this.stores.workerBusy.set(false);
             }
+        } catch (error) {
+            console.error("Failed to perform the key action", error);
+            this.stores.workerBusy.set(false);
+        }
+    }
+
+    async handleInsertNote(
+        key: 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57,
+    ): Promise<void> {
+        const current = get(this.stores.editStatus).selection;
+        if (!current?.id) return;
+        this.stores.workerBusy.set(true);
+        try {
+            const editAction: EditAction = {
+                action: "insertNote",
+                param: {
+                    targetId: current.id,
+                    pname: "c",
+                    oct: 3,
+                    dur: finaleSpeedyDurationToMEI[key],
+                    chordMode: false
+                },
+            };
+            const ok = await this.bridge.verovio.edit(editAction);
+            if (ok) {
+                await this.resetInsertMode();
+                await this.applyEditLayout(true);
+                const editStatus = await this.refreshEditStatus();
+                if (editStatus.chainedId) {
+                    await this.handleSelect(editStatus.chainedId);
+                    await this.handleInsertMode(13);
+                }
+            } else {
+                this.stores.workerBusy.set(false);
+            }
+        } catch (error) {
+            console.error("Failed to perform the key action", error);
+            this.stores.workerBusy.set(false);
+        }
+    }
+
+    async handleInsertMode(
+        key: 13 | 27,
+    ): Promise<void> {
+        const current = get(this.stores.editStatus).selection;
+        if (!current?.id) return;
+        this.stores.workerBusy.set(true);
+        const setCursor = (key == 13);
+        try {
+            const editAction: EditAction = {
+                action: "cursor",
+                param: {
+                    setCursor,
+                    elementId: current.id,
+                },
+            };
+            const ok = await this.bridge.verovio.edit(editAction);
+            if (ok) {
+                await this.applyEditLayout(true);
+                await this.refreshEditStatus();
+            } else {
+                this.stores.workerBusy.set(false);
+            }
+        } catch (error) {
+            console.error("Failed to perform the key action", error);
+            this.stores.workerBusy.set(false);
+        }
+    }
+
+    async resetInsertMode(): Promise<void> {
+        const insertMode = get(this.stores.editStatus).insertMode;
+        if (!insertMode) return;
+        this.stores.workerBusy.set(true);
+        try {
+            const editAction: EditAction = {
+                action: "cursor",
+                param: { setCursor: false },
+            };
+            await this.bridge.verovio.edit(editAction);
+            await this.refreshEditStatus();
+            this.stores.workerBusy.set(false);
         } catch (error) {
             console.error("Failed to perform the key action", error);
             this.stores.workerBusy.set(false);
@@ -372,9 +462,6 @@ export class EditorController {
             };
             const ok = await this.bridge.verovio.edit(editorAction);
             if (ok) {
-                this.stores.editResponseContent.set(
-                    await this.bridge.verovio.editResponseContent(),
-                );
                 await this.applyEditLayout(commit);
                 if (commit) {
                     await this.refreshContextFromSelection();
@@ -502,6 +589,8 @@ export class EditorController {
     }
 
     async adjustZoom(direction: 1 | -1): Promise<void> {
+        await this.resetInsertMode();
+        await this.refreshEditStatus();
         this.stores.verovioState.update((current) => ({
             ...current,
             zoom: Math.min(200, Math.max(10, Math.floor(this.getNextZoom(current.zoom, direction)))),

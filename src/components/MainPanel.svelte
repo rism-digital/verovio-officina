@@ -17,6 +17,7 @@
 
     export let view: ViewModel;
     export let selection: EditStatus["selection"] = null;
+    export let insertMode = false;
     export let onResize: (size: { width: number; height: number }) => void;
     export let onElementSelect: SelectElementHandler | null = null;
     export let onElementSecondarySelect: SelectElementHandler | null = null;
@@ -170,6 +171,7 @@
     }
 
     function selectionHighlights(): Array<{ id: string; color: string }> {
+        if (insertMode) return [];
         if (!selection?.id) return [];
         const highlights = [{ id: selection.id, color: "#cd0000" }];
         if (selection.secondaryId && selection.secondaryId !== selection.id) {
@@ -305,6 +307,7 @@
 
     $: {
         selection;
+        insertMode;
         syncSelectionHighlight();
     }
 </script>

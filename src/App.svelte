@@ -27,7 +27,6 @@
         dirty,
         editResponseContent,
         editStatus,
-        mode,
         statusLine,
         verovioState,
         viewModel,
@@ -190,8 +189,12 @@
         });
     }
 
-    function toggleMode() {
-        mode.update((current) => (current === "insert" ? "edit" : "insert"));
+    async function toggleMode() {
+        if (get(editStatus).insertMode) {
+            await controller.handleInsertMode(27);
+        } else {
+            await controller.handleInsertMode(13);
+        }
     }
 
     function triggerOpenFile() {
@@ -412,7 +415,7 @@
     ></Menu>
 
     <Toolbar
-        mode={$mode}
+        insertMode={$editStatus.insertMode}
         onToggleMode={toggleMode}
         {xmlMode}
         workerBusy={$workerBusy}
@@ -433,6 +436,7 @@
         <MainPanel
             view={$viewModel}
             selection={$editStatus.selection}
+            insertMode={$editStatus.insertMode}
             onResize={(size) => controller.applyLayoutForSize(size)}
             onElementSelect={(id) => controller.handleSelect(id)}
             onElementSecondarySelect={(id) => controller.handleSecondarySelect(id)}

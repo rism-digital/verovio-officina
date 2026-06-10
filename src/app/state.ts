@@ -1,12 +1,12 @@
 import { writable } from 'svelte/store';
-import type { EditResponseContent, EditStatus, Mode, ViewModel } from './types';
+import type { EditResponseContent, EditStatus, ViewModel } from './types';
 
-export const mode = writable<Mode>('insert');
 export const editStatus = writable<EditStatus>({
   chainedId: '',
   canUndo: false,
   canRedo: false,
   isMensuralMusicOnly: false,
+  insertMode: false,
   selection: null
 });
 export const viewModel = writable<ViewModel>({

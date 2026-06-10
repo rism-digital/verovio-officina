@@ -1,5 +1,3 @@
-export type Mode = 'edit' | 'insert';
-
 export type SelectElementHandler = (id: string) => void | Promise<void>;
 export type HoverElementHandler = (id: string | null) => void;
 export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) => void;
@@ -61,6 +59,7 @@ export interface EditStatus {
     canUndo: boolean;
     canRedo: boolean;
     isMensuralMusicOnly: boolean;
+    insertMode: boolean;
     selection: {
         id: string;
         element: string;
@@ -85,6 +84,7 @@ export interface EditResponseContent {
 export type EditActionParam =
     | EditActionChainParam
     | EditActionContextParam
+    | EditActionCursorParam
     | EditActionDeleteParam
     | EditActionInsertParam
     | EditActionInsertControlParam
@@ -100,6 +100,7 @@ export type EditAction =
     | EditActionChain
     | EditActionCommit
     | EditActionContext
+    | EditActionCursor
     | EditActionDelete
     | EditActionInsert
     | EditActionInsertControl
@@ -125,6 +126,11 @@ export type EditActionCommit = {
 export type EditActionContext = {
     action: "context";
     param: EditActionContextParam;
+};
+
+export type EditActionCursor = {
+    action: "cursor";
+    param: EditActionCursorParam;
 };
 
 export type EditActionDelete = {
@@ -185,6 +191,11 @@ export type EditActionContextParam = {
     elementId: string;
 };
 
+export type EditActionCursorParam = {
+    setCursor: boolean
+    elementId?: string;   
+}
+
 export type EditActionDeleteParam = {
     elementId: string;   
     backspace?: boolean; 
@@ -215,9 +226,11 @@ export type EditActionInsertMeasureParam = {
 };
 
 export type EditActionInsertNoteParam = {
-    elementName: string;
-    startId: string;
-    endId?: string;
+    targetId: string;
+    pname: string;
+    oct: number;
+    dur: string
+    chordMode: boolean;
 };
 
 export type EditActionKeyDownParam = {

@@ -4,9 +4,9 @@
         resolveContextButtonBars,
         type ResolvedContextButton,
     } from "../app/action-resolver";
-    import type { Action, Mode } from "../app/types";
+    import type { Action } from "../app/types";
 
-    export let mode: Mode;
+    export let insertMode = false;
     export let onToggleMode: () => void;
     export let xmlMode = false;
     export let workerBusy = false;
@@ -33,8 +33,8 @@
         </div>
     {:else}
         <div class="vrv-btn-group">
-            <div class="vrv-btn vrv-toggleable {mode === 'insert' ? 'toggled' : ''}" on:click={onToggleMode}>
-                {mode === "insert" ? "Insert" : "Edit"}
+            <div class="vrv-btn vrv-toggleable {insertMode ? 'toggled' : ''}" on:click={onToggleMode}>
+                {insertMode ? "Insert" : "Edit"}
             </div>
         </div>
         <div class="vrv-h-separator"></div>

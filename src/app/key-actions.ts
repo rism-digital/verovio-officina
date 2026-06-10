@@ -77,14 +77,59 @@ export function createKeyShortcuts(controller: EditorController): KeyShortcut[] 
             run: async () => controller.handleKeydown(40, { ctrlKey: true }),
         },
         {
+            key: "Backspace",
+            requiresSelection: true,
+            run: async () => controller.deleteSelectedElement(true),
+        },
+        {
             key: "Delete",
             requiresSelection: true,
             run: async () => controller.deleteSelectedElement(false),
         },
         {
-            key: "Backspace",
+            key: "Escape",
             requiresSelection: true,
-            run: async () => controller.deleteSelectedElement(true),
+            run: async () => controller.handleInsertMode(27),
+        },
+        {
+            key: "Enter",
+            requiresSelection: true,
+            run: async () => controller.handleInsertMode(13),
+        },
+        {
+            key: "Digit1",
+            requiresSelection: true,
+            run: async () => controller.handleInsertNote(49),
+        },
+                {
+            key: "Digit2",
+            requiresSelection: true,
+            run: async () => controller.handleInsertNote(50),
+        },
+        {
+            key: "Digit3",
+            requiresSelection: true,
+            run: async () => controller.handleInsertNote(51),
+        },
+                {
+            key: "Digit4",
+            requiresSelection: true,
+            run: async () => controller.handleInsertNote(52),
+        },
+        {
+            key: "Digit5",
+            requiresSelection: true,
+            run: async () => controller.handleInsertNote(53),
+        },
+                {
+            key: "Digit6",
+            requiresSelection: true,
+            run: async () => controller.handleInsertNote(54),
+        },
+        {
+            key: "Digit7",
+            requiresSelection: true,
+            run: async () => controller.handleInsertNote(55),
         },
     ];
 }
@@ -105,7 +150,7 @@ export function keyShortcutMap({
 
 export function keyShortcutMapFromEvent(event: KeyboardEvent): string {
     return keyShortcutMap({
-        key: event.key,
+        key: event.code,
         altKey: event.altKey,
         ctrlKey: event.ctrlKey,
         metaKey: event.metaKey,
