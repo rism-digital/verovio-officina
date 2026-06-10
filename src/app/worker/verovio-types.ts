@@ -17,6 +17,7 @@ export type VerovioOptions = {
     pageMarginBottom: number;
     scale: number;
     scaleToPageSize: boolean;
+    svgBoundingBoxes: boolean;
     xmlIdSeed: number;
 };
 

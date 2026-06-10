@@ -113,7 +113,7 @@
         });
 
         // Make all elements transparent but still hittable
-        svgOverlay.querySelectorAll("g, path, text, ellipse, polyline").forEach((node) => {
+        svgOverlay.querySelectorAll("g, path, text, ellipse, polyline, rect").forEach((node) => {
             const element = node as SVGElement;
             element.style.stroke = "transparent";
             element.style.fill = "transparent";
@@ -209,7 +209,7 @@
         if (!node) return null;
 
         const isG = node.tagName?.toLowerCase() === "g";
-        const isBlocked = node.classList.contains("bounding-box") || node.classList.contains("notehead");
+        const isBlocked = node.matches(".bounding-box, .notehead, .stem, .flag");
 
         if (!isG || isBlocked) {
             return getClosestMEIElement(node.parentElement, elementType);

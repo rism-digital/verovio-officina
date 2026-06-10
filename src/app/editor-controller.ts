@@ -46,6 +46,7 @@ export class EditorController {
         pageMarginBottom: 50,
         scale: 100,
         scaleToPageSize: true,
+        svgBoundingBoxes: true,
         xmlIdSeed: 1,
     };
 
