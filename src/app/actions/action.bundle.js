@@ -1,4 +1,14 @@
 export const actionCatalog = {
+    measure: [
+        {
+            name: "Insert one measure before",
+            action: "add-measure-before",
+        },
+        {
+            name: "Insert one measure after",
+            action: "add-measure-after",
+        },
+    ],
     note: [
         {
             name: "Add accidental",
@@ -523,9 +533,38 @@ export const actionDefinitions = {
             {
                 action: "insertMeasure",
                 param: {
-                    targetId: "",
                     number: "{{dialogValue}}",
-                    insertMode: "",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "add-measure-before": {
+        action: "chain",
+        param: [
+            {
+                action: "insertMeasure",
+                param: {
+                    targetId: "[selection-id]",
+                    number: 1,
+                    insertBefore: true,
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "add-measure-after": {
+        action: "chain",
+        param: [
+            {
+                action: "insertMeasure",
+                param: {
+                    targetId: "[selection-id]",
+                    number: 1,
                 },
             },
             {

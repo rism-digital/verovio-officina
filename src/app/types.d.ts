@@ -204,7 +204,7 @@ export type EditActionInsertControlParam = {
 export type EditActionInsertMeasureParam = {
     elementId?: string;
     number: number;
-    insertMode?: string;
+    insertBefore?: boolean;
 };
 
 export type EditActionInsertNoteParam = {

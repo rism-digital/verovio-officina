@@ -262,24 +262,16 @@
         event.preventDefault();
         event.stopPropagation();
 
-        const node = getClosestMEIElement(event.target as Element);
-        if (!node || !node.id) {
+        if (!selection?.id || !selection.element) {
             closeOverlayContextMenu();
             return;
         }
 
-        const targetElement = getMEIElementName(node);
-        if (!targetElement) {
-            closeOverlayContextMenu();
-            return;
-        }
-
-        await onElementSelect?.(node.id);
         overlayContextMenu = {
             x: event.clientX,
             y: event.clientY,
-            targetId: node.id,
-            targetElement,
+            targetId: selection.id,
+            targetElement: selection.element,
         };
     }
 
