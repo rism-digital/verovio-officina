@@ -13,9 +13,9 @@
     import StatusBar from "./components/StatusBar.svelte";
     import workerUrl from "./app/worker/worker.ts?worker&url";
     import { withBaseUrl } from "./app/asset-url";
-    import { actionDefinitions } from "./app/actions/action.bundle";
     import { EditorController } from "./app/editor-controller";
     import { RNGLoader } from "./app/rng-loader";
+    import { createKeyShortcuts, keyShortcutMap, keyShortcutMapFromEvent } from "./app/key-actions";
     import {
         beginToolbarAction,
         DEFAULT_ENTER_VALUE_DIALOG,
@@ -42,7 +42,6 @@
     const MEI_BASIC_SCHEMA_URL = "https://music-encoding.org/schema/5.1/mei-basic.rng";
     const STORAGE_KEY = "verovio-editor";
     const MEI_EXPORT_OPTIONS_STORAGE_KEY = "verovio-mei-export-options";
-    const NON_DELETABLE_ELEMENTS = new Set(["staff", "layer"]);
     const DEFAULT_MEI_EXPORT_OPTIONS: MEIExportOptions = {
         basic: false,
         removeIds: false,
@@ -102,6 +101,12 @@
         },
     );
 
+    const shortcuts = createKeyShortcuts(controller);
+    const shortcutByKey = new Map(shortcuts.map((shortcut) => [
+        keyShortcutMap(shortcut),
+        shortcut,
+    ]));
+
     onMount(async () => {
         verovioVersion = await controller.init(VEROVIO_URL);
         meiExportOptions = loadMEIExportOptionsFromStorage();
@@ -154,6 +159,15 @@
         );
     }
 
+    function canHandleGlobalShortcut(event: KeyboardEvent): boolean {
+        return !(
+            event.defaultPrevented ||
+            xmlMode ||
+            isDialogOpen() ||
+            isInteractiveTarget(event.target)
+        );
+    }
+
     $: menuInteractionEnabled = !xmlMode && !$workerBusy;
     $: canMenuZoom = menuInteractionEnabled && $verovioState.pageCount > 0;
     $: canMenuZoomIn = canMenuZoom && controller.canZoomIn($verovioState.zoom);
@@ -163,55 +177,17 @@
         menuInteractionEnabled && $verovioState.currentPage < $verovioState.pageCount;
 
     async function handleGlobalKeydown(event: KeyboardEvent) {
-        const direction = event.key === "ArrowRight"
-            ? 39
-            : event.key === "ArrowLeft"
-                ? 37
-                : null;
-        const deleteKey = event.key === "Delete" || event.key === "Backspace"
-            ? event.key
-            : null;
-        if (direction === null && deleteKey === null) return;
-        if (
-            event.defaultPrevented ||
-            event.altKey ||
-            event.ctrlKey ||
-            event.metaKey ||
-            xmlMode ||
-            isDialogOpen() ||
-            isInteractiveTarget(event.target)
-        ) {
-            return;
-        }
-
+        const shortcut = shortcutByKey.get(keyShortcutMapFromEvent(event));
+        if (!shortcut) return;
+        if (!canHandleGlobalShortcut(event)) return;
         const currentSelection = get(editStatus).selection;
-        if (!currentSelection?.id) return;
+        if (shortcut.requiresSelection && !currentSelection?.id) return;
         event.preventDefault();
         if (get(workerBusy)) return;
-        if (direction !== null) {
-            await controller.navigateSelection(direction);
-            return;
-        }
-        await deleteSelectedElement(deleteKey === "Backspace");
-    }
-
-    async function deleteSelectedElement(backspace: boolean) {
-        const elementName = get(editStatus).selection?.element;
-        if (!elementName || NON_DELETABLE_ELEMENTS.has(elementName)) {
-            statusLine.set(elementName
-                ? `Cannot delete <${elementName}>.`
-                : "Cannot delete selected element.");
-            return;
-        }
-        const definition = actionDefinitions[backspace ? "delete-backspace" : "delete"];
-        if (!definition) {
-            statusLine.set("Failed: delete action is not available.");
-            return;
-        }
-        const ok = await controller.handleEditAction(definition);
-        statusLine.set(ok
-            ? `Deleted <${elementName}>.`
-            : `Failed: delete <${elementName}>.`);
+        await shortcut.run({
+            event,
+            selectionId: currentSelection?.id,
+        });
     }
 
     function toggleMode() {

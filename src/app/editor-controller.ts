@@ -1,4 +1,5 @@
 import { get, type Writable } from "svelte/store";
+import { actionDefinitions } from "./actions/action.bundle";
 import type {
     EditActionSetParam,
     EditResponseContent,
@@ -12,6 +13,7 @@ import type { VerovioOptions } from "./worker/verovio-types";
 import { createWorkerBridge, type WorkerBridge } from "./worker/bridge";
 
 const zoomLevels = [10, 20, 35, 75, 100, 150, 200];
+const NON_DELETABLE_ELEMENTS = new Set(["staff", "layer"]);
 
 type ControllerStores = {
     verovioState: Writable<{ zoom: number; pageCount: number; currentPage: number }>;
@@ -305,6 +307,26 @@ export class EditorController {
         } finally {
             this.stores.workerBusy.set(false);
         }
+    }
+
+    async deleteSelectedElement(backspace: boolean): Promise<boolean> {
+        const elementName = get(this.stores.editStatus).selection?.element;
+        if (!elementName || NON_DELETABLE_ELEMENTS.has(elementName)) {
+            this.stores.statusLine.set(elementName
+                ? `Cannot delete <${elementName}>.`
+                : "Cannot delete selected element.");
+            return false;
+        }
+        const definition = actionDefinitions[backspace ? "delete-backspace" : "delete"];
+        if (!definition) {
+            this.stores.statusLine.set("Failed: delete action is not available.");
+            return false;
+        }
+        const ok = await this.handleEditAction(definition);
+        this.stores.statusLine.set(ok
+            ? `Deleted <${elementName}>.`
+            : `Failed: delete <${elementName}>.`);
+        return ok;
     }
 
     async handleAttributeEdit(param: EditActionSetParam, commit: boolean): Promise<void> {
