@@ -290,13 +290,13 @@ export class EditorController {
             };
             const ok = await this.bridge.verovio.edit(editAction);
             if (ok) {
-                await this.resetInsertMode();
+                await this.bridge.verovio.edit({ action: "cursor", param: { setCursor: false }});
                 await this.applyEditLayout(true);
                 const editStatus = await this.refreshEditStatus();
-                if (editStatus.chainedId) {
+                if (editStatus.chainedId) { 
                     await this.handleSelect(editStatus.chainedId);
-                    await this.handleInsertMode(13);
                 }
+                await this.handleInsertMode(13);             
             } else {
                 this.stores.workerBusy.set(false);
             }
