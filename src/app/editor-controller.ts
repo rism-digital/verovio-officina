@@ -103,7 +103,6 @@ export class EditorController {
     }
 
     async setCurrentPage(nextPage: number): Promise<void> {
-        await this.resetInsertMode();
         await this.refreshEditStatus();
         const { pageCount } = get(this.stores.verovioState);
         const clamped = Math.min(Math.max(1, nextPage), Math.max(1, pageCount));
@@ -290,13 +289,11 @@ export class EditorController {
             };
             const ok = await this.bridge.verovio.edit(editAction);
             if (ok) {
-                await this.bridge.verovio.edit({ action: "cursor", param: { setCursor: false }});
                 await this.applyEditLayout(true);
                 const editStatus = await this.refreshEditStatus();
                 if (editStatus.chainedId) { 
                     await this.handleSelect(editStatus.chainedId);
                 }
-                await this.handleInsertMode(13);             
             } else {
                 this.stores.workerBusy.set(false);
             }
@@ -328,24 +325,6 @@ export class EditorController {
             } else {
                 this.stores.workerBusy.set(false);
             }
-        } catch (error) {
-            console.error("Failed to perform the key action", error);
-            this.stores.workerBusy.set(false);
-        }
-    }
-
-    async resetInsertMode(): Promise<void> {
-        const insertMode = get(this.stores.editStatus).insertMode;
-        if (!insertMode) return;
-        this.stores.workerBusy.set(true);
-        try {
-            const editAction: EditAction = {
-                action: "cursor",
-                param: { setCursor: false },
-            };
-            await this.bridge.verovio.edit(editAction);
-            await this.refreshEditStatus();
-            this.stores.workerBusy.set(false);
         } catch (error) {
             console.error("Failed to perform the key action", error);
             this.stores.workerBusy.set(false);
@@ -589,7 +568,6 @@ export class EditorController {
     }
 
     async adjustZoom(direction: 1 | -1): Promise<void> {
-        await this.resetInsertMode();
         await this.refreshEditStatus();
         this.stores.verovioState.update((current) => ({
             ...current,

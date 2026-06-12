@@ -168,12 +168,13 @@
     }
 
     $: menuInteractionEnabled = !xmlMode && !$workerBusy;
-    $: canMenuZoom = menuInteractionEnabled && $verovioState.pageCount > 0;
+    $: canNavigateView = menuInteractionEnabled && !$editStatus.insertMode;
+    $: canMenuZoom = canNavigateView && $verovioState.pageCount > 0;
     $: canMenuZoomIn = canMenuZoom && controller.canZoomIn($verovioState.zoom);
     $: canMenuZoomOut = canMenuZoom && controller.canZoomOut($verovioState.zoom);
-    $: canMenuGoPrev = menuInteractionEnabled && $verovioState.currentPage > 1;
+    $: canMenuGoPrev = canNavigateView && $verovioState.currentPage > 1;
     $: canMenuGoNext =
-        menuInteractionEnabled && $verovioState.currentPage < $verovioState.pageCount;
+        canNavigateView && $verovioState.currentPage < $verovioState.pageCount;
 
     async function handleGlobalKeydown(event: KeyboardEvent) {
         const shortcut = shortcutByKey.get(keyShortcutMapFromEvent(event));
