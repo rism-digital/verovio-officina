@@ -9,7 +9,6 @@
     export let insertMode = false;
     export let onToggleMode: () => void;
     export let xmlMode = false;
-    export let workerBusy = false;
     export let onValidateXml: (() => void) | null = null;
     export let selectedElementName: string | null = null;
     export let hasSecondarySelection = false;
@@ -29,7 +28,7 @@
 <section class="vrv-editor-toolbar vrv-text-no-select">
     {#if xmlMode}
         <div class="vrv-btn-group">
-            <div class="vrv-btn-text" data-before="Validate" class:disabled={workerBusy} on:click={() => onValidateXml?.()}></div>
+            <div class="vrv-btn-text disabled" data-before="Validate" on:click={() => onValidateXml?.()}></div>
         </div>
     {:else}
         <div class="vrv-btn-group">
