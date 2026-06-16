@@ -14,6 +14,8 @@ import type { VerovioOptions } from "./worker/verovio-types";
 import { createWorkerBridge, type WorkerBridge } from "./worker/bridge";
 
 const zoomLevels = [10, 20, 35, 75, 100, 150, 200];
+const MIN_ZOOM = zoomLevels[0];
+const MAX_ZOOM = zoomLevels[zoomLevels.length - 1];
 const NON_DELETABLE_ELEMENTS = new Set(["staff", "layer"]);
 
 export const finaleSpeedyDurationToMEI: Record<number, string> = {
@@ -66,7 +68,7 @@ export class EditorController {
         this.bridge = createWorkerBridge(this.worker);
         this.stores = stores;
     }
-    
+
     async init(verovioUrl: string): Promise<string> {
         this.stores.workerBusy.set(true);
         await this.bridge.init(verovioUrl);
@@ -92,6 +94,58 @@ export class EditorController {
         const editStatus = await this.bridge.verovio.editStatus();
         this.stores.editStatus.set(editStatus);
         return editStatus;
+    }
+
+    private async runEditAction(
+        editAction: EditAction,
+        errorMessage: string,
+    ): Promise<boolean> {
+        this.stores.workerBusy.set(true);
+        try {
+            const ok = await this.bridge.verovio.edit(editAction);
+            if (!ok) {
+                this.stores.workerBusy.set(false);
+            }
+            return ok;
+        } catch (error) {
+            console.error(errorMessage, error);
+            this.stores.workerBusy.set(false);
+            return false;
+        }
+    }
+
+    private async refreshAndSelectChainedId(): Promise<EditStatus> {
+        const editStatus = await this.refreshEditStatus();
+        if (editStatus.chainedId) {
+            await this.handleSelect(editStatus.chainedId);
+        }
+        return editStatus;
+    }
+
+    private async loadContextForElement(id: string): Promise<boolean> {
+        const contextOk = await this.bridge.verovio.edit({
+            action: "context",
+            param: { elementId: id },
+        });
+        this.stores.editResponseContent.set(
+            contextOk ? await this.bridge.verovio.editResponseContent() : null,
+        );
+        return contextOk;
+    }
+
+    private async refreshPageCount(): Promise<number> {
+        const pageCount = await this.bridge.verovio.getPageCount();
+        this.stores.verovioState.update((current) => ({
+            ...current,
+            pageCount,
+            currentPage: Math.min(current.currentPage, Math.max(1, pageCount)),
+        }));
+        return pageCount;
+    }
+
+    private async redoLayoutAndRefreshPageCount(): Promise<void> {
+        await this.bridge.verovio.redoLayout();
+        await this.refreshPageCount();
     }
 
     async updateVerovioView(): Promise<void> {
@@ -141,8 +195,7 @@ export class EditorController {
         if (isMensuralMusicOnly) {
             await this.bridge.verovio.loadData(data);
         }
-        const pageCount = await this.bridge.verovio.getPageCount();
-        this.stores.verovioState.update((current) => ({ ...current, pageCount }));
+        await this.refreshPageCount();
         await this.updateVerovioView();
     }
 
@@ -154,16 +207,7 @@ export class EditorController {
         this.stores.workerBusy.set(true);
         this.updateOptionsForSize(size);
         await this.applyCurrentOptions();
-        await this.bridge.verovio.redoLayout();
-        const pageCount = await this.bridge.verovio.getPageCount();
-        this.stores.verovioState.update((current) => ({ ...current, pageCount }));
-        const { currentPage } = get(this.stores.verovioState);
-        if (currentPage > pageCount) {
-            this.stores.verovioState.update((current) => ({
-                ...current,
-                currentPage: pageCount,
-            }));
-        }
+        await this.redoLayoutAndRefreshPageCount();
         await this.updateVerovioView();
     }
 
@@ -182,30 +226,16 @@ export class EditorController {
     async refreshContextFromSelection(): Promise<void> {
         const current = get(this.stores.editStatus).selection;
         if (!current?.id) return;
-        const editAction: EditAction = {
-            action: "context",
-            param: { elementId: current.id },
-        };
-        const contextOk = await this.bridge.verovio.edit(editAction);
-        if (contextOk) {
-            this.stores.editResponseContent.set(
-                await this.bridge.verovio.editResponseContent(),
-            );
-        } else {
-            this.stores.editResponseContent.set(null);
-        }
+        await this.loadContextForElement(current.id);
     }
 
     async getScoreDefForDialog(): Promise<TreeNodeData | null> {
-        this.stores.workerBusy.set(true);
         try {
-            const editAction: EditAction = {
+            const scoreDefContextOk = await this.runEditAction({
                 action: "properties",
                 param: {},
-            };
-            const scoreDefContextOk = await this.bridge.verovio.edit(editAction);
+            }, "Failed to load scoreDef");
             if (!scoreDefContextOk) {
-                this.stores.workerBusy.set(false);
                 return null;
             }
             const scoreDef = await this.bridge.verovio.editResponseScoreDef();
@@ -219,26 +249,51 @@ export class EditorController {
     }
 
     async applyScoreDefFromDialog(scoreDef: TreeNodeData): Promise<boolean> {
-        this.stores.workerBusy.set(true);
         let scoreDefStr = (scoreDef ? JSON.stringify(scoreDef) : "");
-        try {
-            const editAction: EditAction = {
-                action: "properties",
-                param: { scoreDef: scoreDefStr },
-            };
-            const ok = await this.bridge.verovio.edit(editAction);
-            if (!ok) {
-                this.stores.workerBusy.set(false);
-                return false;
-            }
-            await this.applyEditLayout(true);
-            await this.refreshContextFromSelection();
-            return true;
-        } catch (error) {
-            console.error("Failed to apply scoreDef", error);
-            this.stores.workerBusy.set(false);
+        const ok = await this.runEditAction({
+            action: "properties",
+            param: { scoreDef: scoreDefStr },
+        }, "Failed to apply scoreDef");
+        if (!ok) {
             return false;
         }
+        await this.applyEditLayout(true);
+        await this.refreshContextFromSelection();
+        return true;
+    }
+
+    async handleAttributeEdit(param: EditActionSetParam, commit: boolean): Promise<void> {
+        const ok = await this.runEditAction({
+            action: "set",
+            param,
+        }, "Failed to update attribute");
+        if (!ok) return;
+        await this.applyEditLayout(commit);
+        if (commit) {
+            await this.refreshContextFromSelection();
+        }
+    }
+
+    async handleEditAction(
+        action: EditAction,
+        dialogValue?: string | number,
+        options: { redoLayout?: boolean } = {},
+    ): Promise<boolean> {
+        const editAction = this.resolveEditAction(action, dialogValue);
+        const ok = await this.runEditAction(editAction, "Failed to apply edit action");
+        if (!ok) {
+            return false;
+        }
+        const editStatus = await this.refreshAndSelectChainedId();
+        if (options.redoLayout) {
+            await this.redoLayoutAndRefreshPageCount();
+        }
+        await this.updateVerovioView();
+        if (!editStatus.chainedId) {
+            await this.refreshContextFromSelection();
+        }
+        this.stores.dirty.set(true);
+        return true;
     }
 
     async handleKeydown(
@@ -247,28 +302,18 @@ export class EditorController {
     ): Promise<void> {
         const current = get(this.stores.editStatus).selection;
         if (!current?.id) return;
-        this.stores.workerBusy.set(true);
-        try {
-            const editAction: EditAction = {
-                action: "keyDown",
-                param: {
-                    elementId: current.id,
-                    key,
-                    ...(options.ctrlKey ? { ctrlKey: true } : {}),
-                    ...(options.shiftKey ? { shiftKey: true } : {}),
-                },
-            };
-            const ok = await this.bridge.verovio.edit(editAction);
-            if (ok) {
-                await this.applyEditLayout(true);
-                await this.refreshContextFromSelection();
-            } else {
-                this.stores.workerBusy.set(false);
-            }
-        } catch (error) {
-            console.error("Failed to perform the key action", error);
-            this.stores.workerBusy.set(false);
-        }
+        const ok = await this.runEditAction({
+            action: "keyDown",
+            param: {
+                elementId: current.id,
+                key,
+                ...(options.ctrlKey ? { ctrlKey: true } : {}),
+                ...(options.shiftKey ? { shiftKey: true } : {}),
+            },
+        }, "Failed to perform the key action");
+        if (!ok) return;
+        await this.applyEditLayout(true);
+        await this.refreshContextFromSelection();
     }
 
     async handleDuration(key: 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57,
@@ -293,32 +338,19 @@ export class EditorController {
     ): Promise<void> {
         const current = get(this.stores.editStatus).selection;
         if (!current?.id) return;
-        this.stores.workerBusy.set(true);
-        try {
-            const editAction: EditAction = {
-                action: "insertNote",
-                param: {
-                    targetId: current.id,
-                    pname: "c",
-                    oct: 3,
-                    dur: finaleSpeedyDurationToMEI[key],
-                    chordMode: false
-                },
-            };
-            const ok = await this.bridge.verovio.edit(editAction);
-            if (ok) {
-                await this.applyEditLayout(true);
-                const editStatus = await this.refreshEditStatus();
-                if (editStatus.chainedId) { 
-                    await this.handleSelect(editStatus.chainedId);
-                }
-            } else {
-                this.stores.workerBusy.set(false);
-            }
-        } catch (error) {
-            console.error("Failed to perform the key action", error);
-            this.stores.workerBusy.set(false);
-        }
+        const ok = await this.runEditAction({
+            action: "insertNote",
+            param: {
+                targetId: current.id,
+                pname: "c",
+                oct: 3,
+                dur: finaleSpeedyDurationToMEI[key],
+                chordMode: false
+            },
+        }, "Failed to perform the key action");
+        if (!ok) return;
+        await this.applyEditLayout(true);
+        await this.refreshAndSelectChainedId();
     }
 
     async handleInsertMode(
@@ -326,27 +358,17 @@ export class EditorController {
     ): Promise<void> {
         const current = get(this.stores.editStatus).selection;
         if (!current?.id) return;
-        this.stores.workerBusy.set(true);
         const setCursor = (key == 13);
-        try {
-            const editAction: EditAction = {
-                action: "cursor",
-                param: {
-                    setCursor,
-                    elementId: current.id,
-                },
-            };
-            const ok = await this.bridge.verovio.edit(editAction);
-            if (ok) {
-                await this.applyEditLayout(true);
-                await this.refreshEditStatus();
-            } else {
-                this.stores.workerBusy.set(false);
-            }
-        } catch (error) {
-            console.error("Failed to perform the key action", error);
-            this.stores.workerBusy.set(false);
-        }
+        const ok = await this.runEditAction({
+            action: "cursor",
+            param: {
+                setCursor,
+                elementId: current.id,
+            },
+        }, "Failed to perform the key action");
+        if (!ok) return;
+        await this.applyEditLayout(true);
+        await this.refreshEditStatus();
     }
 
     async handleSelect(id: string | null): Promise<void> {
@@ -368,17 +390,9 @@ export class EditorController {
                 param: { elementId: id },
             }
             const selectOk = await this.bridge.verovio.edit(editActionSelect);
-            const editActionContext: EditAction = {
-                action: "context",
-                param: { elementId: id },
-            };
-            const contextOk = await this.bridge.verovio.edit(editActionContext);
+            const contextOk = selectOk && await this.loadContextForElement(id);
             if (selectOk && contextOk) {
-                const editResponseContent = await this.bridge.verovio.editResponseContent();
                 await this.refreshEditStatus();
-                this.stores.editResponseContent.set(
-                    editResponseContent,
-                );
             } else {
                 this.stores.editResponseContent.set(null);
             }
@@ -450,67 +464,6 @@ export class EditorController {
         return ok;
     }
 
-    async handleAttributeEdit(param: EditActionSetParam, commit: boolean): Promise<void> {
-        this.stores.workerBusy.set(true);
-        try {
-            const editorAction: EditAction = {
-                action: "set",
-                param,
-            };
-            const ok = await this.bridge.verovio.edit(editorAction);
-            if (ok) {
-                await this.applyEditLayout(commit);
-                if (commit) {
-                    await this.refreshContextFromSelection();
-                }
-            } else {
-                this.stores.workerBusy.set(false);
-            }
-        } catch (error) {
-            console.error("Failed to update attribute", error);
-            this.stores.workerBusy.set(false);
-        }
-    }
-
-    async handleEditAction(
-        action: EditAction,
-        dialogValue?: string | number,
-        options: { redoLayout?: boolean } = {},
-    ): Promise<boolean> {
-        this.stores.workerBusy.set(true);
-        try {
-            const editAction = this.resolveEditAction(action, dialogValue);
-            const ok = await this.bridge.verovio.edit(editAction);
-            if (!ok) {
-                this.stores.workerBusy.set(false);
-                return false;
-            }
-            const editStatus = await this.refreshEditStatus();
-            if (editStatus.chainedId) {
-                await this.handleSelect(editStatus.chainedId);
-            }
-            if (options.redoLayout) {
-                await this.bridge.verovio.redoLayout();
-                const pageCount = await this.bridge.verovio.getPageCount();
-                this.stores.verovioState.update((current) => ({
-                    ...current,
-                    pageCount,
-                    currentPage: Math.min(current.currentPage, Math.max(1, pageCount)),
-                }));
-            }
-            await this.updateVerovioView();
-            if (!editStatus.chainedId) {
-                await this.refreshContextFromSelection();
-            }
-            this.stores.dirty.set(true);
-            return true;
-        } catch (error) {
-            console.error("Failed to apply edit action", error);
-            this.stores.workerBusy.set(false);
-            return false;
-        }
-    }
-
     private resolveEditAction(action: EditAction, dialogValue?: string | number): EditAction {
         if (!("param" in action)) {
             return { action: action.action } as EditAction;
@@ -566,30 +519,28 @@ export class EditorController {
     }
 
     getZoomIndex(value: number): number {
-        const sorted = [...zoomLevels].sort((a, b) => a - b);
-        const index = sorted.findIndex((level) => level >= value);
-        if (index === -1) return sorted.length - 1;
-        return sorted[index] === value ? index : Math.max(index - 1, 0);
+        const index = zoomLevels.findIndex((level) => level >= value);
+        if (index === -1) return zoomLevels.length - 1;
+        return zoomLevels[index] === value ? index : Math.max(index - 1, 0);
     }
 
     getNextZoom(current: number, direction: 1 | -1): number {
-        const sorted = [...zoomLevels].sort((a, b) => a - b);
-        const index = sorted.findIndex((level) => level >= current);
+        const index = zoomLevels.findIndex((level) => level >= current);
         if (direction > 0) {
-            if (index === -1) return sorted[sorted.length - 1];
-            const next = sorted[index] === current ? index + 1 : index;
-            return sorted[Math.min(next, sorted.length - 1)];
+            if (index === -1) return MAX_ZOOM;
+            const next = zoomLevels[index] === current ? index + 1 : index;
+            return zoomLevels[Math.min(next, zoomLevels.length - 1)];
         }
-        if (index === -1) return sorted[0];
-        const prev = sorted[index] === current ? index - 1 : index - 1;
-        return sorted[Math.max(prev, 0)];
+        if (index === -1) return MIN_ZOOM;
+        const prev = zoomLevels[index] === current ? index - 1 : index - 1;
+        return zoomLevels[Math.max(prev, 0)];
     }
 
     async adjustZoom(direction: 1 | -1): Promise<void> {
         await this.refreshEditStatus();
         this.stores.verovioState.update((current) => ({
             ...current,
-            zoom: Math.min(200, Math.max(10, Math.floor(this.getNextZoom(current.zoom, direction)))),
+            zoom: this.clampZoom(this.getNextZoom(current.zoom, direction)),
         }));
         if (this.hasLayoutSize()) {
             await this.applyLayoutForLastSize();
@@ -597,7 +548,7 @@ export class EditorController {
     }
 
     private clampZoom(value: number): number {
-        return Math.min(200, Math.max(10, Math.floor(value)));
+        return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Math.floor(value)));
     }
 
     private updateVerovioOptions(patch: Partial<VerovioOptions>): void {
