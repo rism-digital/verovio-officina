@@ -99,37 +99,37 @@ export function createKeyShortcuts(controller: EditorController): KeyShortcut[] 
         {
             key: "Digit1",
             requiresSelection: true,
-            run: async () => controller.handleInsertNote(49),
+            run: async () => controller.handleDuration(49),
         },
                 {
             key: "Digit2",
             requiresSelection: true,
-            run: async () => controller.handleInsertNote(50),
+            run: async () => controller.handleDuration(50),
         },
         {
             key: "Digit3",
             requiresSelection: true,
-            run: async () => controller.handleInsertNote(51),
+            run: async () => controller.handleDuration(51),
         },
                 {
             key: "Digit4",
             requiresSelection: true,
-            run: async () => controller.handleInsertNote(52),
+            run: async () => controller.handleDuration(52),
         },
         {
             key: "Digit5",
             requiresSelection: true,
-            run: async () => controller.handleInsertNote(53),
+            run: async () => controller.handleDuration(53),
         },
                 {
             key: "Digit6",
             requiresSelection: true,
-            run: async () => controller.handleInsertNote(54),
+            run: async () => controller.handleDuration(54),
         },
         {
             key: "Digit7",
             requiresSelection: true,
-            run: async () => controller.handleInsertNote(55),
+            run: async () => controller.handleDuration(55),
         },
     ];
 }

@@ -173,6 +173,11 @@ export type EditActionProperties = {
     param: EditActionPropertiesParam;
 };
 
+export type EditActionResetCursor = {
+    action: "resetCursor";
+    param: EditActionResetCursorParam;
+};
+
 export type EditActionSelect = {
     action: "select";
     param: EditActionSelectParam;
@@ -198,7 +203,7 @@ export type EditActionCursorParam = {
 
 export type EditActionDeleteParam = {
     elementId: string;   
-    backspace?: boolean; 
+    backspace?: boolean;
 }
 
 export type EditActionInsertParam = {
@@ -250,6 +255,10 @@ export type EditActionPropertiesParam =
     | {
         scoreDef: string;
     };
+
+export type EditActionResetCursorParam = {
+    maintainChordInput?: boolean;
+};
 
 export type EditActionSelectParam = {
     elementId: string;

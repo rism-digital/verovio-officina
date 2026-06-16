@@ -8,6 +8,7 @@ import type {
     MEIExportOptions,
     TreeNodeData,
     ViewModel,
+    EditActionParam,
 } from "./types";
 import type { VerovioOptions } from "./worker/verovio-types";
 import { createWorkerBridge, type WorkerBridge } from "./worker/bridge";
@@ -267,6 +268,23 @@ export class EditorController {
         } catch (error) {
             console.error("Failed to perform the key action", error);
             this.stores.workerBusy.set(false);
+        }
+    }
+
+    async handleDuration(key: 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57,
+    ): Promise<void> {
+        const editStatus = get(this.stores.editStatus);
+        if (!editStatus?.selection?.id) return;
+        if (editStatus?.insertMode) {
+            return await this.handleInsertNote(key);
+        }
+        else {
+            const editActionParam: EditActionParam = {
+                elementId: editStatus.selection.id,
+                attribute: "dur",
+                value: finaleSpeedyDurationToMEI[key]
+            };
+            await this.handleAttributeEdit(editActionParam, true);
         }
     }
 
