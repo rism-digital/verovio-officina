@@ -296,8 +296,8 @@ export class EditorController {
         return true;
     }
 
-    async handleKeydown(
-        key: 38 | 40,
+    async handleKeyDown(
+        key:  37 | 38 | 39 | 40,
         options: { ctrlKey?: boolean; shiftKey?: boolean } = {},
     ): Promise<void> {
         const current = get(this.stores.editStatus).selection;
@@ -316,6 +316,20 @@ export class EditorController {
         await this.refreshContextFromSelection();
     }
 
+    async handleArrow(key: 37 | 38 | 39 | 40,
+        options: { ctrlKey?: boolean; shiftKey?: boolean } = {},
+    ): Promise<void> {
+        const editStatus = get(this.stores.editStatus);
+        if (!editStatus?.selection?.id) return;
+        if (editStatus?.insertMode || options.ctrlKey) {
+            return await this.handleKeyDown(key);
+        }
+        else {
+            await this.navigateSelection(key, options);
+            return;
+        }
+    }
+
     async handleDuration(key: 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57,
     ): Promise<void> {
         const editStatus = get(this.stores.editStatus);
@@ -331,6 +345,24 @@ export class EditorController {
             };
             await this.handleAttributeEdit(editActionParam, true);
         }
+    }
+
+    async handleMode(
+        key: 13 | 27,
+    ): Promise<void> {
+        const current = get(this.stores.editStatus).selection;
+        if (!current?.id) return;
+        const setCursor = (key == 13);
+        const ok = await this.runEditAction({
+            action: "cursor",
+            param: {
+                setCursor,
+                elementId: current.id,
+            },
+        }, "Failed to perform the key action");
+        if (!ok) return;
+        await this.applyEditLayout(true);
+        await this.refreshEditStatus();
     }
 
     async handleInsertNote(
@@ -351,24 +383,6 @@ export class EditorController {
         if (!ok) return;
         await this.applyEditLayout(true);
         await this.refreshAndSelectChainedId();
-    }
-
-    async handleInsertMode(
-        key: 13 | 27,
-    ): Promise<void> {
-        const current = get(this.stores.editStatus).selection;
-        if (!current?.id) return;
-        const setCursor = (key == 13);
-        const ok = await this.runEditAction({
-            action: "cursor",
-            param: {
-                setCursor,
-                elementId: current.id,
-            },
-        }, "Failed to perform the key action");
-        if (!ok) return;
-        await this.applyEditLayout(true);
-        await this.refreshEditStatus();
     }
 
     async handleSelect(id: string | null): Promise<void> {
@@ -421,7 +435,8 @@ export class EditorController {
         }
     }
 
-    async navigateSelection(direction: 37 | 39): Promise<boolean> {
+    async navigateSelection(direction: 37 | 38 | 39 | 40,
+        options: { ctrlKey?: boolean; shiftKey?: boolean } = {}): Promise<boolean> {
         const current = get(this.stores.editStatus).selection;
         if (!current?.id) return false;
         this.stores.workerBusy.set(true);

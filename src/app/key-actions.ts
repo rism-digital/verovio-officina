@@ -45,36 +45,48 @@ function shortcutModifierState(shortcut: Pick<
 export function createKeyShortcuts(controller: EditorController): KeyShortcut[] {
     return [
         {
+            key: "ArrowLeft",
+            requiresSelection: true,
+            run: async () => controller.handleArrow(37),
+        }, 
+        {
+            key: "ArrowUp",
+            requiresSelection: true,
+            run: async () => controller.handleArrow(38),
+        },
+        {
             key: "ArrowRight",
             requiresSelection: true,
-            run: async () => controller.navigateSelection(39),
+            run: async () => controller.handleArrow(39),
+        },
+        {
+            key: "ArrowDown",
+            requiresSelection: true,
+            run: async () => controller.handleArrow(40),
         },
         {
             key: "ArrowLeft",
+            primaryKey: true,
             requiresSelection: true,
-            run: async () => controller.navigateSelection(37),
-        },
-        {
-            key: "ArrowUp",
-            requiresSelection: true,
-            run: async () => controller.handleKeydown(38),
-        },
-        {
-            key: "ArrowDown",
-            requiresSelection: true,
-            run: async () => controller.handleKeydown(40),
+            run: async () => controller.handleArrow(38, { ctrlKey: true }),
         },
         {
             key: "ArrowUp",
             primaryKey: true,
             requiresSelection: true,
-            run: async () => controller.handleKeydown(38, { ctrlKey: true }),
+            run: async () => controller.handleArrow(38, { ctrlKey: true }),
+        },
+        {
+            key: "ArrowRight",
+            primaryKey: true,
+            requiresSelection: true,
+            run: async () => controller.handleArrow(39, { ctrlKey: true }),
         },
         {
             key: "ArrowDown",
             primaryKey: true,
             requiresSelection: true,
-            run: async () => controller.handleKeydown(40, { ctrlKey: true }),
+            run: async () => controller.handleArrow(40, { ctrlKey: true }),
         },
         {
             key: "Backspace",
@@ -89,19 +101,19 @@ export function createKeyShortcuts(controller: EditorController): KeyShortcut[] 
         {
             key: "Escape",
             requiresSelection: true,
-            run: async () => controller.handleInsertMode(27),
+            run: async () => controller.handleMode(27),
         },
         {
             key: "Enter",
             requiresSelection: true,
-            run: async () => controller.handleInsertMode(13),
+            run: async () => controller.handleMode(13),
         },
         {
             key: "Digit1",
             requiresSelection: true,
             run: async () => controller.handleDuration(49),
         },
-                {
+        {
             key: "Digit2",
             requiresSelection: true,
             run: async () => controller.handleDuration(50),
@@ -111,7 +123,7 @@ export function createKeyShortcuts(controller: EditorController): KeyShortcut[] 
             requiresSelection: true,
             run: async () => controller.handleDuration(51),
         },
-                {
+        {
             key: "Digit4",
             requiresSelection: true,
             run: async () => controller.handleDuration(52),
@@ -121,7 +133,7 @@ export function createKeyShortcuts(controller: EditorController): KeyShortcut[] 
             requiresSelection: true,
             run: async () => controller.handleDuration(53),
         },
-                {
+        {
             key: "Digit6",
             requiresSelection: true,
             run: async () => controller.handleDuration(54),
