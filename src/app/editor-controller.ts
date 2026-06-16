@@ -321,8 +321,8 @@ export class EditorController {
     ): Promise<void> {
         const editStatus = get(this.stores.editStatus);
         if (!editStatus?.selection?.id) return;
-        if (editStatus?.insertMode || options.ctrlKey) {
-            return await this.handleKeyDown(key);
+        if (editStatus?.insertMode || options.shiftKey) {
+            return await this.handleKeyDown(key, options);
         }
         else {
             await this.navigateSelection(key, options);
