@@ -14,6 +14,7 @@
         ViewModel,
     } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
+    import Keyboard from "./Keyboard.svelte";
 
     export let view: ViewModel;
     export let selection: EditStatus["selection"] = null;
@@ -346,7 +347,7 @@
                     />
                 {/if}
             </div>
-            <div class="vrv-keyboard-panel" style="display: flex;"></div>
+            <Keyboard></Keyboard>
         </div>
     </div>
 </div>
