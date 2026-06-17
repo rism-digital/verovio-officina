@@ -162,6 +162,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         display: block;
         height: 100%;
         min-height: 0;
+        min-width: 0;
 
         ////////////////////////////////////////////////////////////////////////
         // View and SVG elements
@@ -206,6 +207,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             display: flex;
             height: 100%;
             min-height: 0;
+            min-width: 0;
         }
 
         .vrv-side-panel {
@@ -227,10 +229,14 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             flex-direction: column;
             flex: 1 1 auto;
             min-height: 0;
+            min-width: 0;
         }
 
         .vrv-keyboard-panel {
             display: flex;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
             min-height: $editor-keyboard-height;
             background-color: $background;
             border-top: 1px solid $background-border;
@@ -1096,8 +1102,10 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
 
     .vrv-keyboard-wrapper {
         display: flex;
+        flex: 1 1 auto;
+        min-width: 0;
         flex-direction: column;
-        overflow-x: hidden;
+        overflow-x: auto;
 
         $white-key-width: 55px;
         $black-key-width: 35px;

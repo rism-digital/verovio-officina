@@ -4,7 +4,6 @@
 <div
     class="vrv-keyboard-panel"
     data-app-el-id="d3138f6854333000"
-    style="display: flex;"
 >
     <midi-player
         sound-font=""
