@@ -114,14 +114,6 @@ export class EditorController {
         }
     }
 
-    private async refreshAndSelectChainedId(): Promise<EditStatus> {
-        const editStatus = await this.refreshEditStatus();
-        if (editStatus.chainedId) {
-            await this.handleSelect(editStatus.chainedId);
-        }
-        return editStatus;
-    }
-
     private async loadContextForElement(id: string): Promise<boolean> {
         const contextOk = await this.bridge.verovio.edit({
             action: "context",
@@ -133,6 +125,14 @@ export class EditorController {
         return contextOk;
     }
 
+    private async refreshAndSelectChainedId(): Promise<EditStatus> {
+        const editStatus = await this.refreshEditStatus();
+        if (editStatus.chainedId) {
+            await this.handleSelect(editStatus.chainedId);
+        }
+        return editStatus;
+    }
+
     private async refreshPageCount(): Promise<number> {
         const pageCount = await this.bridge.verovio.getPageCount();
         this.stores.verovioState.update((current) => ({
@@ -141,6 +141,12 @@ export class EditorController {
             currentPage: Math.min(current.currentPage, Math.max(1, pageCount)),
         }));
         return pageCount;
+    }
+
+    async refreshContextFromSelection(): Promise<void> {
+        const current = get(this.stores.editStatus).selection;
+        if (!current?.id) return;
+        await this.loadContextForElement(current.id);
     }
 
     private async redoLayoutAndRefreshPageCount(): Promise<void> {
@@ -223,10 +229,18 @@ export class EditorController {
         await this.updateVerovioView();
     }
 
-    async refreshContextFromSelection(): Promise<void> {
-        const current = get(this.stores.editStatus).selection;
-        if (!current?.id) return;
-        await this.loadContextForElement(current.id);
+    async applyScoreDefFromDialog(scoreDef: TreeNodeData): Promise<boolean> {
+        let scoreDefStr = (scoreDef ? JSON.stringify(scoreDef) : "");
+        const ok = await this.runEditAction({
+            action: "properties",
+            param: { scoreDef: scoreDefStr },
+        }, "Failed to apply scoreDef");
+        if (!ok) {
+            return false;
+        }
+        await this.applyEditLayout(true);
+        await this.refreshContextFromSelection();
+        return true;
     }
 
     async getScoreDefForDialog(): Promise<TreeNodeData | null> {
@@ -246,20 +260,6 @@ export class EditorController {
             this.stores.workerBusy.set(false);
             return null;
         }
-    }
-
-    async applyScoreDefFromDialog(scoreDef: TreeNodeData): Promise<boolean> {
-        let scoreDefStr = (scoreDef ? JSON.stringify(scoreDef) : "");
-        const ok = await this.runEditAction({
-            action: "properties",
-            param: { scoreDef: scoreDefStr },
-        }, "Failed to apply scoreDef");
-        if (!ok) {
-            return false;
-        }
-        await this.applyEditLayout(true);
-        await this.refreshContextFromSelection();
-        return true;
     }
 
     async handleAttributeEdit(param: EditActionSetParam, commit: boolean): Promise<void> {

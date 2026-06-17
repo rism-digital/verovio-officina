@@ -419,7 +419,6 @@
         insertMode={$editStatus.insertMode}
         onToggleMode={toggleMode}
         {xmlMode}
-        workerBusy={$workerBusy}
         onValidateXml={validateXmlContent}
         selectedElementName={$editResponseContent?.object?.element ?? null}
         hasSecondarySelection={Boolean($editStatus.selection?.secondaryId)}
