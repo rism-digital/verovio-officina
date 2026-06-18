@@ -42,21 +42,17 @@
         <div class="vrv-btn-group">
             <div
                 class="vrv-btn vrv-toggleable {insertMode ? 'toggled' : ''}"
-                role="button"
-                tabindex="0"
                 on:click={onToggleMode}
                 on:keydown={(event) => handleButtonKeydown(event, onToggleMode)}
             >
                 {insertMode ? "Insert" : "Edit"}
             </div>
             <div
-                class="vrv-btn vrv-toggleable {pianoKeyboardEnabled ? 'toggled' : ''}"
-                role="button"
-                tabindex="0"
+                class="vrv-btn-icon-large vrv-toggleable {pianoKeyboardEnabled ? 'toggled' : ''}"
+                style={`background-image: url("/icons/keyboard/piano.png");`}
                 on:click={onTogglePianoKeyboard}
                 on:keydown={(event) => handleButtonKeydown(event, onTogglePianoKeyboard)}
             >
-                KB
             </div>
         </div>
         <div class="vrv-h-separator"></div>

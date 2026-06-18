@@ -20,10 +20,12 @@
     export let selection: EditStatus["selection"] = null;
     export let insertMode = false;
     export let pianoKeyboardEnabled = false;
+    export let pianoKeyboardOctave = 4;
     export let onResize: (size: { width: number; height: number }) => void;
     export let onElementSelect: SelectElementHandler | null = null;
     export let onElementSecondarySelect: SelectElementHandler | null = null;
     export let onAttributeEdit: EditActionSetHandler | null = null;
+    export let onPianoKeyboardOctaveChange: ((octave: number) => void | Promise<void>) | null = null;
     export let onTargetedContextAction: TargetedContextActionHandler | null = null;
     export let editResponseContent: EditResponseContent| null = null;
     export let rngMEIAll: RNGLoader | null = null;
@@ -246,7 +248,6 @@
         // Get MEI element
         let node: SVGGElement | null = getClosestMEIElement(<SVGElement>event.target);
         if (!node || !node.id) {
-            console.log(node, "MEI element not found or with no id");
             return; // this should never happen, but as a safety
         }
 
@@ -349,7 +350,10 @@
                 {/if}
             </div>
             {#if pianoKeyboardEnabled}
-                <Keyboard></Keyboard>
+                <Keyboard
+                    octave={pianoKeyboardOctave}
+                    onOctaveChange={onPianoKeyboardOctaveChange}
+                ></Keyboard>
             {/if}
         </div>
     </div>

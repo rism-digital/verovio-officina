@@ -36,6 +36,7 @@ type ControllerStores = {
     workerBusy: Writable<boolean>;
     dirty: Writable<boolean>;
     editResponseContent: Writable<EditResponseContent | null>;
+    pianoKeyboardOctave: Writable<number>;
 };
 
 export class EditorController {
@@ -93,6 +94,9 @@ export class EditorController {
     private async refreshEditStatus(): Promise<EditStatus> {
         const editStatus = await this.bridge.verovio.editStatus();
         this.stores.editStatus.set(editStatus);
+        if (editStatus.insertMode && editStatus.insertion) {
+            this.stores.pianoKeyboardOctave.set(editStatus.insertion.oct);
+        }
         return editStatus;
     }
 
@@ -269,6 +273,7 @@ export class EditorController {
         }, "Failed to update attribute");
         if (!ok) return;
         await this.applyEditLayout(commit);
+        await this.refreshEditStatus();
         if (commit) {
             await this.refreshContextFromSelection();
         }
@@ -314,6 +319,7 @@ export class EditorController {
         if (!ok) return;
         await this.applyEditLayout(true);
         await this.refreshContextFromSelection();
+        await this.refreshEditStatus();
     }
 
     async handleArrow(key: 37 | 38 | 39 | 40,

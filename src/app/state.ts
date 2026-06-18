@@ -7,7 +7,8 @@ export const editStatus = writable<EditStatus>({
   canRedo: false,
   isMensuralMusicOnly: false,
   insertMode: false,
-  selection: null
+  selection: null,
+  insertion: null
 });
 export const viewModel = writable<ViewModel>({
   svg: '',
@@ -22,4 +23,5 @@ export const verovioState = writable({
 export const workerBusy = writable(false);
 export const dirty = writable(false);
 export const pianoKeyboardEnabled = writable(false);
+export const pianoKeyboardOctave = writable(4);
 export const statusLine = writable('Ready');

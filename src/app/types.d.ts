@@ -65,6 +65,16 @@ export interface EditStatus {
         element: string;
         secondaryId?: string;
     } | null;
+    insertion: {
+        chordMode: boolean;
+        restMode: boolean;
+        pname: string;
+        oct: number;
+        dots: number;
+        dotLock: boolean;
+        accid: string;
+        accidImplicit: boolean;
+    } | null;
 }
 
 export interface ReferenceObject extends TreeNodeData {

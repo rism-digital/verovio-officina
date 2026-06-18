@@ -24,24 +24,35 @@
     let keyboardWrapper: HTMLDivElement | null = null;
     let keys: HTMLDivElement | null = null;
     let octaves: HTMLDivElement | null = null;
-    let currentOctave = 4;
     let isActivated = false;
+    export let octave = 4;
+    export let onOctaveChange: ((octave: number) => void | Promise<void>) | null = null;
+    let currentOctave = octave;
+
+    $: if (octave !== currentOctave) {
+        currentOctave = octave;
+        activate();
+    }
 
     function maxSelectableOctave() {
         if (!keys || !octaves) return currentOctave;
-        const maxByKeys = Math.floor((keys.children.length - 1) / 12) + 1;
-        return Math.min(octaves.children.length, maxByKeys);
+        const maxByKeys = Math.floor((keys.children.length - 1) / 12);
+        return Math.min(octaves.children.length - 1, maxByKeys);
     }
 
     function activateLower() {
-        if (currentOctave <= 1) return;
-        currentOctave--;
+        if (currentOctave <= 0) return;
+        const nextOctave = currentOctave - 1;
+        currentOctave = nextOctave;
+        onOctaveChange?.(nextOctave);
         activate();
     }
 
     function activateHigher() {
         if (currentOctave >= maxSelectableOctave()) return;
-        currentOctave++;
+        const nextOctave = currentOctave + 1;
+        currentOctave = nextOctave;
+        onOctaveChange?.(nextOctave);
         activate();
     }
 
@@ -74,7 +85,7 @@
             element.classList.remove("selected");
         });
 
-        let key = keys.children[(currentOctave - 1) * 12] as HTMLElement | null;
+        let key = keys.children[(currentOctave) * 12] as HTMLElement | null;
         for (const letter of letters) {
             if (!key) break;
             key.setAttribute("data-key", letter);
@@ -82,7 +93,7 @@
             key = key.nextElementSibling as HTMLElement | null;
         }
 
-        const octave = octaves.children[currentOctave - 1] as
+        const octave = octaves.children[currentOctave] as
             | HTMLElement
             | undefined;
         if (!octave) return;
@@ -119,7 +130,7 @@
         <div class="vrv-keyboard-octaves" bind:this={octaves}>
             <div class="vrv-keyboard-octave">C0</div>
             <div class="vrv-keyboard-octave">C1</div>
-            <div class="vrv-keyboard-octave selected">C2</div>
+            <div class="vrv-keyboard-octave">C2</div>
             <div class="vrv-keyboard-octave">C3</div>
             <div class="vrv-keyboard-octave">C4</div>
             <div class="vrv-keyboard-octave">C5</div>

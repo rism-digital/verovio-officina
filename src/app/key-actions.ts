@@ -18,6 +18,10 @@ export type KeyShortcut = {
     run: KeyShortcutHandler;
 };
 
+export type KeyShortcutActions = {
+    togglePianoKeyboard: () => void;
+};
+
 function isMacPlatform(): boolean {
     return typeof navigator !== "undefined"
         && /Mac|iPhone|iPad|iPod/.test(navigator.platform);
@@ -42,7 +46,10 @@ function shortcutModifierState(shortcut: Pick<
     };
 }
 
-export function createKeyShortcuts(controller: EditorController): KeyShortcut[] {
+export function createKeyShortcuts(
+    controller: EditorController,
+    actions: KeyShortcutActions,
+): KeyShortcut[] {
     return [
         {
             key: "ArrowLeft",
@@ -194,6 +201,12 @@ export function createKeyShortcuts(controller: EditorController): KeyShortcut[] 
             key: "Digit7",
             requiresSelection: true,
             run: async () => controller.handleDuration(55),
+        },
+        //
+        {
+            key: "KeyK",
+            primaryKey: true,
+            run: actions.togglePianoKeyboard,
         },
     ];
 }

@@ -28,6 +28,7 @@
         editResponseContent,
         editStatus,
         pianoKeyboardEnabled,
+        pianoKeyboardOctave,
         statusLine,
         verovioState,
         viewModel,
@@ -98,10 +99,13 @@
             workerBusy,
             dirty,
             editResponseContent,
+            pianoKeyboardOctave,
         },
     );
 
-    const shortcuts = createKeyShortcuts(controller);
+    const shortcuts = createKeyShortcuts(controller, {
+        togglePianoKeyboard,
+    });
     const shortcutByKey = new Map(shortcuts.map((shortcut) => [
         keyShortcutMap(shortcut),
         shortcut,
@@ -201,6 +205,22 @@
 
     function togglePianoKeyboard() {
         pianoKeyboardEnabled.update((enabled) => !enabled);
+    }
+
+    async function handlePianoKeyboardOctaveChange(octave: number) {
+        const current = get(editStatus);
+        if (!current.insertMode || !current.selection?.id) {
+            pianoKeyboardOctave.set(octave);
+            return;
+        }
+        await controller.handleAttributeEdit(
+            {
+                elementId: current.selection.id,
+                attribute: "oct",
+                value: String(octave),
+            },
+            true,
+        );
     }
 
     function triggerOpenFile() {
@@ -445,6 +465,8 @@
             selection={$editStatus.selection}
             insertMode={$editStatus.insertMode}
             pianoKeyboardEnabled={$pianoKeyboardEnabled}
+            pianoKeyboardOctave={$pianoKeyboardOctave}
+            onPianoKeyboardOctaveChange={handlePianoKeyboardOctaveChange}
             onResize={(size) => controller.applyLayoutForSize(size)}
             onElementSelect={(id) => controller.handleSelect(id)}
             onElementSecondarySelect={(id) => controller.handleSecondarySelect(id)}
