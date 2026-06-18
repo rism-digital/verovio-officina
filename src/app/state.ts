@@ -21,4 +21,5 @@ export const verovioState = writable({
 });
 export const workerBusy = writable(false);
 export const dirty = writable(false);
+export const pianoKeyboardEnabled = writable(false);
 export const statusLine = writable('Ready');

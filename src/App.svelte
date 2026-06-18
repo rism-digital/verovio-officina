@@ -27,6 +27,7 @@
         dirty,
         editResponseContent,
         editStatus,
+        pianoKeyboardEnabled,
         statusLine,
         verovioState,
         viewModel,
@@ -196,6 +197,10 @@
         } else {
             await controller.handleMode(13);
         }
+    }
+
+    function togglePianoKeyboard() {
+        pianoKeyboardEnabled.update((enabled) => !enabled);
     }
 
     function triggerOpenFile() {
@@ -418,6 +423,8 @@
     <Toolbar
         insertMode={$editStatus.insertMode}
         onToggleMode={toggleMode}
+        pianoKeyboardEnabled={$pianoKeyboardEnabled}
+        onTogglePianoKeyboard={togglePianoKeyboard}
         {xmlMode}
         onValidateXml={validateXmlContent}
         selectedElementName={$editResponseContent?.object?.element ?? null}
@@ -437,6 +444,7 @@
             view={$viewModel}
             selection={$editStatus.selection}
             insertMode={$editStatus.insertMode}
+            pianoKeyboardEnabled={$pianoKeyboardEnabled}
             onResize={(size) => controller.applyLayoutForSize(size)}
             onElementSelect={(id) => controller.handleSelect(id)}
             onElementSecondarySelect={(id) => controller.handleSecondarySelect(id)}

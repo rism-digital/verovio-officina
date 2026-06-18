@@ -1098,6 +1098,12 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         background-repeat: no-repeat;
         background-position: center center;
         flex-shrink: 0;
+        &-left {
+            background-image: url(/icons/keyboard/left.png);
+        }
+        &-right {
+            background-image: url(/icons/keyboard/right.png);
+        }
     }
 
     .vrv-keyboard-wrapper {

@@ -19,6 +19,7 @@
     export let view: ViewModel;
     export let selection: EditStatus["selection"] = null;
     export let insertMode = false;
+    export let pianoKeyboardEnabled = false;
     export let onResize: (size: { width: number; height: number }) => void;
     export let onElementSelect: SelectElementHandler | null = null;
     export let onElementSecondarySelect: SelectElementHandler | null = null;
@@ -347,7 +348,9 @@
                     />
                 {/if}
             </div>
-            <Keyboard></Keyboard>
+            {#if pianoKeyboardEnabled}
+                <Keyboard></Keyboard>
+            {/if}
         </div>
     </div>
 </div>

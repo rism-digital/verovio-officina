@@ -8,6 +8,8 @@
 
     export let insertMode = false;
     export let onToggleMode: () => void;
+    export let pianoKeyboardEnabled = false;
+    export let onTogglePianoKeyboard: () => void;
     export let xmlMode = false;
     export let onValidateXml: (() => void) | null = null;
     export let selectedElementName: string | null = null;
@@ -23,6 +25,12 @@
         includeDialogs: true,
         includeSecondary: hasSecondarySelection,
     });
+
+    function handleButtonKeydown(event: KeyboardEvent, handler: () => void) {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        handler();
+    }
 </script>
 
 <section class="vrv-editor-toolbar vrv-text-no-select">
@@ -32,8 +40,23 @@
         </div>
     {:else}
         <div class="vrv-btn-group">
-            <div class="vrv-btn vrv-toggleable {insertMode ? 'toggled' : ''}" on:click={onToggleMode}>
+            <div
+                class="vrv-btn vrv-toggleable {insertMode ? 'toggled' : ''}"
+                role="button"
+                tabindex="0"
+                on:click={onToggleMode}
+                on:keydown={(event) => handleButtonKeydown(event, onToggleMode)}
+            >
                 {insertMode ? "Insert" : "Edit"}
+            </div>
+            <div
+                class="vrv-btn vrv-toggleable {pianoKeyboardEnabled ? 'toggled' : ''}"
+                role="button"
+                tabindex="0"
+                on:click={onTogglePianoKeyboard}
+                on:keydown={(event) => handleButtonKeydown(event, onTogglePianoKeyboard)}
+            >
+                KB
             </div>
         </div>
         <div class="vrv-h-separator"></div>
