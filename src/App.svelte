@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onDestroy, onMount } from "svelte";
-    import { get } from "svelte/store";
+    import { get, type Unsubscriber } from "svelte/store";
     import MainPanel from "./components/MainPanel.svelte";
     import XmlPanel from "./components/XmlPanel.svelte";
     import DialogAbout from "./components/dialogs/DialogAbout.svelte";
@@ -15,6 +15,7 @@
     import { withBaseUrl } from "./app/asset-url";
     import { EditorController } from "./app/editor-controller";
     import { RNGLoader } from "./app/rng-loader";
+    import { initUserPreferencesPersistence } from "./app/user-preferences";
     import { createKeyShortcuts, keyShortcutMap, keyShortcutMapFromEvent } from "./app/key-actions";
     import {
         beginToolbarAction,
@@ -27,8 +28,8 @@
         dirty,
         editResponseContent,
         editStatus,
-        pianoKeyboardEnabled,
         pianoKeyboardOctave,
+        userPreferences,
         statusLine,
         verovioState,
         viewModel,
@@ -63,6 +64,7 @@
     let enterValueDialogState: EnterValueDialogState | null = null;
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
     let xmlInitialContent = "";
+    let stopPreferencesSync: Unsubscriber | null = null;
 
     const ABOUT_LIBRARIES_HTML = `Libraries used in this application:\n\n\
 * [html-midi-player](https://github.com/cifkao/html-midi-player)\n\
@@ -112,6 +114,8 @@
     ]));
 
     onMount(async () => {
+        stopPreferencesSync = initUserPreferencesPersistence();
+
         verovioVersion = await controller.init(VEROVIO_URL);
         meiExportOptions = loadMEIExportOptionsFromStorage();
 
@@ -141,6 +145,7 @@
     });
 
     onDestroy(() => {
+        stopPreferencesSync?.();
         controller.destroy();
     });
 
@@ -204,7 +209,10 @@
     }
 
     function togglePianoKeyboard() {
-        pianoKeyboardEnabled.update((enabled) => !enabled);
+        userPreferences.update((preferences) => ({
+            ...preferences,
+            pianoKeyboardEnabled: !preferences.pianoKeyboardEnabled,
+        }));
     }
 
     async function handlePianoKeyboardOctaveChange(octave: number) {
@@ -443,7 +451,7 @@
     <Toolbar
         insertMode={$editStatus.insertMode}
         onToggleMode={toggleMode}
-        pianoKeyboardEnabled={$pianoKeyboardEnabled}
+        pianoKeyboardEnabled={$userPreferences.pianoKeyboardEnabled}
         onTogglePianoKeyboard={togglePianoKeyboard}
         {xmlMode}
         onValidateXml={validateXmlContent}
@@ -464,7 +472,7 @@
             view={$viewModel}
             selection={$editStatus.selection}
             insertMode={$editStatus.insertMode}
-            pianoKeyboardEnabled={$pianoKeyboardEnabled}
+            pianoKeyboardEnabled={$userPreferences.pianoKeyboardEnabled}
             pianoKeyboardOctave={$pianoKeyboardOctave}
             onPianoKeyboardOctaveChange={handlePianoKeyboardOctaveChange}
             onResize={(size) => controller.applyLayoutForSize(size)}
