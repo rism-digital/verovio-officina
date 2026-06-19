@@ -221,14 +221,7 @@
             pianoKeyboardOctave.set(octave);
             return;
         }
-        await controller.handleAttributeEdit(
-            {
-                elementId: current.selection.id,
-                attribute: "oct",
-                value: String(octave),
-            },
-            true,
-        );
+        await controller.handleSetSelectionAttribute("oct", String(octave));
     }
 
     function triggerOpenFile() {
@@ -479,7 +472,7 @@
             onElementSelect={(id) => controller.handleSelect(id)}
             onElementSecondarySelect={(id) => controller.handleSecondarySelect(id)}
             onAttributeEdit={(param, commit) =>
-                controller.handleAttributeEdit(param, commit)}
+                controller.handleSet(param, commit)}
             onTargetedContextAction={handleTargetedContextAction}
             editResponseContent={$editResponseContent}
             {rngMEIAll}

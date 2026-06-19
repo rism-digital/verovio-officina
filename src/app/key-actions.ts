@@ -1,4 +1,5 @@
 import type { EditorController } from "./editor-controller";
+import { pianoKeyboardShortcuts } from "./piano-keyboard";
 
 export type KeyShortcutContext = {
     event: KeyboardEvent;
@@ -202,7 +203,11 @@ export function createKeyShortcuts(
             requiresSelection: true,
             run: async () => controller.handleDuration(55),
         },
-        //
+        ...pianoKeyboardShortcuts.map(({ key, code }) => ({
+            key,
+            requiresSelection: true,
+            run: async () => controller.handleLetter(code),
+        })),
         {
             key: "KeyK",
             primaryKey: true,

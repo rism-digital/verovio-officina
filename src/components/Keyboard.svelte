@@ -1,25 +1,6 @@
 <script lang="ts">
     import { onMount, tick } from "svelte";
-
-    const letters = [
-        "A",
-        "W",
-        "S",
-        "E",
-        "D",
-        "F",
-        "T",
-        "G",
-        "Y",
-        "H",
-        "U",
-        "J",
-        "K",
-        "O",
-        "L",
-        "P",
-        ";",
-    ];
+    import { pianoKeyboardLetters } from "../app/piano-keyboard";
 
     let keyboardWrapper: HTMLDivElement | null = null;
     let keys: HTMLDivElement | null = null;
@@ -86,7 +67,7 @@
         });
 
         let key = keys.children[(currentOctave) * 12] as HTMLElement | null;
-        for (const letter of letters) {
+        for (const letter of pianoKeyboardLetters) {
             if (!key) break;
             key.setAttribute("data-key", letter);
             key.classList.add("selected");

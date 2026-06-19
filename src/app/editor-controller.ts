@@ -12,6 +12,7 @@ import type {
 } from "./types";
 import type { VerovioOptions } from "./worker/verovio-types";
 import { createWorkerBridge, type WorkerBridge } from "./worker/bridge";
+import { midiForKeyboardCode } from "./piano-keyboard";
 
 const zoomLevels = [10, 20, 35, 75, 100, 150, 200];
 const MIN_ZOOM = zoomLevels[0];
@@ -266,7 +267,18 @@ export class EditorController {
         }
     }
 
-    async handleAttributeEdit(param: EditActionSetParam, commit: boolean): Promise<void> {
+    async handleSetSelectionAttribute(attribute: string, value: string): Promise<void> {
+        const editStatus = get(this.stores.editStatus);
+        if (!editStatus?.selection?.id) return;
+        const editActionSetParams = {
+                elementId: editStatus.selection.id,
+                attribute,
+                value
+        };
+        return await this.handleSet(editActionSetParams, true);
+    }
+
+    async handleSet(param: EditActionSetParam, commit: boolean): Promise<void> {
         const ok = await this.runEditAction({
             action: "set",
             param,
@@ -349,7 +361,7 @@ export class EditorController {
                 attribute: "dur",
                 value: finaleSpeedyDurationToMEI[key]
             };
-            await this.handleAttributeEdit(editActionParam, true);
+            await this.handleSet(editActionParam, true);
         }
     }
 
@@ -389,6 +401,14 @@ export class EditorController {
         if (!ok) return;
         await this.applyEditLayout(true);
         await this.refreshAndSelectChainedId();
+    }
+
+    async handleLetter(key: number): Promise<void> {
+        const current = get(this.stores.editStatus).selection;
+        if (!current?.id) return;
+        const midi = midiForKeyboardCode(get(this.stores.pianoKeyboardOctave), key);
+        if (midi === null) return;
+        console.log(midi);
     }
 
     async handleSelect(id: string | null): Promise<void> {
