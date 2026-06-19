@@ -31,6 +31,12 @@
         event.preventDefault();
         handler();
     }
+
+    function enableInsertMode(selectedElementName: string | null): boolean {
+        return ["chord", "layer", "mRest", "mSpace", "note", "rest", "space", "staff"].includes(selectedElementName ?? "");
+    }
+
+
 </script>
 
 <section class="vrv-editor-toolbar vrv-text-no-select">
@@ -41,11 +47,12 @@
     {:else}
         <div class="vrv-btn-group">
             <div
-                class="vrv-btn vrv-toggleable {insertMode ? 'toggled' : ''}"
+                class="vrv-btn-icon vrv-toggleable {insertMode ? 'toggled' : ''} {enableInsertMode(selectedElementName) ? '' : 'disabled'}"
                 on:click={onToggleMode}
                 on:keydown={(event) => handleButtonKeydown(event, onToggleMode)}
+                style={`background-image: url("/icons/toolbar/write.png");`}
+                data-before="{insertMode ? "Esc" : "Enter"}"
             >
-                {insertMode ? "Insert" : "Edit"}
             </div>
             <div
                 class="vrv-btn-icon-large vrv-toggleable {pianoKeyboardEnabled ? 'toggled' : ''}"
