@@ -4,6 +4,7 @@
         resolveContextButtonBars,
         type ResolvedContextButton,
     } from "../app/action-resolver";
+    import { enableInsertMode } from "../app/editor-rules";
     import type { Action } from "../app/types";
 
     export let insertMode = false;
@@ -31,11 +32,6 @@
         event.preventDefault();
         handler();
     }
-
-    function enableInsertMode(selectedElementName: string | null): boolean {
-        return ["chord", "layer", "mRest", "mSpace", "note", "rest", "space", "staff"].includes(selectedElementName ?? "");
-    }
-
 
 </script>
 

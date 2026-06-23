@@ -12,6 +12,7 @@ import type {
 } from "./types";
 import type { VerovioOptions } from "./worker/verovio-types";
 import { createWorkerBridge, type WorkerBridge } from "./worker/bridge";
+import { enableInsertMode } from "./editor-rules";
 import { midiForKeyboardCode } from "./piano-keyboard";
 
 const zoomLevels = [10, 20, 35, 75, 100, 150, 200];
@@ -308,6 +309,7 @@ export class EditorController {
         const current = get(this.stores.editStatus).selection;
         if (!current?.id) return;
         const setCursor = (key == 13);
+        if (setCursor && !enableInsertMode(current.element)) return;
         const ok = await this.vrvEdit({
             action: "cursor",
             param: {
