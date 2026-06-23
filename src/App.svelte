@@ -469,8 +469,8 @@
             pianoKeyboardOctave={$pianoKeyboardOctave}
             onPianoKeyboardOctaveChange={handlePianoKeyboardOctaveChange}
             onResize={(size) => controller.applyLayoutForSize(size)}
-            onElementSelect={(id) => controller.handleSelect(id)}
-            onElementSecondarySelect={(id) => controller.handleSecondarySelect(id)}
+            onElementSelect={(id) => controller.vrvSelect(id)}
+            onElementSecondarySelect={(id) => controller.vrvSelectSecondary(id)}
             onAttributeEdit={(param, commit) =>
                 controller.handleSet(param, commit)}
             onTargetedContextAction={handleTargetedContextAction}
