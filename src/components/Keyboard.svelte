@@ -99,6 +99,11 @@
 </script>
 
 <div class="vrv-keyboard-panel">
+    <div class="vrv-keyboard-mode-controls">
+        <div class="vrv-keyboard-mode-button vrv-keyboard-mode-button-sharp"></div>
+        <div class="vrv-keyboard-mode-auto">AUTO</div>
+        <div class="vrv-keyboard-mode-button vrv-keyboard-mode-button-flat toggled"></div>
+    </div>
     <div
         class="vrv-keyboard-navigator vrv-keyboard-navigator-left vrv-clickable"
         role="button"

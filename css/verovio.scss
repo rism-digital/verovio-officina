@@ -1092,6 +1092,47 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     // Keyboard
     ////////////////////////////////////////////////////////////////////////
 
+    .vrv-keyboard-mode-controls {
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        width: $btn-large;
+        padding: 4px;
+        gap: 8px;
+    }
+
+    .vrv-keyboard-mode-button {
+        @extend .vrv-clickable;
+        @extend .vrv-toggleable;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1 1 0;
+        min-height: 0;
+        border: 1px solid $background-border;
+        line-height: 1;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: 24px 24px;
+        user-select: none;
+
+        &-flat {
+            background-image: url(/icons/keyboard/flat.png);
+        }
+
+        &-sharp {
+            background-image: url(/icons/keyboard/sharp.png);
+        }
+    }
+
+    .vrv-keyboard-mode-auto {
+        color: $text-color;
+        font-size: 11px;
+        line-height: 1;
+        text-align: center;
+        user-select: none;
+    }
+
     .vrv-keyboard-navigator {
         padding: 2px;
         width: $btn-large;
