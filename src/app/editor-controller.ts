@@ -349,7 +349,7 @@ export class EditorController {
                 action: "setCursor",
                 param: {
                     elementId: selection.id,
-                    inputMode: "pitchFirst",
+                    inputMode: get(this.stores.userPreferences).inputMode,
                     chordInput: false,
                 },
             }, "Failed to perform the setCursor action");

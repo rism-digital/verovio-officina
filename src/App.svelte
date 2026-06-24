@@ -7,6 +7,7 @@
     import DialogEnterValue from "./components/dialogs/DialogEnterValue.svelte";
     import DialogExport from "./components/dialogs/DialogExport.svelte";
     import DialogScoreProperties from "./components/dialogs/DialogScoreProperties.svelte";
+    import DialogUserPreferences from "./components/dialogs/DialogUserPreferences.svelte";
     import DialogXmlReload from "./components/dialogs/DialogXmlReload.svelte";
     import Menu from "./components/Menu.svelte";
     import Toolbar from "./components/Toolbar.svelte";
@@ -24,6 +25,7 @@
         type EnterValueDialogState
     } from "./app/toolbar-actions";
     import type { Action, MEIExportOptions, TargetedContextAction, TreeNodeData } from "./app/types";
+    import type { UserPreferences } from "./app/state";
     import {
         dirty,
         editResponseContent,
@@ -60,6 +62,7 @@
     let aboutOpen = false;
     let exportDialogOpen = false;
     let scorePropertiesOpen = false;
+    let settingsOpen = false;
     let dialogScoreDef: TreeNodeData | null = null;
     let xmlReloadDialogOpen = false;
     let enterValueDialogState: EnterValueDialogState | null = null;
@@ -166,6 +169,7 @@
             aboutOpen ||
             exportDialogOpen ||
             scorePropertiesOpen ||
+            settingsOpen ||
             xmlReloadDialogOpen ||
             Boolean(enterValueDialogState)
         );
@@ -216,6 +220,14 @@
             ...preferences,
             pianoKeyboardEnabled: !preferences.pianoKeyboardEnabled,
         }));
+    }
+
+    function openSettingsDialog() {
+        settingsOpen = true;
+    }
+
+    function updateUserPreferences(preferences: UserPreferences) {
+        userPreferences.set(preferences);
     }
 
     function handlePianoKeyboardOctaveChange(octave: number) {
@@ -435,6 +447,7 @@
         onToggleXml={toggleXmlMode}
         onScoreProperties={openScorePropertiesDialog}
         onContextAction={handleToolbarAction}
+        onSettings={openSettingsDialog}
         canZoom={canMenuZoom}
         canZoomIn={canMenuZoomIn}
         canZoomOut={canMenuZoomOut}
@@ -493,6 +506,13 @@
         licenseUrl={ABOUT_LICENSE_URL}
         changelogUrl={ABOUT_CHANGELOG_URL}
         onClose={() => (aboutOpen = false)}
+    />
+
+    <DialogUserPreferences
+        open={settingsOpen}
+        value={$userPreferences}
+        onConfirm={updateUserPreferences}
+        onClose={() => (settingsOpen = false)}
     />
 
     <DialogExport

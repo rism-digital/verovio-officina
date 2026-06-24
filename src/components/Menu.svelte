@@ -22,6 +22,7 @@
     export let onToggleXml: ActionHandler | null = null;
     export let onScoreProperties: ActionHandler | null = null;
     export let onContextAction: ((action: Action) => void) | null = null;
+    export let onSettings: ActionHandler | null = null;
     export let onAbout: ActionHandler | null = null;
 
     const prevIconUrl = withBaseUrl("icons/toolbar/arrow-left.png");
@@ -32,6 +33,12 @@
     let addMeasureItems: ResolvedMenuAction[] = [];
 
     $: addMeasureItems = resolveMenuActions();
+
+    function handleMenuItemKeydown(event: KeyboardEvent, handler: ActionHandler | null) {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        handler?.();
+    }
 </script>
 
 <nav class="vrv-toolbar vrv-text-no-select">
@@ -133,6 +140,14 @@
         <div class="vrv-btn-text" data-before="Help"></div>
         <div class="vrv-menu-content">
             <div class="vrv-v-separator"></div>
+            <div
+                class="vrv-menu-text"
+                data-before="Settings"
+                role="button"
+                tabindex="0"
+                on:click={() => onSettings?.()}
+                on:keydown={(event) => handleMenuItemKeydown(event, onSettings)}
+            ></div>
             <div
                 class="vrv-menu-text"
                 data-before="About"
