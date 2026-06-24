@@ -17,7 +17,6 @@ import { enableInsertMode } from "./editor-rules";
 import {
     keyboardOctaveForPitch,
     midiForKeyboardCode,
-    noteForKeyboardCode,
     noteForMidi,
 } from "./piano-keyboard";
 import type { PianoKeyboardMode, UserPreferences } from "./state";
@@ -648,42 +647,38 @@ export class EditorController {
         await this.bridge.verovio.setOptions(this.verovioOptions);
     }
 
-    async vrvUpdatePitchFromPianoKeyboard(key: number): Promise<void> {
-        const keyboardMode = get(this.stores.pianoKeyboardMode);
-        const selection = get(this.stores.editStatus).selection;
+    async vrvUpdatePitchAccid(accid: "s" | "f" | "n"): Promise<void> {
+        const editStatus = get(this.stores.editStatus);
+        const selection = editStatus.selection;
         if (!selection?.id) return;
-        let param: EditActionUpdatePitchParam;
-        const octave = get(this.stores.pianoKeyboardOctave);
-        if (keyboardMode !== "auto") {
-            const note = noteForKeyboardCode(octave, key, keyboardMode);
-            if (!note) return;
-            param = {
-                elementId: selection.id,
-                pname: note.pname,
-                oct: note.oct,
-                accid: note.accid,
-            };
-        }
-        else {
-            const midi = midiForKeyboardCode(octave, key);
-            if (midi === null) return;
-            param = {
-                elementId: selection.id,
-                midi,
-            };
-        }
         const ok = await this.vrvEdit({
             action: "updatePitch",
-            param,
-        }, "Failed to update the cursor values");
+            param: {
+                elementId: selection.id,
+                accid,
+            },
+        }, "Failed to update the accidental");
         if (!ok) return;
         await this.vrvApplyEditLayout(true);
-        await this.vrvRefreshStatus();
+        if (editStatus.insertMode) {
+            await this.vrvRefreshStatus();
+        }
+        else {
+            await this.vrvRefreshContextFromSelection();
+        }
+    }
+
+    async vrvUpdatePitchFromPianoKeyboard(key: number): Promise<void> {
+        const octave = get(this.stores.pianoKeyboardOctave);
+        const midi = midiForKeyboardCode(octave, key);
+        if (midi === null) return;
+        await this.vrvUpdatePitchFromPianoKeyboardMidi(midi);
     }
 
     async vrvUpdatePitchFromPianoKeyboardMidi(midi: number): Promise<void> {
         const keyboardMode = get(this.stores.pianoKeyboardMode);
         const selection = get(this.stores.editStatus).selection;
+        const insertMode = get(this.stores.editStatus).insertMode;
         if (!selection?.id) return;
         let param: EditActionUpdatePitchParam;
         if (keyboardMode !== "auto") {
@@ -707,6 +702,11 @@ export class EditorController {
         }, "Failed to update the cursor values");
         if (!ok) return;
         await this.vrvApplyEditLayout(true);
-        await this.vrvRefreshStatus();
+        if (insertMode) {
+            await this.vrvRefreshStatus();
+        }
+        else {
+            await this.vrvRefreshContextFromSelection();
+        }
     }
 }

@@ -85,33 +85,33 @@ export const pianoKeyboardLetters = pianoKeyboardShortcuts.map(
 );
 
 const flatNoteNames: PianoKeyboardNote[] = [
-    { pname: "c", accid: "", oct: 0 },
+    { pname: "c", accid: "n", oct: 0 },
     { pname: "d", accid: "f", oct: 0 },
-    { pname: "d", accid: "", oct: 0 },
+    { pname: "d", accid: "n", oct: 0 },
     { pname: "e", accid: "f", oct: 0 },
-    { pname: "e", accid: "", oct: 0 },
-    { pname: "f", accid: "", oct: 0 },
+    { pname: "e", accid: "n", oct: 0 },
+    { pname: "f", accid: "n", oct: 0 },
     { pname: "g", accid: "f", oct: 0 },
-    { pname: "g", accid: "", oct: 0 },
+    { pname: "g", accid: "n", oct: 0 },
     { pname: "a", accid: "f", oct: 0 },
-    { pname: "a", accid: "", oct: 0 },
+    { pname: "a", accid: "n", oct: 0 },
     { pname: "b", accid: "f", oct: 0 },
-    { pname: "b", accid: "", oct: 0 },
+    { pname: "b", accid: "n", oct: 0 },
 ];
 
 const sharpNoteNames: PianoKeyboardNote[] = [
-    { pname: "c", accid: "", oct: 0 },
+    { pname: "c", accid: "n", oct: 0 },
     { pname: "c", accid: "s", oct: 0 },
-    { pname: "d", accid: "", oct: 0 },
+    { pname: "d", accid: "n", oct: 0 },
     { pname: "d", accid: "s", oct: 0 },
-    { pname: "e", accid: "", oct: 0 },
-    { pname: "f", accid: "", oct: 0 },
+    { pname: "e", accid: "n", oct: 0 },
+    { pname: "f", accid: "n", oct: 0 },
     { pname: "f", accid: "s", oct: 0 },
-    { pname: "g", accid: "", oct: 0 },
+    { pname: "g", accid: "n", oct: 0 },
     { pname: "g", accid: "s", oct: 0 },
-    { pname: "a", accid: "", oct: 0 },
+    { pname: "a", accid: "n", oct: 0 },
     { pname: "a", accid: "s", oct: 0 },
-    { pname: "b", accid: "", oct: 0 },
+    { pname: "b", accid: "n", oct: 0 },
 ];
 
 export function midiForKeyboardOffset(octave: number, offset: number): number {

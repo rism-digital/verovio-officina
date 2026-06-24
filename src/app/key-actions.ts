@@ -203,6 +203,21 @@ export function createKeyShortcuts(
             requiresSelection: true,
             run: async () => controller.handleDuration(55),
         },
+        {
+            key: "+",
+            requiresSelection: true,
+            run: async () => controller.vrvUpdatePitchAccid("s"),
+        },
+        {
+            key: "-",
+            requiresSelection: true,
+            run: async () => controller.vrvUpdatePitchAccid("f"),
+        },
+        {
+            key: "*",
+            requiresSelection: true,
+            run: async () => controller.vrvUpdatePitchAccid("n"),
+        },
         ...pianoKeyboardShortcuts.map(({ key, code }) => ({
             key,
             requiresSelection: true,
@@ -231,6 +246,9 @@ export function keyShortcutMap({
 }
 
 export function keyShortcutMapFromEvent(event: KeyboardEvent): string {
+    if (!event.altKey && !event.ctrlKey && !event.metaKey && ["+", "-", "*"].includes(event.key)) {
+        return event.key;
+    }
     return keyShortcutMap({
         key: event.code,
         altKey: event.altKey,
