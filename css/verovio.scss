@@ -1129,8 +1129,13 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         color: $text-color;
         font-size: 11px;
         line-height: 1;
+        padding: 2px 0;
         text-align: center;
         user-select: none;
+
+        &.toggled {
+            background-color: $background-toggled;
+        }
     }
 
     .vrv-keyboard-navigator {

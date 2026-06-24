@@ -26,6 +26,7 @@
     export let onElementSecondarySelect: SelectElementHandler | null = null;
     export let onAttributeEdit: EditActionSetHandler | null = null;
     export let onPianoKeyboardOctaveChange: ((octave: number) => void | Promise<void>) | null = null;
+    export let onPianoKeyboardMidiSelect: ((midi: number) => void | Promise<void>) | null = null;
     export let onTargetedContextAction: TargetedContextActionHandler | null = null;
     export let editResponseContent: EditResponseContent| null = null;
     export let rngMEIAll: RNGLoader | null = null;
@@ -41,6 +42,10 @@
 
     function handleEditAttribute(param: EditActionSetParam, commit: boolean) {
         onAttributeEdit?.(param, commit);
+    }
+
+    function focusMainPanel() {
+        verovioView?.focus();
     }
 
     const RESIZE_DEBOUNCE_MS = 150;
@@ -330,7 +335,7 @@
             {rngMEIBasic}
         />
         <div class="vrv-v-split">
-            <div class="vrv-verovio-view" bind:this={verovioView}>
+            <div class="vrv-verovio-view" bind:this={verovioView} tabindex="-1">
                 <div class="vrv-svg-wrapper" bind:this={svgWrapper}>
                     {@html view.svg}
                 </div>
@@ -353,6 +358,8 @@
                 <Keyboard
                     octave={pianoKeyboardOctave}
                     onOctaveChange={onPianoKeyboardOctaveChange}
+                    onMidiSelect={onPianoKeyboardMidiSelect}
+                    onInteractionComplete={focusMainPanel}
                 ></Keyboard>
             {/if}
         </div>

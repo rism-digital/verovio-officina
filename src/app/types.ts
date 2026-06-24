@@ -94,7 +94,6 @@ export interface EditResponseContent {
 export type EditActionParam =
     | EditActionChainParam
     | EditActionContextParam
-    | EditActionCursorParam
     | EditActionDeleteParam
     | EditActionInsertParam
     | EditActionInsertControlParam
@@ -103,14 +102,16 @@ export type EditActionParam =
     | EditActionKeyDownParam
     | EditActionNavigationParam
     | EditActionPropertiesParam
+    | EditActionResetCursorParam
     | EditActionSelectParam
-    | EditActionSetParam;
+    | EditActionSetParam
+    | EditActionSetCursorParam
+    | EditActionUpdateCursorParam;
 
 export type EditAction =
     | EditActionChain
     | EditActionCommit
     | EditActionContext
-    | EditActionCursor
     | EditActionDelete
     | EditActionInsert
     | EditActionInsertControl
@@ -118,9 +119,12 @@ export type EditAction =
     | EditActionInsertNote
     | EditActionKeyDown
     | EditActionNavigate
-    | EditActionProperties
+    | EditActionProperties    
+    | EditActionResetCursor
     | EditActionSelect
-    | EditActionSet;
+    | EditActionSet
+    | EditActionSetCursor
+    | EditActionUpdatePitch;
 
 // Actions
 
@@ -136,11 +140,6 @@ export type EditActionCommit = {
 export type EditActionContext = {
     action: "context";
     param: EditActionContextParam;
-};
-
-export type EditActionCursor = {
-    action: "cursor";
-    param: EditActionCursorParam;
 };
 
 export type EditActionDelete = {
@@ -198,6 +197,16 @@ export type EditActionSet = {
     param: EditActionSetParam;
 };
 
+export type EditActionSetCursor = {
+    action: "setCursor";
+    param: EditActionSetCursorParam;
+};
+
+export type EditActionUpdatePitch = {
+    action: "updatePitch";
+    param: EditActionUpdateCursorParam;
+};
+
 // ActionParams
 
 export type EditActionChainParam = EditAction[];
@@ -205,11 +214,6 @@ export type EditActionChainParam = EditAction[];
 export type EditActionContextParam = {
     elementId: string;
 };
-
-export type EditActionCursorParam = {
-    setCursor: boolean
-    elementId?: string;   
-}
 
 export type EditActionDeleteParam = {
     elementId: string;   
@@ -280,3 +284,18 @@ export type EditActionSetParam = {
     attribute: string;
     value: string;
 };
+
+export type EditActionSetCursorParam = {
+    elementId?: string;
+    inputMode: "pitchFirst" | "durationFirst";
+    chordInput: boolean;
+}
+
+export type EditActionUpdateCursorParam = {
+    elementId: string;
+    pname?: string;
+    oct?: number;
+    accid?: string;
+    midi?: number;
+}
+

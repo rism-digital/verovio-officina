@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount, tick } from "svelte";
     import { pianoKeyboardLetters } from "../app/piano-keyboard";
+    import { pianoKeyboardMode, type PianoKeyboardMode } from "../app/state";
 
     let keyboardWrapper: HTMLDivElement | null = null;
     let keys: HTMLDivElement | null = null;
@@ -8,6 +9,8 @@
     let isActivated = false;
     export let octave = 4;
     export let onOctaveChange: ((octave: number) => void | Promise<void>) | null = null;
+    export let onInteractionComplete: (() => void) | null = null;
+    export let onMidiSelect: ((midi: number) => void | Promise<void>) | null = null;
     let currentOctave = octave;
 
     $: if (octave !== currentOctave) {
@@ -91,6 +94,54 @@
         event.preventDefault();
         if (direction === "lower") activateLower();
         else activateHigher();
+        blurCurrentTarget(event);
+    }
+
+    function handleModeKeydown(event: KeyboardEvent, mode: Exclude<PianoKeyboardMode, "auto">) {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        setKeyboardMode(mode);
+        blurCurrentTarget(event);
+    }
+
+    function handleModeClick(event: MouseEvent, mode: Exclude<PianoKeyboardMode, "auto">) {
+        setKeyboardMode(mode);
+        blurCurrentTarget(event);
+    }
+
+    function handleNavigatorClick(event: MouseEvent, direction: "lower" | "higher") {
+        if (direction === "lower") activateLower();
+        else activateHigher();
+        blurCurrentTarget(event);
+    }
+
+    async function handleKeyClick(event: MouseEvent) {
+        const keyElement = (event.target as Element | null)?.closest(".vrv-keyboard-key");
+        if (!(keyElement instanceof HTMLElement)) return;
+        const midi = Number(keyElement.dataset.midi);
+        if (!Number.isInteger(midi)) return;
+        await onMidiSelect?.(midi);
+        onInteractionComplete?.();
+    }
+
+    function keyboardClick(node: HTMLElement) {
+        node.addEventListener("click", handleKeyClick);
+        return {
+            destroy() {
+                node.removeEventListener("click", handleKeyClick);
+            },
+        };
+    }
+
+    function blurCurrentTarget(event: Event) {
+        if (event.currentTarget instanceof HTMLElement) {
+            event.currentTarget.blur();
+        }
+        onInteractionComplete?.();
+    }
+
+    function setKeyboardMode(mode: Exclude<PianoKeyboardMode, "auto">) {
+        pianoKeyboardMode.update((current) => current === mode ? "auto" : mode);
     }
 
     onMount(() => {
@@ -100,16 +151,36 @@
 
 <div class="vrv-keyboard-panel">
     <div class="vrv-keyboard-mode-controls">
-        <div class="vrv-keyboard-mode-button vrv-keyboard-mode-button-sharp"></div>
-        <div class="vrv-keyboard-mode-auto">AUTO</div>
-        <div class="vrv-keyboard-mode-button vrv-keyboard-mode-button-flat toggled"></div>
+        <div
+            class="vrv-keyboard-mode-button vrv-keyboard-mode-button-sharp"
+            class:toggled={$pianoKeyboardMode === "sharp"}
+            role="button"
+            tabindex="0"
+            aria-label="Use sharp spelling"
+            aria-pressed={$pianoKeyboardMode === "sharp"}
+            on:click={(event) => handleModeClick(event, "sharp")}
+            on:keydown={(event) => handleModeKeydown(event, "sharp")}
+        ></div>
+        <div class="vrv-keyboard-mode-auto" class:toggled={$pianoKeyboardMode === "auto"}>
+            {$pianoKeyboardMode === "auto" ? "AUTO" : "SET"}
+        </div>
+        <div
+            class="vrv-keyboard-mode-button vrv-keyboard-mode-button-flat"
+            class:toggled={$pianoKeyboardMode === "flat"}
+            role="button"
+            tabindex="0"
+            aria-label="Use flat spelling"
+            aria-pressed={$pianoKeyboardMode === "flat"}
+            on:click={(event) => handleModeClick(event, "flat")}
+            on:keydown={(event) => handleModeKeydown(event, "flat")}
+        ></div>
     </div>
     <div
         class="vrv-keyboard-navigator vrv-keyboard-navigator-left vrv-clickable"
         role="button"
         tabindex="0"
         aria-label="Move keyboard selection down one octave"
-        on:click={activateLower}
+        on:click={(event) => handleNavigatorClick(event, "lower")}
         on:keydown={(event) => handleNavigatorKeydown(event, "lower")}
     ></div>
     <div class="vrv-keyboard-wrapper" bind:this={keyboardWrapper}>
@@ -128,6 +199,7 @@
             class="vrv-keyboard-keys"
             data-app-el-id="27e293eda8b10000"
             bind:this={keys}
+            use:keyboardClick
         >
             <div class="vrv-keyboard-key white" data-midi="12"></div>
             <div class="vrv-keyboard-key black" data-midi="13"></div>
@@ -244,7 +316,7 @@
         role="button"
         tabindex="0"
         aria-label="Move keyboard selection up one octave"
-        on:click={activateHigher}
+        on:click={(event) => handleNavigatorClick(event, "higher")}
         on:keydown={(event) => handleNavigatorKeydown(event, "higher")}
     ></div>
 </div>

@@ -28,6 +28,7 @@
         dirty,
         editResponseContent,
         editStatus,
+        pianoKeyboardMode,
         pianoKeyboardOctave,
         userPreferences,
         statusLine,
@@ -101,7 +102,9 @@
             workerBusy,
             dirty,
             editResponseContent,
+            pianoKeyboardMode,
             pianoKeyboardOctave,
+            userPreferences,
         },
     );
 
@@ -215,13 +218,13 @@
         }));
     }
 
-    async function handlePianoKeyboardOctaveChange(octave: number) {
-        const current = get(editStatus);
-        if (!current.insertMode || !current.selection?.id) {
-            pianoKeyboardOctave.set(octave);
-            return;
-        }
-        await controller.handleSetSelectionAttribute("oct", String(octave));
+    function handlePianoKeyboardOctaveChange(octave: number) {
+        pianoKeyboardOctave.set(octave);
+    }
+
+    async function handlePianoKeyboardMidiSelect(midi: number) {
+        if (get(workerBusy)) return;
+        await controller.vrvUpdatePitchFromPianoKeyboardMidi(midi);
     }
 
     function triggerOpenFile() {
@@ -468,6 +471,7 @@
             pianoKeyboardEnabled={$userPreferences.pianoKeyboardEnabled}
             pianoKeyboardOctave={$pianoKeyboardOctave}
             onPianoKeyboardOctaveChange={handlePianoKeyboardOctaveChange}
+            onPianoKeyboardMidiSelect={handlePianoKeyboardMidiSelect}
             onResize={(size) => controller.applyLayoutForSize(size)}
             onElementSelect={(id) => controller.vrvSelect(id)}
             onElementSecondarySelect={(id) => controller.vrvSelectSecondary(id)}

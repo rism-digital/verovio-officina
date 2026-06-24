@@ -9,11 +9,18 @@ import type {
     TreeNodeData,
     ViewModel,
     EditActionParam,
+    EditActionUpdateCursorParam as EditActionUpdatePitchParam,
 } from "./types";
 import type { VerovioOptions } from "./worker/verovio-types";
 import { createWorkerBridge, type WorkerBridge } from "./worker/bridge";
 import { enableInsertMode } from "./editor-rules";
-import { midiForKeyboardCode } from "./piano-keyboard";
+import {
+    keyboardOctaveForPitch,
+    midiForKeyboardCode,
+    noteForKeyboardCode,
+    noteForMidi,
+} from "./piano-keyboard";
+import type { PianoKeyboardMode, UserPreferences } from "./state";
 
 const zoomLevels = [10, 20, 35, 75, 100, 150, 200];
 const MIN_ZOOM = zoomLevels[0];
@@ -38,7 +45,9 @@ type ControllerStores = {
     workerBusy: Writable<boolean>;
     dirty: Writable<boolean>;
     editResponseContent: Writable<EditResponseContent | null>;
+    pianoKeyboardMode: Writable<PianoKeyboardMode>;
     pianoKeyboardOctave: Writable<number>;
+    userPreferences: Writable<UserPreferences>;
 };
 
 export class EditorController {
@@ -91,8 +100,8 @@ export class EditorController {
     async applyLayoutForSize(size: { width: number; height: number }): Promise<void> {
         if (!size.width || !size.height) return;
         this.lastLayoutSize = size;
-        const current = get(this.stores.viewModel);
-        if (!current.svg) return;
+        const viewModel = get(this.stores.viewModel);
+        if (!viewModel.svg) return;
         this.stores.workerBusy.set(true);
         this.updateOptionsForSize(size);
         await this.vrvSetOptions();
@@ -257,12 +266,12 @@ export class EditorController {
     async handleInsertNote(
         key: 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57,
     ): Promise<void> {
-        const current = get(this.stores.editStatus).selection;
-        if (!current?.id) return;
+        const selection = get(this.stores.editStatus).selection;
+        if (!selection?.id) return;
         const ok = await this.vrvEdit({
             action: "insertNote",
             param: {
-                targetId: current.id,
+                targetId: selection.id,
                 pname: "c",
                 oct: 3,
                 dur: finaleSpeedyDurationToMEI[key],
@@ -278,12 +287,12 @@ export class EditorController {
         key:  37 | 38 | 39 | 40,
         options: { ctrlKey?: boolean; shiftKey?: boolean } = {},
     ): Promise<void> {
-        const current = get(this.stores.editStatus).selection;
-        if (!current?.id) return;
+        const selection = get(this.stores.editStatus).selection;
+        if (!selection?.id) return;
         const ok = await this.vrvEdit({
             action: "keyDown",
             param: {
-                elementId: current.id,
+                elementId: selection.id,
                 key,
                 ...(options.ctrlKey ? { ctrlKey: true } : {}),
                 ...(options.shiftKey ? { shiftKey: true } : {}),
@@ -296,28 +305,47 @@ export class EditorController {
     }
 
     async handleLetter(key: number): Promise<void> {
-        const current = get(this.stores.editStatus).selection;
-        if (!current?.id) return;
-        const midi = midiForKeyboardCode(get(this.stores.pianoKeyboardOctave), key);
-        if (midi === null) return;
-        console.log(midi);
+        const { pianoKeyboardEnabled } = get(this.stores.userPreferences);
+        if (pianoKeyboardEnabled) {
+            const editStatus = get(this.stores.editStatus);
+            if (!editStatus?.selection?.id) return;
+            return this.vrvUpdatePitchFromPianoKeyboard(key);
+        } else {
+            await this.handleLetterNoteNames(key);
+        }
+    }
+
+    async handleLetterNoteNames(key: number): Promise<void> {
+        console.log(key);
     }
 
     async handleMode(
         key: 13 | 27,
     ): Promise<void> {
-        const current = get(this.stores.editStatus).selection;
-        if (!current?.id) return;
+        const selection = get(this.stores.editStatus).selection;
+        if (!selection?.id) return;
         const setCursor = (key == 13);
-        if (setCursor && !enableInsertMode(current.element)) return;
-        const ok = await this.vrvEdit({
-            action: "cursor",
-            param: {
-                setCursor,
-                elementId: current.id,
-            },
-        }, "Failed to perform the key action");
-        if (!ok) return;
+        if (setCursor) {
+            if (!enableInsertMode(selection.element)) return;
+            const ok = await this.vrvEdit({
+                action: "setCursor",
+                param: {
+                    elementId: selection.id,
+                    inputMode: "pitchFirst",
+                    chordInput: false,
+                },
+            }, "Failed to perform the setCursor action");
+            if (!ok) return;
+        }
+        else {
+            const ok = await this.vrvEdit({
+                action: "resetCursor",
+                param: {
+                    maintainChordInput: false,
+                },
+            }, "Failed to perform the resetCursor action");
+            if (!ok) return;
+        }
         await this.vrvApplyEditLayout(true);
         await this.vrvRefreshStatus();
     }
@@ -480,13 +508,13 @@ export class EditorController {
 
     async vrvNavigate(direction: 37 | 38 | 39 | 40,
         options: { ctrlKey?: boolean; shiftKey?: boolean } = {}): Promise<boolean> {
-        const current = get(this.stores.editStatus).selection;
-        if (!current?.id) return false;
+        const selection = get(this.stores.editStatus).selection;
+        if (!selection?.id) return false;
         this.stores.workerBusy.set(true);
         try {
             const editAction: EditAction = {
                 action: "navigate",
-                param: { elementId: current.id, direction },
+                param: { elementId: selection.id, direction },
             };
             const ok = await this.bridge.verovio.edit(editAction);
             if (!ok) return false;
@@ -519,9 +547,9 @@ export class EditorController {
     }
 
     async vrvRefreshContextFromSelection(): Promise<void> {
-        const current = get(this.stores.editStatus).selection;
-        if (!current?.id) return;
-        await this.vrvRefreshContextForElement(current.id);
+        const selection = get(this.stores.editStatus).selection;
+        if (!selection?.id) return;
+        await this.vrvRefreshContextForElement(selection.id);
     }
 
     private async vrvRefreshPageCount(): Promise<number> {
@@ -538,7 +566,13 @@ export class EditorController {
         const editStatus = await this.bridge.verovio.editStatus();
         this.stores.editStatus.set(editStatus);
         if (editStatus.insertMode && editStatus.insertion) {
-            this.stores.pianoKeyboardOctave.set(editStatus.insertion.oct);
+            const keyboardOctave = keyboardOctaveForPitch(
+                get(this.stores.pianoKeyboardOctave),
+                editStatus.insertion,
+            );
+            if (keyboardOctave !== null) {
+                this.stores.pianoKeyboardOctave.set(keyboardOctave);
+            }
         }
         return editStatus;
     }
@@ -554,9 +588,9 @@ export class EditorController {
     async vrvRefreshSVG(): Promise<void> {
         const { currentPage } = get(this.stores.verovioState);
         const svg = await this.bridge.verovio.renderToSVG(currentPage);
-        const current = get(this.stores.viewModel);
+        const viewModel = get(this.stores.viewModel);
         this.svgRenderId += 1;
-        this.stores.viewModel.set({ ...current, svg, svgId: this.svgRenderId });
+        this.stores.viewModel.set({ ...viewModel, svg, svgId: this.svgRenderId });
         this.stores.workerBusy.set(false);
     }
 
@@ -612,5 +646,67 @@ export class EditorController {
 
     private async vrvSetOptions(): Promise<void> {
         await this.bridge.verovio.setOptions(this.verovioOptions);
+    }
+
+    async vrvUpdatePitchFromPianoKeyboard(key: number): Promise<void> {
+        const keyboardMode = get(this.stores.pianoKeyboardMode);
+        const selection = get(this.stores.editStatus).selection;
+        if (!selection?.id) return;
+        let param: EditActionUpdatePitchParam;
+        const octave = get(this.stores.pianoKeyboardOctave);
+        if (keyboardMode !== "auto") {
+            const note = noteForKeyboardCode(octave, key, keyboardMode);
+            if (!note) return;
+            param = {
+                elementId: selection.id,
+                pname: note.pname,
+                oct: note.oct,
+                accid: note.accid,
+            };
+        }
+        else {
+            const midi = midiForKeyboardCode(octave, key);
+            if (midi === null) return;
+            param = {
+                elementId: selection.id,
+                midi,
+            };
+        }
+        const ok = await this.vrvEdit({
+            action: "updatePitch",
+            param,
+        }, "Failed to update the cursor values");
+        if (!ok) return;
+        await this.vrvApplyEditLayout(true);
+        await this.vrvRefreshStatus();
+    }
+
+    async vrvUpdatePitchFromPianoKeyboardMidi(midi: number): Promise<void> {
+        const keyboardMode = get(this.stores.pianoKeyboardMode);
+        const selection = get(this.stores.editStatus).selection;
+        if (!selection?.id) return;
+        let param: EditActionUpdatePitchParam;
+        if (keyboardMode !== "auto") {
+            const note = noteForMidi(midi, keyboardMode);
+            param = {
+                elementId: selection.id,
+                pname: note.pname,
+                oct: note.oct,
+                accid: note.accid,
+            };
+        }
+        else {
+            param = {
+                elementId: selection.id,
+                midi,
+            };
+        }
+        const ok = await this.vrvEdit({
+            action: "updatePitch",
+            param,
+        }, "Failed to update the cursor values");
+        if (!ok) return;
+        await this.vrvApplyEditLayout(true);
+        await this.vrvRefreshStatus();
     }
 }

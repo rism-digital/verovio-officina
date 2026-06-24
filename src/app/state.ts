@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 import type { EditResponseContent, EditStatus, ViewModel } from './types';
 
 export type InputMode = 'pitchFirst' | 'durationFirst';
+export type PianoKeyboardMode = 'flat' | 'auto' | 'sharp';
 
 export type UserPreferences = {
     pianoKeyboardEnabled: boolean;
@@ -35,5 +36,6 @@ export const verovioState = writable({
 export const workerBusy = writable(false);
 export const dirty = writable(false);
 export const userPreferences = writable<UserPreferences>(DEFAULT_USER_PREFERENCES);
+export const pianoKeyboardMode = writable<PianoKeyboardMode>('auto');
 export const pianoKeyboardOctave = writable(4);
 export const statusLine = writable('Ready');
