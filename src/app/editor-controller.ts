@@ -315,7 +315,26 @@ export class EditorController {
     }
 
     async handleLetterNoteNames(key: number): Promise<void> {
-        console.log(key);
+        const pname = String.fromCharCode(key).toLowerCase();
+        if (!["a", "b", "c", "d", "e", "f", "g"].includes(pname)) return;
+        const editStatus = get(this.stores.editStatus);
+        const selection = editStatus.selection;
+        if (!selection?.id) return;
+        const ok = await this.vrvEdit({
+            action: "updatePitch",
+            param: {
+                elementId: selection.id,
+                pname,
+            },
+        }, "Failed to update the pitch name");
+        if (!ok) return;
+        await this.vrvApplyEditLayout(true);
+        if (editStatus.insertMode) {
+            await this.vrvRefreshStatus();
+        }
+        else {
+            await this.vrvRefreshContextFromSelection();
+        }
     }
 
     async handleMode(

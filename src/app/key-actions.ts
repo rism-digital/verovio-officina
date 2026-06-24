@@ -218,6 +218,16 @@ export function createKeyShortcuts(
             requiresSelection: true,
             run: async () => controller.vrvUpdatePitchAccid("n"),
         },
+        {
+            key: "KeyB",
+            requiresSelection: true,
+            run: async () => controller.handleLetter(98),
+        },
+        {
+            key: "KeyC",
+            requiresSelection: true,
+            run: async () => controller.handleLetter(99),
+        },
         ...pianoKeyboardShortcuts.map(({ key, code }) => ({
             key,
             requiresSelection: true,
