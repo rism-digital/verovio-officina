@@ -219,6 +219,11 @@ export function createKeyShortcuts(
             run: async () => controller.vrvUpdatePitchAccid("n"),
         },
         {
+            key: ".",
+            requiresSelection: true,
+            run: async () => controller.handleKeyDown(46),
+        },
+        {
             key: "KeyB",
             requiresSelection: true,
             run: async () => controller.handleLetter(98),
@@ -256,7 +261,7 @@ export function keyShortcutMap({
 }
 
 export function keyShortcutMapFromEvent(event: KeyboardEvent): string {
-    if (!event.altKey && !event.ctrlKey && !event.metaKey && ["+", "-", "*"].includes(event.key)) {
+    if (!event.altKey && !event.ctrlKey && !event.metaKey && ["+", "-", "*", "."].includes(event.key)) {
         return event.key;
     }
     return keyShortcutMap({

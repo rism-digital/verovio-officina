@@ -236,7 +236,7 @@ export class EditorController {
                 attribute: "dur",
                 value: finaleSpeedyDurationToMEI[key]
             };
-            await this.handleSet(editActionParam, true);
+            await this.vrvSet(editActionParam, true);
         }
     }
 
@@ -283,7 +283,7 @@ export class EditorController {
     }
 
     async handleKeyDown(
-        key:  37 | 38 | 39 | 40,
+        key: number,
         options: { ctrlKey?: boolean; shiftKey?: boolean } = {},
     ): Promise<void> {
         const selection = get(this.stores.editStatus).selection;
@@ -368,19 +368,6 @@ export class EditorController {
         await this.vrvRefreshStatus();
     }
 
-    async handleSet(param: EditActionSetParam, commit: boolean): Promise<void> {
-        const ok = await this.vrvEdit({
-            action: "set",
-            param,
-        }, "Failed to update attribute");
-        if (!ok) return;
-        await this.vrvApplyEditLayout(commit);
-        await this.vrvRefreshStatus();
-        if (commit) {
-            await this.vrvRefreshContextFromSelection();
-        }
-    }
-
     async handleSetSelectionAttribute(attribute: string, value: string): Promise<void> {
         const editStatus = get(this.stores.editStatus);
         if (!editStatus?.selection?.id) return;
@@ -389,7 +376,7 @@ export class EditorController {
                 attribute,
                 value
         };
-        return await this.handleSet(editActionSetParams, true);
+        return await this.vrvSet(editActionSetParams, true);
     }
 
     async init(verovioUrl: string): Promise<string> {
@@ -659,6 +646,19 @@ export class EditorController {
             }
         } catch (error) {
             console.error("Failed to update secondary selection", error);
+        }
+    }
+
+    async vrvSet(param: EditActionSetParam, commit: boolean): Promise<void> {
+        const ok = await this.vrvEdit({
+            action: "set",
+            param,
+        }, "Failed to update attribute");
+        if (!ok) return;
+        await this.vrvApplyEditLayout(commit);
+        await this.vrvRefreshStatus();
+        if (commit) {
+            await this.vrvRefreshContextFromSelection();
         }
     }
 

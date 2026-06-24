@@ -476,7 +476,7 @@
             onElementSelect={(id) => controller.vrvSelect(id)}
             onElementSecondarySelect={(id) => controller.vrvSelectSecondary(id)}
             onAttributeEdit={(param, commit) =>
-                controller.handleSet(param, commit)}
+                controller.vrvSet(param, commit)}
             onTargetedContextAction={handleTargetedContextAction}
             editResponseContent={$editResponseContent}
             {rngMEIAll}
