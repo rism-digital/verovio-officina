@@ -547,7 +547,7 @@ export const actionDefinitions = {
             {
                 action: "insertMeasure",
                 param: {
-                    targetId: "[selection-id]",
+                    elementId: "[selection-id]",
                     number: 1,
                     insertBefore: true,
                 },
@@ -563,7 +563,7 @@ export const actionDefinitions = {
             {
                 action: "insertMeasure",
                 param: {
-                    targetId: "[selection-id]",
+                    elementId: "[selection-id]",
                     number: 1,
                 },
             },

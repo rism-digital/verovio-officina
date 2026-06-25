@@ -9,7 +9,7 @@ import type {
     TreeNodeData,
     ViewModel,
     EditActionParam,
-    EditActionUpdateCursorParam as EditActionUpdatePitchParam,
+    EditActionUpdatePitchParam,
 } from "./types";
 import type { VerovioOptions } from "./worker/verovio-types";
 import { createWorkerBridge, type WorkerBridge } from "./worker/bridge";
@@ -266,15 +266,12 @@ export class EditorController {
         key: 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57,
     ): Promise<void> {
         const selection = get(this.stores.editStatus).selection;
-        if (!selection?.id) return;
+        const insertMode = get(this.stores.editStatus).insertMode;
+        if (!selection?.id || !insertMode) return;
         const ok = await this.vrvEdit({
-            action: "insertNote",
+            action: "insertCursorByDur",
             param: {
-                targetId: selection.id,
-                pname: "c",
-                oct: 3,
                 dur: finaleSpeedyDurationToMEI[key],
-                chordMode: false
             },
         }, "Failed to perform the key action");
         if (!ok) return;
@@ -350,7 +347,7 @@ export class EditorController {
                 param: {
                     elementId: selection.id,
                     inputMode: get(this.stores.userPreferences).inputMode,
-                    chordInput: false,
+                    chordMode: false,
                 },
             }, "Failed to perform the setCursor action");
             if (!ok) return;
@@ -364,6 +361,23 @@ export class EditorController {
             }, "Failed to perform the resetCursor action");
             if (!ok) return;
         }
+        await this.vrvApplyEditLayout(true);
+        await this.vrvRefreshStatus();
+    }
+
+    async handleRestMode(restMode: boolean): Promise<void> {
+        const editStatus = get(this.stores.editStatus);
+        const selection = editStatus.selection;
+        const { inputMode } = get(this.stores.userPreferences);
+        if (!editStatus.insertMode || inputMode !== "pitchFirst") return;
+        if (!selection?.id) return;
+        const ok = await this.vrvEdit({
+            action: "updateCursor",
+            param: {
+                restMode,
+            },
+        }, "Failed to update the cursor rest mode");
+        if (!ok) return;
         await this.vrvApplyEditLayout(true);
         await this.vrvRefreshStatus();
     }

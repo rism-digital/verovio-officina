@@ -224,6 +224,16 @@ export function createKeyShortcuts(
             run: async () => controller.handleKeyDown(46),
         },
         {
+            key: "Space",
+            requiresSelection: true,
+            run: async () => controller.handleRestMode(true),
+        },
+        {
+            key: "KeyN",
+            requiresSelection: true,
+            run: async () => controller.handleRestMode(false),
+        },
+        {
             key: "KeyB",
             requiresSelection: true,
             run: async () => controller.handleLetter(98),

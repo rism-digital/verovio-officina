@@ -97,8 +97,11 @@ export type EditActionParam =
     | EditActionDeleteParam
     | EditActionInsertParam
     | EditActionInsertControlParam
+    | EditActionInsertCursorByDurParam
+    | EditActionInsertCursorByPitchParam
     | EditActionInsertMeasureParam
     | EditActionInsertNoteParam
+    | EditActionInsertRestParam
     | EditActionKeyDownParam
     | EditActionNavigationParam
     | EditActionPropertiesParam
@@ -106,7 +109,8 @@ export type EditActionParam =
     | EditActionSelectParam
     | EditActionSetParam
     | EditActionSetCursorParam
-    | EditActionUpdateCursorParam;
+    | EditActionUpdateCursorParam
+    | EditActionUpdatePitchParam;
 
 export type EditAction =
     | EditActionChain
@@ -115,8 +119,11 @@ export type EditAction =
     | EditActionDelete
     | EditActionInsert
     | EditActionInsertControl
+    | EditActionInsertCursorByDur
+    | EditActionInsertCursorByPitch
     | EditActionInsertMeasure
     | EditActionInsertNote
+    | EditActionInsertRest
     | EditActionKeyDown
     | EditActionNavigate
     | EditActionProperties    
@@ -124,6 +131,7 @@ export type EditAction =
     | EditActionSelect
     | EditActionSet
     | EditActionSetCursor
+    | EditActionUpdateCursor
     | EditActionUpdatePitch;
 
 // Actions
@@ -157,6 +165,16 @@ export type EditActionInsertControl = {
     param: EditActionInsertControlParam;
 };
 
+export type EditActionInsertCursorByDur = {
+    action: "insertCursorByDur";
+    param: EditActionInsertCursorByDurParam;
+};
+
+export type EditActionInsertCursorByPitch = {
+    action: "insertCursorByPitch";
+    param: EditActionInsertCursorByPitchParam;
+};
+
 export type EditActionInsertMeasure = {
     action: "insertMeasure";
     param: EditActionInsertMeasureParam;
@@ -165,6 +183,11 @@ export type EditActionInsertMeasure = {
 export type EditActionInsertNote = {
     action: "insertNote";
     param: EditActionInsertNoteParam;
+};
+
+export type EditActionInsertRest = {
+    action: "insertRest";
+    param: EditActionInsertRestParam;
 };
 
 export type EditActionKeyDown = {
@@ -202,9 +225,14 @@ export type EditActionSetCursor = {
     param: EditActionSetCursorParam;
 };
 
+export type EditActionUpdateCursor = {
+    action: "updateCursor";
+    param: EditActionUpdateCursorParam;
+};
+
 export type EditActionUpdatePitch = {
     action: "updatePitch";
-    param: EditActionUpdateCursorParam;
+    param: EditActionUpdatePitchParam;
 };
 
 // ActionParams
@@ -238,6 +266,17 @@ export type EditActionInsertControlParam = {
     endId?: string;
 };
 
+export type EditActionInsertCursorByDurParam = {
+    dur: string;
+    dots?: number;
+};
+
+export type EditActionInsertCursorByPitchParam = {
+    pname?: string;
+    oct?: number;
+    accid?: string;
+};
+
 export type EditActionInsertMeasureParam = {
     elementId?: string;
     number: number;
@@ -245,11 +284,20 @@ export type EditActionInsertMeasureParam = {
 };
 
 export type EditActionInsertNoteParam = {
-    targetId: string;
-    pname: string;
-    oct: number;
-    dur: string
-    chordMode: boolean;
+    elementId: string;
+    pname?: string;
+    oct?: number;
+    accid?: string;
+    accidGes?: string;
+    dur?: string
+    dots?: number;
+    chordMode?: boolean;
+};
+
+export type EditActionInsertRestParam = {
+    elementId: string;
+    dur: string;
+    dots?: number;
 };
 
 export type EditActionKeyDownParam = {
@@ -288,14 +336,19 @@ export type EditActionSetParam = {
 export type EditActionSetCursorParam = {
     elementId?: string;
     inputMode: "pitchFirst" | "durationFirst";
-    chordInput: boolean;
+    chordMode: boolean;
+    restMode?: boolean;
 }
 
 export type EditActionUpdateCursorParam = {
+    restMode?: boolean;
+    chordMode?: boolean;
+}
+
+export type EditActionUpdatePitchParam = {
     elementId: string;
     pname?: string;
     oct?: number;
     accid?: string;
     midi?: number;
 }
-
