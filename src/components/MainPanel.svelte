@@ -24,6 +24,7 @@
     export let onResize: (size: { width: number; height: number }) => void;
     export let onElementSelect: SelectElementHandler | null = null;
     export let onElementSecondarySelect: SelectElementHandler | null = null;
+    export let onNoteDoubleClick: SelectElementHandler | null = null;
     export let onAttributeEdit: EditActionSetHandler | null = null;
     export let onPianoKeyboardOctaveChange: ((octave: number) => void | Promise<void>) | null = null;
     export let onPianoKeyboardMidiSelect: ((midi: number) => void | Promise<void>) | null = null;
@@ -143,6 +144,7 @@
             if (element.dataset.bound === "true") return;
             element.dataset.bound = "true";
             element.addEventListener("mousedown", onSVGOverlayMouseDown);
+            element.addEventListener("dblclick", onSVGOverlayDoubleClick);
         });
     }
 
@@ -262,6 +264,19 @@
         }
 
         await onElementSelect?.(node.id);
+    }
+
+    async function onSVGOverlayDoubleClick(event: MouseEvent) {
+        event.stopPropagation();
+
+        if (<HTMLDivElement>(<HTMLElement>event.target).parentNode === svgOverlay) {
+            return;
+        }
+
+        const node = getClosestMEIElement(<SVGElement>event.target, "note");
+        if (!node?.id) return;
+
+        await onNoteDoubleClick?.(node.id);
     }
 
     function closeOverlayContextMenu() {

@@ -688,6 +688,25 @@ export class EditorController {
         }
     }
 
+    async vrvSelectCustom(id: string | null, custom: "note"): Promise<void> {
+        if (!id) return;
+        try {
+            const editActionSelect: EditAction = {
+                action: "select",
+                param: {
+                    elementId: id,
+                    custom,
+                },
+            };
+            const selectOk = await this.bridge.verovio.edit(editActionSelect);
+            if (selectOk) {
+                await this.vrvRefreshStatus();
+            }
+        } catch (error) {
+            console.error("Failed to update custom selection", error);
+        }
+    }
+
     async vrvSet(param: EditActionSetParam, commit: boolean): Promise<void> {
         const ok = await this.vrvEdit({
             action: "set",

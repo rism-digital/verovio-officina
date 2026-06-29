@@ -324,6 +324,7 @@ export type EditActionResetCursorParam = {
 export type EditActionSelectParam = {
     elementId: string;
     secondary?: boolean;
+    custom?: "note";
 };
 
 export type EditActionSetParam = {

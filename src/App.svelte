@@ -488,6 +488,7 @@
             onResize={(size) => controller.applyLayoutForSize(size)}
             onElementSelect={(id) => controller.vrvSelect(id)}
             onElementSecondarySelect={(id) => controller.vrvSelectSecondary(id)}
+            onNoteDoubleClick={(id) => controller.vrvSelectCustom(id, "note")}
             onAttributeEdit={(param, commit) =>
                 controller.vrvSet(param, commit)}
             onTargetedContextAction={handleTargetedContextAction}
