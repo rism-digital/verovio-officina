@@ -61,6 +61,7 @@ export class EditorController {
         breaks: "auto",
         footer: "auto",
         justifyVertically: false,
+        measureMinWidth: 25,
         mensuralResponsiveView: "none",
         pageHeight: 0,
         pageWidth: 0,

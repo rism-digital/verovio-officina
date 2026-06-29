@@ -8,6 +8,7 @@ export type VerovioOptions = {
     choiceXPathQuery?: Array<string>;
     footer: string;
     justifyVertically: boolean;
+    measureMinWidth: number;
     mensuralResponsiveView: "none" | "auto";
     pageHeight: number;
     pageWidth: number;

@@ -22,6 +22,7 @@
     export let onToggleXml: ActionHandler | null = null;
     export let onScoreProperties: ActionHandler | null = null;
     export let onContextAction: ((action: Action) => void) | null = null;
+    export let onHelp: ActionHandler | null = null;
     export let onSettings: ActionHandler | null = null;
     export let onAbout: ActionHandler | null = null;
 
@@ -140,6 +141,14 @@
         <div class="vrv-btn-text" data-before="Help"></div>
         <div class="vrv-menu-content">
             <div class="vrv-v-separator"></div>
+            <div
+                class="vrv-menu-text"
+                data-before="Get Help"
+                role="button"
+                tabindex="0"
+                on:click={() => onHelp?.()}
+                on:keydown={(event) => handleMenuItemKeydown(event, onHelp)}
+            ></div>
             <div
                 class="vrv-menu-text"
                 data-before="Settings"

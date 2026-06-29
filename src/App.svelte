@@ -6,6 +6,7 @@
     import DialogAbout from "./components/dialogs/DialogAbout.svelte";
     import DialogEnterValue from "./components/dialogs/DialogEnterValue.svelte";
     import DialogExport from "./components/dialogs/DialogExport.svelte";
+    import DialogHelp from "./components/dialogs/DialogHelp.svelte";
     import DialogScoreProperties from "./components/dialogs/DialogScoreProperties.svelte";
     import DialogUserPreferences from "./components/dialogs/DialogUserPreferences.svelte";
     import DialogXmlReload from "./components/dialogs/DialogXmlReload.svelte";
@@ -60,6 +61,7 @@
     let xmlMode = false;
     let xmlContent = "";
     let aboutOpen = false;
+    let helpOpen = false;
     let exportDialogOpen = false;
     let scorePropertiesOpen = false;
     let settingsOpen = false;
@@ -87,6 +89,14 @@
         }
         const schemaText = await response.text();
         loader.setRelaxNGSchema(schemaText);
+    }
+
+    async function loadEmptyMei(): Promise<string> {
+        const response = await fetch(withBaseUrl("empty.mei"));
+        if (!response.ok) {
+            throw new Error(`Failed to load empty MEI: ${response.status}`);
+        }
+        return response.text();
     }
 
     function loadMEIExportOptionsFromStorage(): MEIExportOptions {
@@ -142,6 +152,15 @@
             await controller.loadData(stored);
             statusLine.set("Loaded from local storage.");
             dirty.set(false);
+        } else {
+            try {
+                await controller.loadData(await loadEmptyMei());
+                statusLine.set("Loaded empty score.");
+                dirty.set(false);
+            } catch (error) {
+                console.error("Failed to load empty MEI", error);
+                statusLine.set("Failed to load empty score.");
+            }
         }
     });
 
@@ -167,6 +186,7 @@
     function isDialogOpen(): boolean {
         return (
             aboutOpen ||
+            helpOpen ||
             exportDialogOpen ||
             scorePropertiesOpen ||
             settingsOpen ||
@@ -392,6 +412,10 @@
         aboutOpen = true;
     }
 
+    function openHelpDialog() {
+        helpOpen = true;
+    }
+
     async function openScorePropertiesDialog() {
         const scoreDef = await controller.getScoreDefForDialog();
         if (!scoreDef) {
@@ -447,6 +471,7 @@
         onToggleXml={toggleXmlMode}
         onScoreProperties={openScorePropertiesDialog}
         onContextAction={handleToolbarAction}
+        onHelp={openHelpDialog}
         onSettings={openSettingsDialog}
         canZoom={canMenuZoom}
         canZoomIn={canMenuZoomIn}
@@ -507,6 +532,11 @@
         licenseUrl={ABOUT_LICENSE_URL}
         changelogUrl={ABOUT_CHANGELOG_URL}
         onClose={() => (aboutOpen = false)}
+    />
+
+    <DialogHelp
+        open={helpOpen}
+        onClose={() => (helpOpen = false)}
     />
 
     <DialogUserPreferences
