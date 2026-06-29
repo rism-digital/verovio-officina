@@ -71,7 +71,6 @@ export interface EditStatus {
         pname: string;
         oct: number;
         dots: number;
-        dotLock: boolean;
         accid: string;
         accidImplicit: boolean;
     } | null;
@@ -319,7 +318,7 @@ export type EditActionPropertiesParam =
     };
 
 export type EditActionResetCursorParam = {
-    maintainChordInput?: boolean;
+    maintainChordMode?: boolean;
 };
 
 export type EditActionSelectParam = {

@@ -161,12 +161,18 @@ export function createKeyShortcuts(
         {
             key: "Escape",
             requiresSelection: true,
-            run: async () => controller.handleMode(27),
+            run: async () => controller.handleEscape(),
         },
         {
             key: "Enter",
             requiresSelection: true,
-            run: async () => controller.handleMode(13),
+            run: async () => controller.handleEnter(),
+        },
+        {
+            key: "Enter",
+            shiftKey: true,
+            requiresSelection: true,
+            run: async () => controller.handleEnter(true),
         },
         {
             key: "Digit1",

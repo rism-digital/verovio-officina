@@ -209,9 +209,9 @@
 
     async function toggleMode() {
         if (get(editStatus).insertMode) {
-            await controller.handleMode(27);
+            await controller.handleEscape();
         } else {
-            await controller.handleMode(13);
+            await controller.handleEnter();
         }
     }
 

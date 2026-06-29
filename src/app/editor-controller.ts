@@ -214,6 +214,18 @@ export class EditorController {
     ): Promise<void> {
         const editStatus = get(this.stores.editStatus);
         if (!editStatus?.selection?.id) return;
+        if (editStatus.insertMode && editStatus.insertion?.chordMode && key === 39) {
+            const ok = await this.vrvEdit({
+                action: "resetCursor",
+                param: {
+                    maintainChordMode: true,
+                },
+            }, "Failed to perform the resetCursor action");
+            if (!ok) return;
+            await this.vrvApplyEditLayout(true);
+            await this.vrvRefreshStatus();
+            return;
+        }
         if (editStatus?.insertMode || options.shiftKey) {
             return await this.handleKeyDown(key, options);
         }
@@ -334,33 +346,46 @@ export class EditorController {
         }
     }
 
-    async handleMode(
-        key: 13 | 27,
-    ): Promise<void> {
-        const selection = get(this.stores.editStatus).selection;
-        if (!selection?.id) return;
-        const setCursor = (key == 13);
-        if (setCursor) {
+    async handleEnter(chordMode = false): Promise<void> {
+        const editStatus = get(this.stores.editStatus);
+        const selection = editStatus.selection;
+        if (editStatus.insertMode) {
+            if (chordMode) return;
+            const ok = await this.vrvEdit({
+                action: "updateCursor",
+                param: {
+                    chordMode: true,
+                },
+            }, "Failed to update the cursor chord mode");
+            if (!ok) return;
+        }
+        else {
+            if (!selection?.id) return;
             if (!enableInsertMode(selection.element)) return;
             const ok = await this.vrvEdit({
                 action: "setCursor",
                 param: {
                     elementId: selection.id,
                     inputMode: get(this.stores.userPreferences).inputMode,
-                    chordMode: false,
+                    chordMode,
                 },
             }, "Failed to perform the setCursor action");
             if (!ok) return;
         }
-        else {
-            const ok = await this.vrvEdit({
-                action: "resetCursor",
-                param: {
-                    maintainChordInput: false,
-                },
-            }, "Failed to perform the resetCursor action");
-            if (!ok) return;
-        }
+        await this.vrvApplyEditLayout(true);
+        await this.vrvRefreshStatus();
+    }
+
+    async handleEscape(): Promise<void> {
+        const selection = get(this.stores.editStatus).selection;
+        if (!selection?.id) return;
+        const ok = await this.vrvEdit({
+            action: "resetCursor",
+            param: {
+                maintainChordMode: false,
+            },
+        }, "Failed to perform the resetCursor action");
+        if (!ok) return;
         await this.vrvApplyEditLayout(true);
         await this.vrvRefreshStatus();
     }
