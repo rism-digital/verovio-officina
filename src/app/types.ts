@@ -274,6 +274,7 @@ export type EditActionInsertCursorByPitchParam = {
     pname?: string;
     oct?: number;
     accid?: string;
+    midi?: number;
 };
 
 export type EditActionInsertMeasureParam = {

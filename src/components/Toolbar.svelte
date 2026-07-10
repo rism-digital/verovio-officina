@@ -5,12 +5,15 @@
         type ResolvedContextButton,
     } from "../app/action-resolver";
     import { enableInsertMode } from "../app/editor-rules";
+    import type { InputMode } from "../app/state";
     import type { Action } from "../app/types";
 
     export let insertMode = false;
     export let onToggleMode: () => void;
     export let pianoKeyboardEnabled = false;
     export let onTogglePianoKeyboard: () => void;
+    export let inputMode: InputMode = "pitchFirst";
+    export let onInputModeChange: (inputMode: InputMode) => void;
     export let xmlMode = false;
     export let onValidateXml: (() => void) | null = null;
     export let selectedElementName: string | null = null;
@@ -57,6 +60,18 @@
                 on:keydown={(event) => handleButtonKeydown(event, onTogglePianoKeyboard)}
             >
             </div>
+            <div
+                class="vrv-btn-icon-large vrv-toggleable {inputMode === 'pitchFirst' ? 'toggled' : ''} {insertMode ? 'disabled' : ''}"                
+                style={`background-image: url("/icons/toolbar/pitch-first.png");`}
+                on:click={() => onInputModeChange("pitchFirst")}
+                on:keydown={(event) => handleButtonKeydown(event, () => onInputModeChange("pitchFirst"))}
+            ></div>
+            <div
+                class="vrv-btn-icon-large vrv-toggleable {inputMode === 'durationFirst' ? 'toggled' : ''} {insertMode ? 'disabled' : ''}"
+                style={`background-image: url("/icons/toolbar/duration-first.png");`}
+                on:click={() => onInputModeChange("durationFirst")}
+                on:keydown={(event) => handleButtonKeydown(event, () => onInputModeChange("durationFirst"))}
+            ></div>
         </div>
         <div class="vrv-h-separator"></div>
         <div class="vrv-btn-icon-large disabled" style={`background-image: url('${undoIconUrl}');`}>

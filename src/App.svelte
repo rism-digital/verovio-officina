@@ -26,7 +26,7 @@
         type EnterValueDialogState
     } from "./app/toolbar-actions";
     import type { Action, MEIExportOptions, TargetedContextAction, TreeNodeData } from "./app/types";
-    import type { UserPreferences } from "./app/state";
+    import type { InputMode, UserPreferences } from "./app/state";
     import {
         dirty,
         editResponseContent,
@@ -242,6 +242,13 @@
         }));
     }
 
+    function setInputMode(inputMode: InputMode) {
+        userPreferences.update((preferences) => ({
+            ...preferences,
+            inputMode,
+        }));
+    }
+
     function openSettingsDialog() {
         settingsOpen = true;
     }
@@ -256,7 +263,7 @@
 
     async function handlePianoKeyboardMidiSelect(midi: number) {
         if (get(workerBusy)) return;
-        await controller.vrvUpdatePitchFromPianoKeyboardMidi(midi);
+        await controller.vrvPitchFromPianoKeyboardMidi(midi);
     }
 
     function triggerOpenFile() {
@@ -487,6 +494,8 @@
         onToggleMode={toggleMode}
         pianoKeyboardEnabled={$userPreferences.pianoKeyboardEnabled}
         onTogglePianoKeyboard={togglePianoKeyboard}
+        inputMode={$userPreferences.inputMode}
+        onInputModeChange={setInputMode}
         {xmlMode}
         onValidateXml={validateXmlContent}
         selectedElementName={$editResponseContent?.object?.element ?? null}
