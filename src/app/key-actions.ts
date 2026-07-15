@@ -227,18 +227,15 @@ export function createKeyShortcuts(
         },
         {
             key: "+",
-            requiresSelection: true,
-            run: async () => controller.vrvUpdatePitchAccid("s"),
+            run: async () => controller.handlePitchAccidentalMode("s"),
         },
         {
             key: "-",
-            requiresSelection: true,
-            run: async () => controller.vrvUpdatePitchAccid("f"),
+            run: async () => controller.handlePitchAccidentalMode("f"),
         },
         {
             key: "*",
-            requiresSelection: true,
-            run: async () => controller.vrvUpdatePitchAccid("n"),
+            run: async () => controller.handlePitchAccidentalMode("n"),
         },
         {
             key: ".",
@@ -248,7 +245,7 @@ export function createKeyShortcuts(
         {
             key: "Space",
             requiresSelection: true,
-            run: async () => controller.handleRestMode(true),
+            run: async () => controller.handleSpace(),
         },
         {
             key: "KeyN",
@@ -293,6 +290,17 @@ export function keyShortcutMap({
 }
 
 export function keyShortcutMapFromEvent(event: KeyboardEvent): string {
+    const numpadOperators: Record<string, string> = {
+        NumpadAdd: "+",
+        NumpadSubtract: "-",
+        NumpadMultiply: "*",
+        NumpadDecimal: ".",
+    };
+        console.log(event.code);
+    if (!event.altKey && !event.ctrlKey && !event.metaKey && event.code in numpadOperators) {
+
+        return numpadOperators[event.code];
+    }
     if (!event.altKey && !event.ctrlKey && !event.metaKey && ["+", "-", "*", "."].includes(event.key)) {
         return event.key;
     }

@@ -215,10 +215,10 @@ export class EditorController {
         options: { ctrlKey?: boolean; shiftKey?: boolean } = {},
     ): Promise<void> {
         const editStatus = get(this.stores.editStatus);
-        const { inputMode } = get(this.stores.userPreferences);
+        const inputMode = get(this.stores.userPreferences).inputMode;
         if (!editStatus?.selection?.id) return;
         // Left arrow in chordMode
-        if (editStatus.insertMode && editStatus.insertion?.chordMode && key === 39) {
+        if (editStatus.insertMode && inputMode === "pitchFirst" && editStatus.insertion?.chordMode && key === 39) {
             return await this.vrvResetCursor(true);
         }
         if (editStatus?.insertMode) {
@@ -242,7 +242,7 @@ export class EditorController {
     async handleDuration(key: 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57,
     ): Promise<void> {
         const editStatus = get(this.stores.editStatus);
-        const { inputMode } = get(this.stores.userPreferences);
+        const inputMode = get(this.stores.userPreferences).inputMode;
         if (!editStatus?.selection?.id) return;
         if (editStatus?.insertMode && inputMode === "pitchFirst") {
             return await this.handleInsertNote(key);
@@ -279,12 +279,44 @@ export class EditorController {
         return true;
     }
 
-    async handleUndo(): Promise<boolean> {
-        return await this.vrvUndoRedo("undo");
+    async handleEnter(chordMode = false): Promise<void> {
+        const editStatus = get(this.stores.editStatus);
+        const selection = editStatus.selection;
+        const inputMode = get(this.stores.userPreferences).inputMode;
+        if (editStatus.insertMode) {
+            if (chordMode) return;
+            if (editStatus.insertion?.chordMode && inputMode === "durationFirst") {
+                return await this.vrvResetCursor(true);
+            }
+            const ok = await this.vrvEdit({
+                action: "updateCursor",
+                param: {
+                    chordMode: true,
+                },
+            }, "Failed to update the cursor chord mode");
+            if (!ok) return;
+        }
+        else {
+            if (!selection?.id) return;
+            if (!enableInsertMode(selection.element)) return;
+            const ok = await this.vrvEdit({
+                action: "setCursor",
+                param: {
+                    elementId: selection.id,
+                    inputMode: get(this.stores.userPreferences).inputMode,
+                    chordMode,
+                },
+            }, "Failed to perform the setCursor action");
+            if (!ok) return;
+        }
+        await this.vrvApplyEditLayout(true);
+        await this.vrvRefreshStatus();
     }
 
-    async handleRedo(): Promise<boolean> {
-        return await this.vrvUndoRedo("redo");
+    async handleEscape(): Promise<void> {
+        const selection = get(this.stores.editStatus).selection;
+        if (!selection?.id) return;
+        return await this.vrvResetCursor(false);
     }
 
     async handleInsertNote(
@@ -336,42 +368,6 @@ export class EditorController {
         }
     }
 
-    async handleEnter(chordMode = false): Promise<void> {
-        const editStatus = get(this.stores.editStatus);
-        const selection = editStatus.selection;
-        if (editStatus.insertMode) {
-            if (chordMode) return;
-            const ok = await this.vrvEdit({
-                action: "updateCursor",
-                param: {
-                    chordMode: true,
-                },
-            }, "Failed to update the cursor chord mode");
-            if (!ok) return;
-        }
-        else {
-            if (!selection?.id) return;
-            if (!enableInsertMode(selection.element)) return;
-            const ok = await this.vrvEdit({
-                action: "setCursor",
-                param: {
-                    elementId: selection.id,
-                    inputMode: get(this.stores.userPreferences).inputMode,
-                    chordMode,
-                },
-            }, "Failed to perform the setCursor action");
-            if (!ok) return;
-        }
-        await this.vrvApplyEditLayout(true);
-        await this.vrvRefreshStatus();
-    }
-
-    async handleEscape(): Promise<void> {
-        const selection = get(this.stores.editStatus).selection;
-        if (!selection?.id) return;
-        return await this.vrvResetCursor(false);
-    }
-
     async handlePitchFromPianoKeyboard(key: number): Promise<void> {
         const octave = get(this.stores.pianoKeyboardOctave);
         const midi = midiForKeyboardCode(octave, key);
@@ -379,10 +375,24 @@ export class EditorController {
         await this.vrvPitchFromPianoKeyboardMidi(midi);
     }
 
+    async handlePitchAccidentalMode(accid: "s" | "f" | "n"): Promise<void> {
+        if (get(this.stores.userPreferences).pianoKeyboardEnabled) {
+            this.stores.pianoKeyboardMode.set(
+                accid === "s" ? "sharp" : accid === "f" ? "flat" : "auto",
+            );
+            return;
+        }
+        await this.vrvUpdatePitchAccid(accid);
+    }
+
+    async handleRedo(): Promise<boolean> {
+        return await this.vrvUndoRedo("redo");
+    }
+
     async handleRestMode(restMode: boolean): Promise<void> {
         const editStatus = get(this.stores.editStatus);
         const selection = editStatus.selection;
-        const { inputMode } = get(this.stores.userPreferences);
+        const inputMode = get(this.stores.userPreferences).inputMode;
         if (!editStatus.insertMode || inputMode !== "pitchFirst") return;
         if (!selection?.id) return;
         const ok = await this.vrvEdit({
@@ -395,7 +405,6 @@ export class EditorController {
         await this.vrvApplyEditLayout(true);
         await this.vrvRefreshStatus();
     }
-
     async handleSetSelectionAttribute(attribute: string, value: string): Promise<void> {
         const editStatus = get(this.stores.editStatus);
         if (!editStatus?.selection?.id) return;
@@ -406,6 +415,22 @@ export class EditorController {
         };
         return await this.vrvSet(editActionSetParams, true);
     }
+
+    async handleSpace(): Promise<void> {
+        const editStatus = get(this.stores.editStatus);
+        const inputMode = get(this.stores.userPreferences).inputMode;
+        // In duration first but not in chord mode, add a -1 midi
+        if (editStatus.insertMode && inputMode === "durationFirst" && !editStatus.insertion?.chordMode) {
+            await this.vrvPitchFromPianoKeyboardMidi(-1);
+            return;
+        }
+        await this.handleRestMode(true);
+    }
+
+    async handleUndo(): Promise<boolean> {
+        return await this.vrvUndoRedo("undo");
+    }
+
 
     async init(verovioUrl: string): Promise<string> {
         this.stores.workerBusy.set(true);
@@ -612,13 +637,15 @@ export class EditorController {
         let editAction: EditAction;
         if (insertMode && durationFirst) {
             let param: EditActionInsertCursorByPitchParam;
-            if (keyboardMode !== "auto") {
+            if (midi >= 0 && keyboardMode !== "auto") {
                 const note = noteForMidi(midi, keyboardMode);
-                param = {
-                    pname: note.pname,
-                    oct: note.oct,
-                    accid: note.accid,
-                };
+                param = note.accid === "n"
+                    ? { midi }
+                    : {
+                        pname: note.pname,
+                        oct: note.oct,
+                        accid: note.accid,
+                    };
             }
             else {
                 param = { midi };
@@ -630,7 +657,7 @@ export class EditorController {
         }
         else {
             let param: EditActionUpdatePitchParam;
-            if (keyboardMode !== "auto") {
+            if (midi >= 0 && keyboardMode !== "auto") {
                 const note = noteForMidi(midi, keyboardMode);
                 param = {
                     elementId: selection.id,
