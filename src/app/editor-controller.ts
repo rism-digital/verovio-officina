@@ -279,6 +279,14 @@ export class EditorController {
         return true;
     }
 
+    async handleUndo(): Promise<boolean> {
+        return await this.vrvUndoRedo("undo");
+    }
+
+    async handleRedo(): Promise<boolean> {
+        return await this.vrvUndoRedo("redo");
+    }
+
     async handleInsertNote(
         key: 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57,
     ): Promise<void> {
@@ -392,9 +400,9 @@ export class EditorController {
         const editStatus = get(this.stores.editStatus);
         if (!editStatus?.selection?.id) return;
         const editActionSetParams = {
-                elementId: editStatus.selection.id,
-                attribute,
-                value
+            elementId: editStatus.selection.id,
+            attribute,
+            value
         };
         return await this.vrvSet(editActionSetParams, true);
     }
@@ -552,6 +560,109 @@ export class EditorController {
             return false;
         } finally {
             this.stores.workerBusy.set(false);
+        }
+    }
+
+    async vrvPitchFromLetter(key: number): Promise<void> {
+        const pname = String.fromCharCode(key).toLowerCase();
+        if (!["a", "b", "c", "d", "e", "f", "g"].includes(pname)) return;
+        const selection = get(this.stores.editStatus).selection;
+        const insertMode = get(this.stores.editStatus).insertMode;
+        const durationFirst = get(this.stores.userPreferences).inputMode === "durationFirst";
+        if (!selection?.id) return;
+        if (insertMode && durationFirst) {
+            const ok = await this.vrvEdit({
+                action: "insertCursorByPitch",
+                param: {
+                    pname,
+                },
+            }, "Failed to insert the pitch name");
+            if (!ok) return;
+        }
+        else {
+            const ok = await this.vrvEdit({
+                action: "updatePitch",
+                param: {
+                    elementId: selection.id,
+                    pname,
+                },
+            }, "Failed to update the pitch name");
+            if (!ok) return;
+        }
+        await this.vrvApplyEditLayout(true);
+        if (insertMode) {
+            if (durationFirst) {
+                await this.vrvRefreshStatusAndSelectChainedId();
+            }
+            else {
+                await this.vrvRefreshStatus();
+            }
+        }
+        else {
+            await this.vrvRefreshContextFromSelection();
+        }
+    }
+
+    async vrvPitchFromPianoKeyboardMidi(midi: number): Promise<void> {
+        const keyboardMode = get(this.stores.pianoKeyboardMode);
+        const selection = get(this.stores.editStatus).selection;
+        const insertMode = get(this.stores.editStatus).insertMode;
+        const durationFirst = get(this.stores.userPreferences).inputMode === "durationFirst";
+        if (!selection?.id) return;
+        let editAction: EditAction;
+        if (insertMode && durationFirst) {
+            let param: EditActionInsertCursorByPitchParam;
+            if (keyboardMode !== "auto") {
+                const note = noteForMidi(midi, keyboardMode);
+                param = {
+                    pname: note.pname,
+                    oct: note.oct,
+                    accid: note.accid,
+                };
+            }
+            else {
+                param = { midi };
+            }
+            editAction = {
+                action: "insertCursorByPitch",
+                param,
+            };
+        }
+        else {
+            let param: EditActionUpdatePitchParam;
+            if (keyboardMode !== "auto") {
+                const note = noteForMidi(midi, keyboardMode);
+                param = {
+                    elementId: selection.id,
+                    pname: note.pname,
+                    oct: note.oct,
+                    accid: note.accid,
+                };
+            }
+            else {
+                param = {
+                    elementId: selection.id,
+                    midi,
+                };
+            }
+            editAction = {
+                action: "updatePitch",
+                param,
+            };
+        }
+        const ok = await this.vrvEdit(editAction, "Failed to insert or update the pitch or midi value");
+        if (!ok) return;
+        await this.vrvApplyEditLayout(true);
+        if (insertMode) {
+            if (durationFirst) {
+                await this.vrvRefreshStatusAndSelectChainedId();
+            }
+            else {
+                await this.vrvRefreshStatus();
+            }
+        }
+        else {
+            await this.vrvRefreshContextFromSelection();
         }
     }
 
@@ -745,106 +856,29 @@ export class EditorController {
         }
     }
 
-    async vrvPitchFromLetter(key: number): Promise<void> {
-        const pname = String.fromCharCode(key).toLowerCase();
-        if (!["a", "b", "c", "d", "e", "f", "g"].includes(pname)) return;
-        const selection = get(this.stores.editStatus).selection;
-        const insertMode = get(this.stores.editStatus).insertMode;
-        const durationFirst = get(this.stores.userPreferences).inputMode === "durationFirst";
-        if (!selection?.id) return;
-        if (insertMode && durationFirst) {
-            const ok = await this.vrvEdit({
-                action: "insertCursorByPitch",
-                param: {
-                    pname,
-                },
-            }, "Failed to insert the pitch name");
-            if (!ok) return;
-        }
-        else {
-            const ok = await this.vrvEdit({
-                action: "updatePitch",
-                param: {
-                    elementId: selection.id,
-                    pname,
-                },
-            }, "Failed to update the pitch name");
-            if (!ok) return;
-        }
-        await this.vrvApplyEditLayout(true);
-        if (insertMode) {
-            if (durationFirst) {
-                await this.vrvRefreshStatusAndSelectChainedId();
-            }
-            else {
-                await this.vrvRefreshStatus();
-            }
-        }
-        else {
-            await this.vrvRefreshContextFromSelection();
-        }
-    }
+    private async vrvUndoRedo(action: "undo" | "redo"): Promise<boolean> {
+        const canApply = action === "undo"
+            ? get(this.stores.editStatus).canUndo
+            : get(this.stores.editStatus).canRedo;
+        if (!canApply) return false;
 
-    async vrvPitchFromPianoKeyboardMidi(midi: number): Promise<void> {
-        const keyboardMode = get(this.stores.pianoKeyboardMode);
-        const selection = get(this.stores.editStatus).selection;
-        const insertMode = get(this.stores.editStatus).insertMode;
-        const durationFirst = get(this.stores.userPreferences).inputMode === "durationFirst";
-        if (!selection?.id) return;
-        let editAction: EditAction;
-        if (insertMode && durationFirst) {
-            let param: EditActionInsertCursorByPitchParam;
-            if (keyboardMode !== "auto") {
-                const note = noteForMidi(midi, keyboardMode);
-                param = {
-                    pname: note.pname,
-                    oct: note.oct,
-                    accid: note.accid,
-                };
-            }
-            else {
-                param = { midi };
-            }
-            editAction = {
-                action: "insertCursorByPitch",
-                param,
-            };
+        const ok = await this.vrvEdit({
+            action,
+        }, `Failed to ${action}`);
+        if (!ok) return false;
+
+        const editStatus = await this.vrvRefreshStatus();
+        if (editStatus.invalidLayout === true) {
+            await this.vrvRedoLayoutAndRefreshPageCount();
         }
-        else {
-            let param: EditActionUpdatePitchParam;
-            if (keyboardMode !== "auto") {
-                const note = noteForMidi(midi, keyboardMode);
-                param = {
-                    elementId: selection.id,
-                    pname: note.pname,
-                    oct: note.oct,
-                    accid: note.accid,
-                };
-            }
-            else {
-                param = {
-                    elementId: selection.id,
-                    midi,
-                };
-            }
-            editAction = {
-                action: "updatePitch",
-                param,
-            };
-        }
-        const ok = await this.vrvEdit(editAction, "Failed to insert or update the pitch or midi value");
-        if (!ok) return;
-        await this.vrvApplyEditLayout(true);
-        if (insertMode) {
-            if (durationFirst) {
-                await this.vrvRefreshStatusAndSelectChainedId();
-            }
-            else {
-                await this.vrvRefreshStatus();
-            }
-        }
-        else {
+        await this.vrvRefreshSVG();
+        if (editStatus.selection?.id) {
+            await this.vrvSelect(editStatus.selection?.id);
             await this.vrvRefreshContextFromSelection();
+        } else {
+            this.stores.editResponseContent.set(null);
         }
+        this.stores.dirty.set(true);
+        return true;
     }
 }

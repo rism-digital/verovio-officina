@@ -74,6 +74,7 @@ export interface EditStatus {
         accid: string;
         accidImplicit: boolean;
     } | null;
+    invalidLayout: boolean | null;
 }
 
 export interface ReferenceObject extends TreeNodeData {
@@ -125,11 +126,13 @@ export type EditAction =
     | EditActionInsertRest
     | EditActionKeyDown
     | EditActionNavigate
-    | EditActionProperties    
+    | EditActionProperties   
+    | EditActionRedo 
     | EditActionResetCursor
     | EditActionSelect
     | EditActionSet
     | EditActionSetCursor
+    | EditActionUndo
     | EditActionUpdateCursor
     | EditActionUpdatePitch;
 
@@ -202,6 +205,10 @@ export type EditActionNavigate = {
 export type EditActionProperties = {
     action: "properties";
     param: EditActionPropertiesParam;
+};
+
+export type EditActionRedo = {
+    action: "redo";
 };
 
 export type EditActionResetCursor = {
@@ -340,6 +347,10 @@ export type EditActionSetCursorParam = {
     chordMode: boolean;
     restMode?: boolean;
 }
+
+export type EditActionUndo = {
+    action: "undo";
+};
 
 export type EditActionUpdateCursorParam = {
     restMode?: boolean;

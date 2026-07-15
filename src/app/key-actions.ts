@@ -159,6 +159,22 @@ export function createKeyShortcuts(
             run: async () => controller.deleteSelectedElement(false),
         },
         {
+            key: "KeyZ",
+            primaryKey: true,
+            run: async () => controller.handleUndo(),
+        },
+        {
+            key: "KeyY",
+            primaryKey: true,
+            run: async () => controller.handleRedo(),
+        },
+        {
+            key: "KeyZ",
+            primaryKey: true,
+            shiftKey: true,
+            run: async () => controller.handleRedo(),
+        },
+        {
             key: "Escape",
             requiresSelection: true,
             run: async () => controller.handleEscape(),

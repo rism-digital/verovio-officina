@@ -21,7 +21,8 @@ export const editStatus = writable<EditStatus>({
   isMensuralMusicOnly: false,
   insertMode: false,
   selection: null,
-  insertion: null
+  insertion: null,
+  invalidLayout: null
 });
 export const viewModel = writable<ViewModel>({
   svg: '',

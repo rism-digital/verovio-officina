@@ -18,6 +18,10 @@
     export let onValidateXml: (() => void) | null = null;
     export let selectedElementName: string | null = null;
     export let hasSecondarySelection = false;
+    export let canUndo = false;
+    export let canRedo = false;
+    export let onUndo: (() => void) | null = null;
+    export let onRedo: (() => void) | null = null;
     export let onContextAction: ((action: Action) => void) | null = null;
 
     const undoIconUrl = withBaseUrl("icons/editor/undo.png");
@@ -34,6 +38,16 @@
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
         handler();
+    }
+
+    function handleUndo() {
+        if (!canUndo) return;
+        onUndo?.();
+    }
+
+    function handleRedo() {
+        if (!canRedo) return;
+        onRedo?.();
     }
 
 </script>
@@ -74,10 +88,20 @@
             ></div>
         </div>
         <div class="vrv-h-separator"></div>
-        <div class="vrv-btn-icon-large disabled" style={`background-image: url('${undoIconUrl}');`}>
+        <div
+            class="vrv-btn-icon-large {canUndo ? '' : 'disabled'}"
+            style={`background-image: url('${undoIconUrl}');`}
+            on:click={handleUndo}
+            on:keydown={(event) => handleButtonKeydown(event, handleUndo)}
+        >
             <span class="vrv-tooltip">Undo ('Shift-Ctrl-V')</span>
         </div>
-        <div class="vrv-btn-icon-large disabled" style={`background-image: url('${redoIconUrl}');`}>
+        <div
+            class="vrv-btn-icon-large {canRedo ? '' : 'disabled'}"
+            style={`background-image: url('${redoIconUrl}');`}
+            on:click={handleRedo}
+            on:keydown={(event) => handleButtonKeydown(event, handleRedo)}
+        >
             <span class="vrv-tooltip">Redo ('Shift-Ctrl-V')</span>
         </div>
         {#if contextBars.length > 0}

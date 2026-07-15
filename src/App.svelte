@@ -212,6 +212,8 @@
     $: canMenuGoPrev = canNavigateView && $verovioState.currentPage > 1;
     $: canMenuGoNext =
         canNavigateView && $verovioState.currentPage < $verovioState.pageCount;
+    $: canUndo = menuInteractionEnabled && $editStatus.canUndo;
+    $: canRedo = menuInteractionEnabled && $editStatus.canRedo;
 
     async function handleGlobalKeydown(event: KeyboardEvent) {
         const shortcut = shortcutByKey.get(keyShortcutMapFromEvent(event));
@@ -264,6 +266,16 @@
     async function handlePianoKeyboardMidiSelect(midi: number) {
         if (get(workerBusy)) return;
         await controller.vrvPitchFromPianoKeyboardMidi(midi);
+    }
+
+    async function undo() {
+        if (get(workerBusy) || !get(editStatus).canUndo) return;
+        await controller.handleUndo();
+    }
+
+    async function redo() {
+        if (get(workerBusy) || !get(editStatus).canRedo) return;
+        await controller.handleRedo();
     }
 
     function triggerOpenFile() {
@@ -500,6 +512,10 @@
         onValidateXml={validateXmlContent}
         selectedElementName={$editResponseContent?.object?.element ?? null}
         hasSecondarySelection={Boolean($editStatus.selection?.secondaryId)}
+        {canUndo}
+        {canRedo}
+        onUndo={undo}
+        onRedo={redo}
         onContextAction={handleToolbarAction}
     />
 
