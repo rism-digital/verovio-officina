@@ -175,6 +175,12 @@ export function createKeyShortcuts(
             run: async () => controller.handleRedo(),
         },
         {
+            key: "KeyL",
+            primaryKey: true,
+            shiftKey: true,
+            run: async () => controller.handleRefreshLayout(),
+        },
+        {
             key: "Escape",
             requiresSelection: true,
             run: async () => controller.handleEscape(),

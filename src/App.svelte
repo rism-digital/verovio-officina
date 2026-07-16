@@ -214,6 +214,7 @@
         canNavigateView && $verovioState.currentPage < $verovioState.pageCount;
     $: canUndo = menuInteractionEnabled && $editStatus.canUndo;
     $: canRedo = menuInteractionEnabled && $editStatus.canRedo;
+    $: canRefreshLayout = menuInteractionEnabled;
 
     async function handleGlobalKeydown(event: KeyboardEvent) {
         const shortcut = shortcutByKey.get(keyShortcutMapFromEvent(event));
@@ -276,6 +277,12 @@
     async function redo() {
         if (get(workerBusy) || !get(editStatus).canRedo) return;
         await controller.handleRedo();
+    }
+
+    async function refreshLayout() {
+        if (get(workerBusy)) return;
+        await controller.refreshLayout();
+        statusLine.set("Layout refreshed.");
     }
 
     function triggerOpenFile() {
@@ -514,8 +521,10 @@
         hasSecondarySelection={Boolean($editStatus.selection?.secondaryId)}
         {canUndo}
         {canRedo}
+        {canRefreshLayout}
         onUndo={undo}
         onRedo={redo}
+        onRefreshLayout={refreshLayout}
         onContextAction={handleToolbarAction}
     />
 

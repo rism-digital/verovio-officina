@@ -389,6 +389,21 @@ export class EditorController {
         return await this.vrvUndoRedo("redo");
     }
 
+    async handleRefreshLayout(): Promise<void> {
+        this.stores.workerBusy.set(true);
+        try {
+            await this.vrvRedoLayoutAndRefreshPageCount();
+            await this.vrvRefreshSVG();
+            const editStatus = await this.vrvRefreshStatus();
+            if (editStatus.selection?.id) {
+                await this.vrvSelect(editStatus.selection?.id);
+                await this.vrvRefreshContextFromSelection();
+            }
+        } finally {
+            this.stores.workerBusy.set(false);
+        }
+    }
+
     async handleRestMode(restMode: boolean): Promise<void> {
         const editStatus = get(this.stores.editStatus);
         const selection = editStatus.selection;
