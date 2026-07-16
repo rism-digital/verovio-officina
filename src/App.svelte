@@ -28,6 +28,7 @@
     import type { Action, MEIExportOptions, TargetedContextAction, TreeNodeData } from "./app/types";
     import type { InputMode, UserPreferences } from "./app/state";
     import {
+        DEFAULT_USER_PREFERENCES,
         dirty,
         editResponseContent,
         editStatus,
@@ -260,6 +261,19 @@
         userPreferences.set(preferences);
     }
 
+    async function resetToDefault() {
+        if (get(workerBusy)) return;
+        const defaultMei = await loadEmptyMei();
+        userPreferences.set(DEFAULT_USER_PREFERENCES);
+        localStorage.setItem(STORAGE_KEY, defaultMei);
+        await controller.loadData(defaultMei);
+        dirty.set(false);
+        xmlMode = false;
+        xmlContent = "";
+        xmlInitialContent = "";
+        statusLine.set("Reset to default.");
+    }
+
     function handlePianoKeyboardOctaveChange(octave: number) {
         pianoKeyboardOctave.set(octave);
     }
@@ -281,7 +295,7 @@
 
     async function refreshLayout() {
         if (get(workerBusy)) return;
-        await controller.refreshLayout();
+        await controller.handleRefreshLayout();
         statusLine.set("Layout refreshed.");
     }
 
@@ -499,6 +513,7 @@
         onContextAction={handleToolbarAction}
         onHelp={openHelpDialog}
         onSettings={openSettingsDialog}
+        onResetDefault={resetToDefault}
         canZoom={canMenuZoom}
         canZoomIn={canMenuZoomIn}
         canZoomOut={canMenuZoomOut}

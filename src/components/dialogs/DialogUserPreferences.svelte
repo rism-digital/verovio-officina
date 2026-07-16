@@ -38,8 +38,8 @@
     <div class="vrv-dialog-form">
         <div class="vrv-dialog-label">Input mode</div>
         <select class="vrv-dialog-input" bind:value={inputMode}>
-            <option value="pitchFirst">Pitch first</option>
             <option value="durationFirst">Duration first</option>
+            <option value="pitchFirst">Pitch first</option>
         </select>
     </div>
 </Dialog>

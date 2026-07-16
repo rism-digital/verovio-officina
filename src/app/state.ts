@@ -11,7 +11,7 @@ export type UserPreferences = {
 
 export const DEFAULT_USER_PREFERENCES: UserPreferences = {
     pianoKeyboardEnabled: false,
-    inputMode: 'pitchFirst',
+    inputMode: 'durationFirst',
 };
 
 export const editStatus = writable<EditStatus>({

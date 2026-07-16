@@ -302,7 +302,6 @@ export function keyShortcutMapFromEvent(event: KeyboardEvent): string {
         NumpadMultiply: "*",
         NumpadDecimal: ".",
     };
-        console.log(event.code);
     if (!event.altKey && !event.ctrlKey && !event.metaKey && event.code in numpadOperators) {
 
         return numpadOperators[event.code];

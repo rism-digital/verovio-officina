@@ -24,6 +24,7 @@
     export let onContextAction: ((action: Action) => void) | null = null;
     export let onHelp: ActionHandler | null = null;
     export let onSettings: ActionHandler | null = null;
+    export let onResetDefault: ActionHandler | null = null;
     export let onAbout: ActionHandler | null = null;
 
     const prevIconUrl = withBaseUrl("icons/toolbar/arrow-left.png");
@@ -156,6 +157,14 @@
                 tabindex="0"
                 on:click={() => onSettings?.()}
                 on:keydown={(event) => handleMenuItemKeydown(event, onSettings)}
+            ></div>
+            <div
+                class="vrv-menu-text"
+                data-before="Restore to default"
+                role="button"
+                tabindex="0"
+                on:click={() => onResetDefault?.()}
+                on:keydown={(event) => handleMenuItemKeydown(event, onResetDefault)}
             ></div>
             <div
                 class="vrv-menu-text"
