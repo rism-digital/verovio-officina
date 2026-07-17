@@ -25,6 +25,7 @@
     export let onElementSelect: SelectElementHandler | null = null;
     export let onElementSecondarySelect: SelectElementHandler | null = null;
     export let onNoteDoubleClick: SelectElementHandler | null = null;
+    export let onTextParentDoubleClick: SelectElementHandler | null = null;
     export let onAttributeEdit: EditActionSetHandler | null = null;
     export let onPianoKeyboardOctaveChange: ((octave: number) => void | Promise<void>) | null = null;
     export let onPianoKeyboardMidiSelect: ((midi: number) => void | Promise<void>) | null = null;
@@ -218,7 +219,7 @@
         }
     }
 
-    function getClosestMEIElement(node: Element | null, elementType?: string): SVGGElement | null {
+    function getClosestMEIElement(node: Element | null, elementType?: string | string[]): SVGGElement | null {
         if (!node) return null;
 
         const isG = node.tagName?.toLowerCase() === "g";
@@ -228,7 +229,8 @@
             return getClosestMEIElement(node.parentElement, elementType);
         }
 
-        if (elementType && !node.classList.contains(elementType)) {
+        const elementTypes = Array.isArray(elementType) ? elementType : [elementType];
+        if (elementType && !elementTypes.some((type) => type && node.classList.contains(type))) {
             return getClosestMEIElement(node.parentElement, elementType);
         }
 
@@ -274,9 +276,10 @@
         }
 
         const node = getClosestMEIElement(<SVGElement>event.target, "note");
-        if (!node?.id) return;
+        if (node?.id) await onNoteDoubleClick?.(node.id);
 
-        await onNoteDoubleClick?.(node.id);
+        const nodeDir = getClosestMEIElement(<SVGElement>event.target, ["dir", "dynam", "fing", "syl"]);
+        if (nodeDir?.id) await onTextParentDoubleClick?.(nodeDir.id);
     }
 
     function closeOverlayContextMenu() {

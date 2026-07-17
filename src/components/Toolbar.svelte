@@ -20,12 +20,15 @@
     export let hasSecondarySelection = false;
     export let canUndo = false;
     export let canRedo = false;
+    export let canRefreshLayout = false;
     export let onUndo: (() => void) | null = null;
     export let onRedo: (() => void) | null = null;
+    export let onRefreshLayout: (() => void) | null = null;
     export let onContextAction: ((action: Action) => void) | null = null;
 
     const undoIconUrl = withBaseUrl("icons/editor/undo.png");
     const redoIconUrl = withBaseUrl("icons/editor/redo.png");
+    const refreshLayoutIconUrl = withBaseUrl("icons/editor/update.png");
 
     let contextBars: ResolvedContextButton[][] = [];
 
@@ -48,6 +51,11 @@
     function handleRedo() {
         if (!canRedo) return;
         onRedo?.();
+    }
+
+    function handleRefreshLayout() {
+        if (!canRefreshLayout) return;
+        onRefreshLayout?.();
     }
 
     function handleContextAction(action: Action) {
@@ -108,6 +116,14 @@
             on:keydown={(event) => handleButtonKeydown(event, handleRedo)}
         >
             <span class="vrv-tooltip">Redo ('Shift-Ctrl-V')</span>
+        </div>
+        <div
+            class="vrv-btn-icon-large {canRefreshLayout ? '' : 'disabled'}"
+            style={`background-image: url('${refreshLayoutIconUrl}');`}
+            on:click={handleRefreshLayout}
+            on:keydown={(event) => handleButtonKeydown(event, handleRefreshLayout)}
+        >
+            <span class="vrv-tooltip">Refresh layout ('Primary-Shift-L')</span>
         </div>
         {#if contextBars.length > 0}
             <div class="vrv-h-separator"></div>

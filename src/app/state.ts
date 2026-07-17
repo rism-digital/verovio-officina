@@ -36,6 +36,7 @@ export const verovioState = writable({
 });
 export const workerBusy = writable(false);
 export const dirty = writable(false);
+export const documentRevision = writable(0);
 export const userPreferences = writable<UserPreferences>(DEFAULT_USER_PREFERENCES);
 export const pianoKeyboardMode = writable<PianoKeyboardMode>('auto');
 export const pianoKeyboardOctave = writable(4);

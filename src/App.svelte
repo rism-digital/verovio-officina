@@ -15,6 +15,7 @@
     import StatusBar from "./components/StatusBar.svelte";
     import workerUrl from "./app/worker/worker.ts?worker&url";
     import { withBaseUrl } from "./app/asset-url";
+    import { initMeiAutosave, type AutosaveHandle } from "./app/autosave";
     import { EditorController } from "./app/editor-controller";
     import { RNGLoader } from "./app/rng-loader";
     import { initUserPreferencesPersistence } from "./app/user-preferences";
@@ -30,6 +31,7 @@
     import {
         DEFAULT_USER_PREFERENCES,
         dirty,
+        documentRevision,
         editResponseContent,
         editStatus,
         pianoKeyboardMode,
@@ -72,6 +74,7 @@
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
     let xmlInitialContent = "";
     let stopPreferencesSync: Unsubscriber | null = null;
+    let autosave: AutosaveHandle | null = null;
 
     const ABOUT_LIBRARIES_HTML = `Libraries used in this application:\n\n\
 * [html-midi-player](https://github.com/cifkao/html-midi-player)\n\
@@ -115,6 +118,7 @@
             statusLine,
             workerBusy,
             dirty,
+            documentRevision,
             editResponseContent,
             pianoKeyboardMode,
             pianoKeyboardOctave,
@@ -153,16 +157,26 @@
             await controller.loadData(stored);
             statusLine.set("Loaded from local storage.");
             dirty.set(false);
+            autosave?.markClean();
         } else {
             try {
                 await controller.loadData(await loadEmptyMei());
                 statusLine.set("Loaded empty score.");
                 dirty.set(false);
+                autosave?.markClean();
             } catch (error) {
                 console.error("Failed to load empty MEI", error);
                 statusLine.set("Failed to load empty score.");
             }
         }
+    });
+
+    onMount(() => {
+        autosave = initMeiAutosave(controller, {
+            documentRevision,
+            workerBusy,
+            statusLine,
+        }, STORAGE_KEY);
     });
 
     onMount(() => {
@@ -172,6 +186,7 @@
 
     onDestroy(() => {
         stopPreferencesSync?.();
+        autosave?.destroy();
         controller.destroy();
     });
 
@@ -268,6 +283,7 @@
         localStorage.setItem(STORAGE_KEY, defaultMei);
         await controller.loadData(defaultMei);
         dirty.set(false);
+        autosave?.markClean();
         xmlMode = false;
         xmlContent = "";
         xmlInitialContent = "";
@@ -312,6 +328,7 @@
         localStorage.setItem(STORAGE_KEY, content);
         await controller.loadData(content);
         dirty.set(false);
+        autosave?.markClean();
         statusLine.set(`Opened ${file.name}.`);
         target.value = "";
     }
@@ -319,6 +336,7 @@
     async function saveDoc() {
         const exported = await controller.saveDoc();
         localStorage.setItem(STORAGE_KEY, exported);
+        autosave?.markClean();
     }
 
     async function exportDoc() {
@@ -354,6 +372,8 @@
             editStatus.update((current) => ({ ...current, selection: null }));
             localStorage.setItem(STORAGE_KEY, xmlContent);
             await controller.loadData(xmlContent);
+            dirty.set(false);
+            autosave?.markClean();
             xmlInitialContent = xmlContent;
             xmlMode = false;
             statusLine.set("Score view enabled.");
@@ -563,6 +583,7 @@
             onElementSelect={(id) => controller.vrvSelect(id)}
             onElementSecondarySelect={(id) => controller.vrvSelectSecondary(id)}
             onNoteDoubleClick={(id) => controller.vrvSelectCustom(id, "note")}
+            onTextParentDoubleClick={(id) => controller.vrvSelectCustom(id, "textParent")}
             onAttributeEdit={(param, commit) =>
                 controller.vrvSet(param, commit)}
             onTargetedContextAction={handleTargetedContextAction}

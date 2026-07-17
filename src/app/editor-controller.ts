@@ -44,6 +44,7 @@ type ControllerStores = {
     statusLine: Writable<string>;
     workerBusy: Writable<boolean>;
     dirty: Writable<boolean>;
+    documentRevision: Writable<number>;
     editResponseContent: Writable<EditResponseContent | null>;
     pianoKeyboardMode: Writable<PianoKeyboardMode>;
     pianoKeyboardOctave: Writable<number>;
@@ -120,6 +121,7 @@ export class EditorController {
             return false;
         }
         await this.vrvApplyEditLayout(true);
+        this.markDocumentChanged();
         await this.vrvRefreshContextFromSelection();
         return true;
     }
@@ -275,7 +277,7 @@ export class EditorController {
         if (!editStatus.chainedId) {
             await this.vrvRefreshContextFromSelection();
         }
-        this.stores.dirty.set(true);
+        this.markDocumentChanged();
         return true;
     }
 
@@ -333,6 +335,7 @@ export class EditorController {
         }, "Failed to perform the key action");
         if (!ok) return;
         await this.vrvApplyEditLayout(true);
+        this.markDocumentChanged();
         await this.vrvRefreshStatusAndSelectChainedId();
     }
 
@@ -353,6 +356,7 @@ export class EditorController {
         }, "Failed to perform the key action");
         if (!ok) return;
         await this.vrvApplyEditLayout(true);
+        this.markDocumentChanged();
         await this.vrvRefreshContextFromSelection();
         await this.vrvRefreshStatus();
     }
@@ -630,6 +634,7 @@ export class EditorController {
             if (!ok) return;
         }
         await this.vrvApplyEditLayout(true);
+        this.markDocumentChanged();
         if (insertMode) {
             if (durationFirst) {
                 await this.vrvRefreshStatusAndSelectChainedId();
@@ -695,6 +700,7 @@ export class EditorController {
         const ok = await this.vrvEdit(editAction, "Failed to insert or update the pitch or midi value");
         if (!ok) return;
         await this.vrvApplyEditLayout(true);
+        this.markDocumentChanged();
         if (insertMode) {
             if (durationFirst) {
                 await this.vrvRefreshStatusAndSelectChainedId();
@@ -841,7 +847,7 @@ export class EditorController {
         }
     }
 
-    async vrvSelectCustom(id: string | null, custom: "note"): Promise<void> {
+    async vrvSelectCustom(id: string | null, custom: "note" | "textParent"): Promise<void> {
         if (!id) return;
         try {
             const editActionSelect: EditAction = {
@@ -854,6 +860,7 @@ export class EditorController {
             const selectOk = await this.bridge.verovio.edit(editActionSelect);
             if (selectOk) {
                 await this.vrvRefreshStatus();
+                await this.vrvRefreshContextFromSelection();
             }
         } catch (error) {
             console.error("Failed to update custom selection", error);
@@ -867,6 +874,9 @@ export class EditorController {
         }, "Failed to update attribute");
         if (!ok) return;
         await this.vrvApplyEditLayout(commit);
+        if (commit) {
+            this.markDocumentChanged();
+        }
         await this.vrvRefreshStatus();
         if (commit) {
             await this.vrvRefreshContextFromSelection();
@@ -890,6 +900,7 @@ export class EditorController {
         }, "Failed to update the accidental");
         if (!ok) return;
         await this.vrvApplyEditLayout(true);
+        this.markDocumentChanged();
         if (editStatus.insertMode) {
             await this.vrvRefreshStatus();
         }
@@ -920,7 +931,12 @@ export class EditorController {
         } else {
             this.stores.editResponseContent.set(null);
         }
-        this.stores.dirty.set(true);
+        this.markDocumentChanged();
         return true;
+    }
+
+    private markDocumentChanged(): void {
+        this.stores.dirty.set(true);
+        this.stores.documentRevision.update((revision) => revision + 1);
     }
 }
