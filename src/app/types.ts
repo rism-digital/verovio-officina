@@ -99,6 +99,7 @@ export type EditActionParam =
     | EditActionInsertControlParam
     | EditActionInsertCursorByDurParam
     | EditActionInsertCursorByPitchParam
+    | EditActionInsertCursorByTypeParam
     | EditActionInsertMeasureParam
     | EditActionInsertNoteParam
     | EditActionInsertRestParam
@@ -121,6 +122,7 @@ export type EditAction =
     | EditActionInsertControl
     | EditActionInsertCursorByDur
     | EditActionInsertCursorByPitch
+    | EditActionInsertCursorByType
     | EditActionInsertMeasure
     | EditActionInsertNote
     | EditActionInsertRest
@@ -175,6 +177,11 @@ export type EditActionInsertCursorByDur = {
 export type EditActionInsertCursorByPitch = {
     action: "insertCursorByPitch";
     param: EditActionInsertCursorByPitchParam;
+};
+
+export type EditActionInsertCursorByType = {
+    action: "insertCursorByType";
+    param: EditActionInsertCursorByTypeParam;
 };
 
 export type EditActionInsertMeasure = {
@@ -282,6 +289,10 @@ export type EditActionInsertCursorByPitchParam = {
     oct?: number;
     accid?: string;
     midi?: number;
+};
+
+export type EditActionInsertCursorByTypeParam = {
+    type: "copy" | "tie" | "rest";
 };
 
 export type EditActionInsertMeasureParam = {

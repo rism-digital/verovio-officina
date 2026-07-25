@@ -11,6 +11,7 @@ import type {
     EditActionParam,
     EditActionUpdatePitchParam,
     EditActionInsertCursorByPitchParam,
+    EditActionInsertCursorByTypeParam,
 } from "./types";
 import type { VerovioOptions } from "./worker/verovio-types";
 import { createWorkerBridge, type WorkerBridge } from "./worker/bridge";
@@ -438,9 +439,8 @@ export class EditorController {
     async handleSpace(): Promise<void> {
         const editStatus = get(this.stores.editStatus);
         const inputMode = get(this.stores.userPreferences).inputMode;
-        // In duration first but not in chord mode, add a -1 midi
         if (editStatus.insertMode && inputMode === "durationFirst" && !editStatus.insertion?.chordMode) {
-            await this.vrvPitchFromPianoKeyboardMidi(-1);
+            await this.vrvInsertCursorByType("rest");
             return;
         }
         await this.handleRestMode(true);
@@ -583,6 +583,23 @@ export class EditorController {
         }
     }
 
+    async vrvInsertCursorByType(type: "rest" | "copy" | "tie"): Promise<void> {
+        const selection = get(this.stores.editStatus).selection;
+        const insertMode = get(this.stores.editStatus).insertMode;
+        const durationFirst = get(this.stores.userPreferences).inputMode === "durationFirst";
+        if (!selection?.id || !insertMode || !durationFirst) return;
+
+        const param: EditActionInsertCursorByTypeParam = { type };
+        const ok = await this.vrvEdit({
+            action: "insertCursorByType",
+            param,
+        }, `Failed to insert cursor by type: ${type}`);
+        if (!ok) return;
+        await this.vrvApplyEditLayout(true);
+        this.markDocumentChanged();
+        await this.vrvRefreshStatusAndSelectChainedId();
+    }
+
     async vrvNavigate(direction: 37 | 38 | 39 | 40,
         options: { ctrlKey?: boolean; shiftKey?: boolean } = {}): Promise<boolean> {
         const selection = get(this.stores.editStatus).selection;
@@ -649,6 +666,7 @@ export class EditorController {
     }
 
     async vrvPitchFromPianoKeyboardMidi(midi: number): Promise<void> {
+        if (midi < 0) return;
         const keyboardMode = get(this.stores.pianoKeyboardMode);
         const selection = get(this.stores.editStatus).selection;
         const insertMode = get(this.stores.editStatus).insertMode;
@@ -657,7 +675,7 @@ export class EditorController {
         let editAction: EditAction;
         if (insertMode && durationFirst) {
             let param: EditActionInsertCursorByPitchParam;
-            if (midi >= 0 && keyboardMode !== "auto") {
+            if (keyboardMode !== "auto") {
                 const note = noteForMidi(midi, keyboardMode);
                 param = note.accid === "n"
                     ? { midi }
@@ -677,7 +695,7 @@ export class EditorController {
         }
         else {
             let param: EditActionUpdatePitchParam;
-            if (midi >= 0 && keyboardMode !== "auto") {
+            if (keyboardMode !== "auto") {
                 const note = noteForMidi(midi, keyboardMode);
                 param = {
                     elementId: selection.id,

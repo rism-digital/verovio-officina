@@ -15,7 +15,7 @@
     import StatusBar from "./components/StatusBar.svelte";
     import workerUrl from "./app/worker/worker.ts?worker&url";
     import { withBaseUrl } from "./app/asset-url";
-    import { initMeiAutosave, type AutosaveHandle } from "./app/autosave";
+    import { initMEIAutosave, type AutosaveHandle } from "./app/autosave";
     import { EditorController } from "./app/editor-controller";
     import { RNGLoader } from "./app/rng-loader";
     import { initUserPreferencesPersistence } from "./app/user-preferences";
@@ -172,7 +172,7 @@
     });
 
     onMount(() => {
-        autosave = initMeiAutosave(controller, {
+        autosave = initMEIAutosave(controller, {
             documentRevision,
             workerBusy,
             statusLine,
