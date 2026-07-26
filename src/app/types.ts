@@ -366,6 +366,7 @@ export type EditActionUndo = {
 export type EditActionUpdateCursorParam = {
     restMode?: boolean;
     chordMode?: boolean;
+    tieMode?: string;
 }
 
 export type EditActionUpdatePitchParam = {

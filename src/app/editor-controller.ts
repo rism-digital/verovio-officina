@@ -446,6 +446,28 @@ export class EditorController {
         await this.handleRestMode(true);
     }
 
+    async handleTieMode(insertType: "tie" | "copy"): Promise<void> {
+        const editStatus = get(this.stores.editStatus);
+        const selection = editStatus.selection;
+        const inputMode = get(this.stores.userPreferences).inputMode;
+        if (!editStatus.insertMode || !selection?.id) return;
+
+        if (inputMode === "durationFirst") {
+            await this.vrvInsertCursorByType(insertType);
+            return;
+        }
+
+        const ok = await this.vrvEdit({
+            action: "updateCursor",
+            param: {
+                tieMode: insertType,
+            },
+        }, "Failed to update the cursor tie mode");
+        if (!ok) return;
+        await this.vrvApplyEditLayout(true);
+        await this.vrvRefreshStatus();
+    }
+
     async handleUndo(): Promise<boolean> {
         return await this.vrvUndoRedo("undo");
     }

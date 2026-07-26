@@ -254,6 +254,17 @@ export function createKeyShortcuts(
             run: async () => controller.handleSpace(),
         },
         {
+            key: "Equal",
+            requiresSelection: true,
+            run: async () => controller.handleTieMode("tie"),
+        },
+        {
+            key: "Equal",
+            shiftKey: true,
+            requiresSelection: true,
+            run: async () => controller.handleTieMode("copy"),
+        },
+        {
             key: "KeyN",
             requiresSelection: true,
             run: async () => controller.handleRestMode(false),
@@ -296,6 +307,7 @@ export function keyShortcutMap({
 }
 
 export function keyShortcutMapFromEvent(event: KeyboardEvent): string {
+    const key = event.code === "NumpadEqual" ? "Equal" : event.code;
     const numpadOperators: Record<string, string> = {
         NumpadAdd: "+",
         NumpadSubtract: "-",
@@ -310,7 +322,7 @@ export function keyShortcutMapFromEvent(event: KeyboardEvent): string {
         return event.key;
     }
     return keyShortcutMap({
-        key: event.code,
+        key,
         altKey: event.altKey,
         ctrlKey: event.ctrlKey,
         metaKey: event.metaKey,
