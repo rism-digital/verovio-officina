@@ -37,6 +37,8 @@ In duration-first mode, choose the rhythmic value before entering the next note,
 | Shortcut | Action |
 | --- | --- |
 | `1` to `7` | Select the duration for the next insertion. |
+| ArrowLeft or ArrowRight | Decrease of increase the current duration |
+| ArrowUp or ArrowDown | Move the cursor octave up or down |
 | `.` | Toggle the duration dot. |
 | `+` | Use a sharp accidental for inserted notes. |
 | `-` | Use a flat accidental for inserted notes. |
@@ -54,6 +56,8 @@ In pitch-first mode, choose the pitch first, then use the duration keys to updat
 | Shortcut | Action |
 | --- | --- |
 | `A` to `G` | Select the pitch for the cursor. |
+| ArrowUp or ArrowDown | Move the cursor pitch up or down |
+| Primary+ArrowUp or ArrowDown | Move the cursor pitch octave up or down |
 | Piano keys | Select the pitch for the cursor when the piano keyboard is enabled. |
 | `Space` | Switch the cursor to rest insertion. |
 | `N` | Switch the cursor from rest insertion to note insertion. |
