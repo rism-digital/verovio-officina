@@ -51,6 +51,7 @@
     const MEI_BASIC_SCHEMA_URL = "https://music-encoding.org/schema/5.1/mei-basic.rng";
     const STORAGE_KEY = "verovio-editor";
     const MEI_EXPORT_OPTIONS_STORAGE_KEY = "verovio-mei-export-options";
+    const HELP_SEEN_STORAGE_KEY = "verovio-help-seen";
     const DEFAULT_MEI_EXPORT_OPTIONS: MEIExportOptions = {
         basic: false,
         removeIds: false,
@@ -168,6 +169,10 @@
                 console.error("Failed to load empty MEI", error);
                 statusLine.set("Failed to load empty score.");
             }
+        }
+
+        if (!localStorage.getItem(HELP_SEEN_STORAGE_KEY)) {
+            helpOpen = true;
         }
     });
 
@@ -287,6 +292,8 @@
         xmlMode = false;
         xmlContent = "";
         xmlInitialContent = "";
+        localStorage.removeItem(HELP_SEEN_STORAGE_KEY);
+        helpOpen = true;
         statusLine.set("Reset to default.");
     }
 
@@ -476,6 +483,11 @@
         helpOpen = true;
     }
 
+    function closeHelpDialog() {
+        helpOpen = false;
+        localStorage.setItem(HELP_SEEN_STORAGE_KEY, "true");
+    }
+
     async function openScorePropertiesDialog() {
         const scoreDef = await controller.getScoreDefForDialog();
         if (!scoreDef) {
@@ -606,7 +618,7 @@
 
     <DialogHelp
         open={helpOpen}
-        onClose={() => (helpOpen = false)}
+        onClose={closeHelpDialog}
     />
 
     <DialogUserPreferences

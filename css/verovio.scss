@@ -678,6 +678,51 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             display: flex;
             flex-direction: column;
 
+            &.vrv-dialog-help {
+                width: calc(100vw - 100px);
+                max-width: none;
+                height: calc(100vh - 150px);
+                max-height: none;
+
+                .vrv-dialog-content {
+                    flex: 1 1 auto;
+                    min-height: 0;
+                    display: flex;
+                }
+
+                .vrv-help-content {
+                    flex: 1 1 auto;
+                    min-height: 0;
+                    max-height: none;
+                    overflow-y: auto;
+
+                    table {
+                        background-color: $background-toggled;
+                        padding: 8px;
+                        table-layout: fixed;
+                        width: calc(100% - 16px);
+
+                        th {
+                            border-bottom: 1px solid $background-border;
+                            text-align: left;
+                        }
+
+                        th:first-child,
+                        td:first-child {
+                            width: 200px;
+                        }
+                    }
+
+                    > :first-child {
+                        margin-top: 0;
+                    }
+
+                    > :last-child {
+                        margin-bottom: 0;
+                    }
+                }
+            }
+
             .vrv-dialog-btn {
                 @extend .vrv-clickable;
                 @extend .vrv-activable;
