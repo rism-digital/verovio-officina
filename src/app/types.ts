@@ -269,8 +269,7 @@ export type EditActionInsertParam = {
         | "insertBefore"
         | "inserBefore"
         | "appendChild"
-        | "appendChildNoDuplicate"
-        | "appenchChildNoDuplicate";
+        | "appendChildNoDuplicate";
 };
 
 export type EditActionInsertControlParam = {
@@ -303,8 +302,8 @@ export type EditActionInsertMeasureParam = {
 
 export type EditActionInsertNoteParam = {
     elementId: string;
-    pname?: string;
-    oct?: number;
+    pname: string;
+    oct: number;
     accid?: string;
     accidGes?: string;
     dur?: string

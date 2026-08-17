@@ -34,16 +34,19 @@
                            <label>Violin</label>
                            <labelAbbr>Vln.</labelAbbr>
                            <clef shape="G" line="2"/>
+                           <keySig sig="3f"></keySig>
                         </staffDef>
                         <staffDef n="2" lines="5" meter.count="4" meter.unit="4">
-                           <label>Viola 2</label>
-                           <labelAbbr>Vla. 2</labelAbbr>
+                           <label>Viola</label>
+                           <labelAbbr>Vla.</labelAbbr>
                            <clef shape="C" line="3"/>
+                           <keySig sig="3f"></keySig>
                         </staffDef>
                         <staffDef n="3" lines="5" meter.count="4" meter.unit="4">
                            <label>Violoncello</label>
                            <labelAbbr>Vc.</labelAbbr>
                            <clef shape="F" line="4"/>
+                           <keySig sig="3f"></keySig>
                         </staffDef>
                      </staffGrp>
                   </staffGrp>
