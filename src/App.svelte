@@ -69,6 +69,7 @@
     let exportDialogOpen = false;
     let scorePropertiesOpen = false;
     let settingsOpen = false;
+    let showHidden = false;
     let dialogScoreDef: TreeNodeData | null = null;
     let xmlReloadDialogOpen = false;
     let enterValueDialogState: EnterValueDialogState | null = null;
@@ -236,6 +237,7 @@
     $: canUndo = menuInteractionEnabled && $editStatus.canUndo;
     $: canRedo = menuInteractionEnabled && $editStatus.canRedo;
     $: canRefreshLayout = menuInteractionEnabled;
+    $: canToggleShowHidden = menuInteractionEnabled;
 
     async function handleGlobalKeydown(event: KeyboardEvent) {
         const shortcut = shortcutByKey.get(keyShortcutMapFromEvent(event));
@@ -320,6 +322,13 @@
         if (get(workerBusy)) return;
         await controller.handleRefreshLayout();
         statusLine.set("Layout refreshed.");
+    }
+
+    async function toggleShowHidden() {
+        if (get(workerBusy)) return;
+        showHidden = !showHidden;
+        await controller.applyShowHidden(showHidden);
+        statusLine.set(showHidden ? "Hidden elements shown." : "Hidden elements hidden.");
     }
 
     function triggerOpenFile() {
@@ -569,9 +578,12 @@
         {canUndo}
         {canRedo}
         {canRefreshLayout}
+        {showHidden}
+        {canToggleShowHidden}
         onUndo={undo}
         onRedo={redo}
         onRefreshLayout={refreshLayout}
+        onToggleShowHidden={toggleShowHidden}
         onContextAction={handleToolbarAction}
     />
 

@@ -74,6 +74,7 @@ export class EditorController {
         pageMarginBottom: 50,
         scale: 100,
         scaleToPageSize: true,
+        showHidden: false,
         svgBoundingBoxes: true,
         xmlIdSeed: 1,
     };
@@ -110,6 +111,13 @@ export class EditorController {
         await this.vrvSetOptions();
         await this.vrvRedoLayoutAndRefreshPageCount();
         await this.vrvRefreshSVG();
+    }
+
+    async applyShowHidden(showHidden: boolean): Promise<void> {
+        this.stores.workerBusy.set(true);
+        this.updateVerovioOptions({ showHidden });
+        await this.vrvSetOptions();
+        await this.vrvApplyEditLayout(true);
     }
 
     async applyScoreDefFromDialog(scoreDef: TreeNodeData): Promise<boolean> {
