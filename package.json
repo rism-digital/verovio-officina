@@ -22,6 +22,7 @@
     "vite": "^7.1.4"
   },
   "dependencies": {
-    "marked": "^17.0.5"
+    "marked": "^17.0.5",
+    "monaco-editor": "^0.56.0"
   }
 }

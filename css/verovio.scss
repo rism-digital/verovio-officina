@@ -255,15 +255,10 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     .vrv-xml-editor {
         flex: 1 1 auto;
         min-height: 0;
-        width: calc(100% - 24px);
-        resize: none;
+        min-width: 0;
+        width: 100%;
         border: 0;
         outline: none;
-        padding: 12px;
-        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-        font-size: 13px;
-        line-height: 1.4;
-        color: $text-color;
         background: $dialog-color;
     }
 
