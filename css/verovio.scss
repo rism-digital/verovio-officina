@@ -170,23 +170,21 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
 
         .vrv-verovio-view {
             display: block;
+            flex: 1 1 auto;
             height: 100%;
             min-height: 0;
+            overflow: auto;
             position: relative;
-            flex: 1 1 auto;
-            min-height: 0;
-            overflow-x: auto;
-            overflow-y: auto;
 
             .vrv-svg-wrapper,
             .vrv-svg-overlay {
                 inset: 0;
+                overflow: visible;
+                position: absolute;
+
                 svg {
                     float: left;
                 }
-
-                overflow: visible;
-                position: absolute;
 
                 text {
                     @extend .vrv-text-no-select
@@ -197,6 +195,25 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 height: 100%;
             }
 
+        }
+
+        .vrv-verovio-view.page {
+            background-color: lightgray;
+            .vrv-svg-wrapper,
+            .vrv-svg-overlay {
+                align-content: center;
+                svg {
+                    float: none;
+                    border-right: 1px solid $background;
+                    border-bottom: 1px solid $background;
+                }
+            }
+
+            .vrv-svg-wrapper {
+                svg {
+                    background: white;
+                }
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////

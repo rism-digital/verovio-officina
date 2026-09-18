@@ -4,6 +4,7 @@
         type ResolvedMenuAction,
     } from "../app/action-resolver";
     import { withBaseUrl } from "../app/asset-url";
+    import type { ViewMode } from "../app/state";
     import type { ActionHandler, Action } from "../app/types";
     export let canZoom = false;
     export let canZoomIn = true;
@@ -11,6 +12,7 @@
     export let canGoPrev = false;
     export let canGoNext = false;
     export let xmlMode = false;
+    export let viewMode: ViewMode = "page";
 
     export let onOpen: ActionHandler | null = null;
     export let onSave: ActionHandler | null = null;
@@ -21,6 +23,7 @@
     export let onNextPage: ActionHandler | null = null;
     export let onToggleXml: ActionHandler | null = null;
     export let onScoreProperties: ActionHandler | null = null;
+    export let onViewModeChange: ((viewMode: ViewMode) => void | Promise<void>) | null = null;
     export let onContextAction: ((action: Action) => void) | null = null;
     export let onHelp: ActionHandler | null = null;
     export let onSettings: ActionHandler | null = null;
@@ -40,6 +43,12 @@
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
         handler?.();
+    }
+
+    function handleViewModeKeydown(event: KeyboardEvent, nextViewMode: ViewMode) {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        onViewModeChange?.(nextViewMode);
     }
 </script>
 
@@ -74,6 +83,28 @@
                 class="vrv-menu-text disabled"
                 data-before="Score properties"
                 on:click={() => onScoreProperties?.()}
+            ></div>
+        </div>
+    </div>
+    <div class="vrv-menu">
+        <div class="vrv-btn-text" data-before="View"></div>
+        <div class="vrv-menu-content">
+            <div class="vrv-v-separator"></div>
+            <div
+                class="vrv-menu-text {viewMode === 'page' ? 'vrv-menu-checked' : ''}"
+                data-before="Page mode"
+                role="menuitem"
+                tabindex="0"
+                on:click={() => onViewModeChange?.("page")}
+                on:keydown={(event) => handleViewModeKeydown(event, "page")}
+            ></div>
+            <div
+                class="vrv-menu-text {viewMode === 'responsive' ? 'vrv-menu-checked' : ''}"
+                data-before="Responsive mode"
+                role="menuitem"
+                tabindex="0"
+                on:click={() => onViewModeChange?.("responsive")}
+                on:keydown={(event) => handleViewModeKeydown(event, "responsive")}
             ></div>
         </div>
     </div>

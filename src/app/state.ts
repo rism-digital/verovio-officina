@@ -2,16 +2,19 @@ import { writable } from 'svelte/store';
 import type { EditResponseContent, EditStatus, ViewModel } from './types';
 
 export type InputMode = 'pitchFirst' | 'durationFirst';
+export type ViewMode = 'page' | 'responsive';
 export type PianoKeyboardMode = 'flat' | 'auto' | 'sharp';
 
 export type UserPreferences = {
     pianoKeyboardEnabled: boolean;
     inputMode: InputMode;
+    viewMode: ViewMode;
 };
 
 export const DEFAULT_USER_PREFERENCES: UserPreferences = {
     pianoKeyboardEnabled: false,
     inputMode: 'durationFirst',
+    viewMode: 'page',
 };
 
 export const editStatus = writable<EditStatus>({

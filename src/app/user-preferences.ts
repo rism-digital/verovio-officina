@@ -4,12 +4,17 @@ import {
     userPreferences,
     type InputMode,
     type UserPreferences,
+    type ViewMode,
 } from "./state";
 
 const USER_PREFERENCES_STORAGE_KEY = "verovio-user-preferences";
 
 function isInputMode(value: unknown): value is InputMode {
     return value === "pitchFirst" || value === "durationFirst";
+}
+
+function isViewMode(value: unknown): value is ViewMode {
+    return value === "page" || value === "responsive";
 }
 
 export function loadUserPreferencesFromStorage(): UserPreferences {
@@ -25,6 +30,9 @@ export function loadUserPreferencesFromStorage(): UserPreferences {
             inputMode: isInputMode(parsed.inputMode)
                 ? parsed.inputMode
                 : DEFAULT_USER_PREFERENCES.inputMode,
+            viewMode: isViewMode(parsed.viewMode)
+                ? parsed.viewMode
+                : DEFAULT_USER_PREFERENCES.viewMode,
         };
     } catch {
         return DEFAULT_USER_PREFERENCES;

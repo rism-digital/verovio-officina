@@ -27,6 +27,8 @@ const zoomLevels = [10, 20, 35, 75, 100, 150, 200];
 const MIN_ZOOM = zoomLevels[0];
 const MAX_ZOOM = zoomLevels[zoomLevels.length - 1];
 const NON_DELETABLE_ELEMENTS = new Set(["staff", "layer"]);
+const PAGE_MODE_HEIGHT = 2970;
+const PAGE_MODE_WIDTH = 2100;
 
 export const finaleSpeedyDurationToMEI: Record<number, string> = {
     55: "1",
@@ -66,8 +68,8 @@ export class EditorController {
         justifyVertically: false,
         measureMinWidth: 25,
         mensuralResponsiveView: "none",
-        pageHeight: 0,
-        pageWidth: 0,
+        pageHeight: PAGE_MODE_HEIGHT,
+        pageWidth: PAGE_MODE_WIDTH,
         pageMarginLeft: 50,
         pageMarginRight: 50,
         pageMarginTop: 50,
@@ -491,7 +493,9 @@ export class EditorController {
 
     async loadData(data: string): Promise<void> {
         this.stores.workerBusy.set(true);
-        this.updateVerovioOptions({ adjustPageHeight: true });
+        const { viewMode } = get(this.stores.userPreferences);
+        const isResponsiveViewMode = viewMode === "responsive";
+        this.updateVerovioOptions({ breaks: "auto" });
         this.stores.verovioState.update((current) => ({
             ...current,
             currentPage: 1,
@@ -505,11 +509,11 @@ export class EditorController {
         const editStatus = await this.vrvRefreshStatus();
         const isMensuralMusicOnly = editStatus.isMensuralMusicOnly;
         this.updateVerovioOptions({
-            adjustPageHeight: !isMensuralMusicOnly,
+            adjustPageHeight: isMensuralMusicOnly ? true : isResponsiveViewMode,
             breaks: isMensuralMusicOnly ? "none" : "auto",
         });
         await this.vrvSetOptions();
-        // Reload with adjustPageHeight set to false
+        // Reload with adjustPageHeight set to true and breaks to 'none'
         if (isMensuralMusicOnly) {
             await this.bridge.verovio.loadData(data);
         }
@@ -569,10 +573,14 @@ export class EditorController {
 
     private updateOptionsForSize(size: { width: number; height: number }): void {
         const { zoom } = get(this.stores.verovioState);
+        const { viewMode } = get(this.stores.userPreferences);
+        const isPageViewMode = viewMode === "page";
         this.updateVerovioOptions({
-            pageHeight: Math.max(0, Math.floor(size.height)),
-            pageWidth: Math.max(0, Math.floor(size.width)),
+            adjustPageHeight: !isPageViewMode,
+            pageHeight: isPageViewMode ? PAGE_MODE_HEIGHT : Math.max(0, Math.floor(size.height)),
+            pageWidth: isPageViewMode ? PAGE_MODE_WIDTH : Math.max(0, Math.floor(size.width)),
             scale: this.clampZoom(zoom),
+            scaleToPageSize: !isPageViewMode,
         });
     }
 

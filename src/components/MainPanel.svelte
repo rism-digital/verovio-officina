@@ -14,9 +14,11 @@
         ViewModel,
     } from "../app/types";
     import type { RNGLoader } from "../app/rng-loader";
+    import type { ViewMode } from "../app/state";
     import Keyboard from "./Keyboard.svelte";
 
     export let view: ViewModel;
+    export let viewMode: ViewMode = "page";
     export let selection: EditStatus["selection"] = null;
     export let insertMode = false;
     export let pianoKeyboardEnabled = false;
@@ -353,7 +355,12 @@
             {rngMEIBasic}
         />
         <div class="vrv-v-split">
-            <div class="vrv-verovio-view" bind:this={verovioView} tabindex="-1">
+            <div
+                class:page={viewMode === "page"}
+                class="vrv-verovio-view"
+                bind:this={verovioView}
+                tabindex="-1"
+            >
                 <div class="vrv-svg-wrapper" bind:this={svgWrapper}>
                     {@html view.svg}
                 </div>

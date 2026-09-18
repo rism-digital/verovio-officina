@@ -27,7 +27,7 @@
         type EnterValueDialogState
     } from "./app/toolbar-actions";
     import type { Action, MEIExportOptions, TargetedContextAction, TreeNodeData } from "./app/types";
-    import type { InputMode, UserPreferences } from "./app/state";
+    import type { InputMode, UserPreferences, ViewMode } from "./app/state";
     import {
         DEFAULT_USER_PREFERENCES,
         dirty,
@@ -273,6 +273,16 @@
             ...preferences,
             inputMode,
         }));
+    }
+
+    async function setViewMode(viewMode: ViewMode) {
+        if (get(userPreferences).viewMode === viewMode) return;
+        userPreferences.update((preferences) => ({
+            ...preferences,
+            viewMode,
+        }));
+        await controller.applyLayoutForLastSize();
+        statusLine.set(viewMode === "page" ? "Page mode enabled." : "Responsive mode enabled.");
     }
 
     function openSettingsDialog() {
@@ -551,6 +561,8 @@
             controller.setCurrentPage(get(verovioState).currentPage + 1)}
         onToggleXml={toggleXmlMode}
         onScoreProperties={openScorePropertiesDialog}
+        viewMode={$userPreferences.viewMode}
+        onViewModeChange={setViewMode}
         onContextAction={handleToolbarAction}
         onHelp={openHelpDialog}
         onSettings={openSettingsDialog}
@@ -597,6 +609,7 @@
     {:else}
         <MainPanel
             view={$viewModel}
+            viewMode={$userPreferences.viewMode}
             selection={$editStatus.selection}
             insertMode={$editStatus.insertMode}
             pianoKeyboardEnabled={$userPreferences.pianoKeyboardEnabled}
