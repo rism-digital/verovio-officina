@@ -262,6 +262,16 @@ export function createKeyShortcuts(
         },
         {
             key: "BracketLeft",
+            requiresSelection: true,
+            run: async () => controller.handleInsertCursorContainer("graceGrp"),
+        },
+        {
+            key: "BracketRight",
+            requiresSelection: true,
+            run: async () => controller.handleResetCursorContainer("graceGrp"),
+        },
+        {
+            key: "BracketLeft",
             shiftKey: true,
             requiresSelection: true,
             run: async () => controller.handleInsertCursorContainer("beam"),

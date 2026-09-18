@@ -79,7 +79,7 @@ When on a chord in insert mode, pressing `=` will enter a tied chord with the cu
 
 ### Containers
 
-In insert mode, pressing `(` will add a tuplet and `)` will terminate it. Pressing `{` will add a beam and `}` will terminate it.
+In insert mode, pressing `(` will add a tuplet and `)` will terminate it. Pressing `{` will add a beam and `}` will terminate it. Pressing `[` will add a grace group and `]` will terminate it.
 
 ### Common Shortcuts
 
