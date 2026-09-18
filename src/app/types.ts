@@ -309,7 +309,7 @@ export type EditActionInsertCursorByTypeParam = {
 };
 
 export type EditActionInsertCursorContainerParam = {
-    container: "tuplet";
+    container: "tuplet" | "beam";
 };
 
 export type EditActionInsertMeasureParam = {
@@ -358,7 +358,7 @@ export type EditActionResetCursorParam = {
 };
 
 export type EditActionResetCursorContainerParam = {
-    container: "tuplet";
+    container: "tuplet" | "beam";
 };
 
 export type EditActionSelectParam = {

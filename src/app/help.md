@@ -77,9 +77,9 @@ Chord mode can be activated with `Enter` once in insert mode, or with `Shift-Ent
 
 When on a chord in insert mode, pressing `=` will enter a tied chord with the current duration in duration-first insert mode, or change the cursor to tie in pitch-first. Pressing `Shift-=` does the same but without adding the ties to the chord copy.
 
-### Tuplets
+### Containers
 
-In insert mode, pressing `(` will add tuplet. Notes, rests or chords added after having added the tuplet will be added to it. Pressing `)` will terminate it.
+In insert mode, pressing `(` will add a tuplet and `)` will terminate it. Pressing `{` will add a beam and `}` will terminate it.
 
 ### Common Shortcuts
 

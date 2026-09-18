@@ -358,13 +358,13 @@ export class EditorController {
         await this.vrvRefreshStatusAndSelectChainedId();
     }
 
-    async handleInsertCursorContainer(container: "tuplet"): Promise<void> {
+    async handleInsertCursorContainer(container: "tuplet" | "beam"): Promise<void> {
         const editStatus = get(this.stores.editStatus);
         if (!editStatus.insertMode || editStatus.insertion?.chordMode) return;
         await this.vrvCursorContainer("insertCursorContainer", { container });
     }
 
-    async handleResetCursorContainer(container: "tuplet"): Promise<void> {
+    async handleResetCursorContainer(container: "tuplet" | "beam"): Promise<void> {
         const editStatus = get(this.stores.editStatus);
         if (!editStatus.insertMode || editStatus.insertion?.chordMode) return;
         await this.vrvCursorContainer("resetCursorContainer", { container });

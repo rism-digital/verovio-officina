@@ -261,6 +261,18 @@ export function createKeyShortcuts(
             run: async () => controller.handleResetCursorContainer("tuplet"),
         },
         {
+            key: "BracketLeft",
+            shiftKey: true,
+            requiresSelection: true,
+            run: async () => controller.handleInsertCursorContainer("beam"),
+        },
+        {
+            key: "BracketRight",
+            shiftKey: true,
+            requiresSelection: true,
+            run: async () => controller.handleResetCursorContainer("beam"),
+        },
+        {
             key: "Space",
             requiresSelection: true,
             run: async () => controller.handleSpace(),
