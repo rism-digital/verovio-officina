@@ -89,9 +89,15 @@ export class EditorController {
 
     async adjustZoom(direction: 1 | -1): Promise<void> {
         await this.vrvRefreshStatus();
+        const currentZoom = this.clampZoom(get(this.stores.userPreferences).zoom);
+        const zoom = this.clampZoom(this.getNextZoom(currentZoom, direction));
+        this.stores.userPreferences.update((current) => ({
+            ...current,
+            zoom,
+        }));
         this.stores.verovioState.update((current) => ({
             ...current,
-            zoom: this.clampZoom(this.getNextZoom(current.zoom, direction)),
+            zoom,
         }));
         if (this.hasLayoutSize()) {
             await this.applyLayoutForLastSize();
@@ -572,8 +578,7 @@ export class EditorController {
     }
 
     private updateOptionsForSize(size: { width: number; height: number }): void {
-        const { zoom } = get(this.stores.verovioState);
-        const { viewMode } = get(this.stores.userPreferences);
+        const { viewMode, zoom } = get(this.stores.userPreferences);
         const isPageViewMode = viewMode === "page";
         this.updateVerovioOptions({
             adjustPageHeight: !isPageViewMode,

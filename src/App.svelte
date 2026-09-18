@@ -229,8 +229,8 @@
     $: menuInteractionEnabled = !xmlMode && !$workerBusy;
     $: canNavigateView = menuInteractionEnabled && !$editStatus.insertMode;
     $: canMenuZoom = canNavigateView && $verovioState.pageCount > 0;
-    $: canMenuZoomIn = canMenuZoom && controller.canZoomIn($verovioState.zoom);
-    $: canMenuZoomOut = canMenuZoom && controller.canZoomOut($verovioState.zoom);
+    $: canMenuZoomIn = canMenuZoom && controller.canZoomIn($userPreferences.zoom);
+    $: canMenuZoomOut = canMenuZoom && controller.canZoomOut($userPreferences.zoom);
     $: canMenuGoPrev = canNavigateView && $verovioState.currentPage > 1;
     $: canMenuGoNext =
         canNavigateView && $verovioState.currentPage < $verovioState.pageCount;

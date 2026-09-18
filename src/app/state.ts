@@ -9,12 +9,14 @@ export type UserPreferences = {
     pianoKeyboardEnabled: boolean;
     inputMode: InputMode;
     viewMode: ViewMode;
+    zoom: number;
 };
 
 export const DEFAULT_USER_PREFERENCES: UserPreferences = {
     pianoKeyboardEnabled: false,
     inputMode: 'durationFirst',
     viewMode: 'page',
+    zoom: 100,
 };
 
 export const editStatus = writable<EditStatus>({
@@ -33,7 +35,7 @@ export const viewModel = writable<ViewModel>({
 });
 export const editResponseContent = writable<EditResponseContent | null>(null);
 export const verovioState = writable({
-    zoom: 100,
+    zoom: DEFAULT_USER_PREFERENCES.zoom,
     pageCount: 0,
     currentPage: 1
 });

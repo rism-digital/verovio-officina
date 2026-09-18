@@ -2,6 +2,7 @@ import type { Unsubscriber } from "svelte/store";
 import {
     DEFAULT_USER_PREFERENCES,
     userPreferences,
+    verovioState,
     type InputMode,
     type UserPreferences,
     type ViewMode,
@@ -15,6 +16,10 @@ function isInputMode(value: unknown): value is InputMode {
 
 function isViewMode(value: unknown): value is ViewMode {
     return value === "page" || value === "responsive";
+}
+
+function isZoom(value: unknown): value is number {
+    return typeof value === "number" && Number.isFinite(value) && value > 0;
 }
 
 export function loadUserPreferencesFromStorage(): UserPreferences {
@@ -33,6 +38,9 @@ export function loadUserPreferencesFromStorage(): UserPreferences {
             viewMode: isViewMode(parsed.viewMode)
                 ? parsed.viewMode
                 : DEFAULT_USER_PREFERENCES.viewMode,
+            zoom: isZoom(parsed.zoom)
+                ? parsed.zoom
+                : DEFAULT_USER_PREFERENCES.zoom,
         };
     } catch {
         return DEFAULT_USER_PREFERENCES;
@@ -47,6 +55,17 @@ export function saveUserPreferencesToStorage(preferences: UserPreferences): void
 }
 
 export function initUserPreferencesPersistence(): Unsubscriber {
-    userPreferences.set(loadUserPreferencesFromStorage());
-    return userPreferences.subscribe(saveUserPreferencesToStorage);
+    const preferences = loadUserPreferencesFromStorage();
+    userPreferences.set(preferences);
+    verovioState.update((current) => ({
+        ...current,
+        zoom: preferences.zoom,
+    }));
+    return userPreferences.subscribe((currentPreferences) => {
+        saveUserPreferencesToStorage(currentPreferences);
+        verovioState.update((current) => ({
+            ...current,
+            zoom: currentPreferences.zoom,
+        }));
+    });
 }
