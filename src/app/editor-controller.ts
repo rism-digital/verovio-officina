@@ -12,6 +12,8 @@ import type {
     EditActionUpdatePitchParam,
     EditActionInsertCursorByPitchParam,
     EditActionInsertCursorByTypeParam,
+    EditActionInsertCursorContainerParam,
+    EditActionResetCursorContainerParam,
 } from "./types";
 import type { VerovioOptions } from "./worker/verovio-types";
 import { createWorkerBridge, type WorkerBridge } from "./worker/bridge";
@@ -356,6 +358,18 @@ export class EditorController {
         await this.vrvRefreshStatusAndSelectChainedId();
     }
 
+    async handleInsertCursorContainer(container: "tuplet"): Promise<void> {
+        const editStatus = get(this.stores.editStatus);
+        if (!editStatus.insertMode || editStatus.insertion?.chordMode) return;
+        await this.vrvCursorContainer("insertCursorContainer", { container });
+    }
+
+    async handleResetCursorContainer(container: "tuplet"): Promise<void> {
+        const editStatus = get(this.stores.editStatus);
+        if (!editStatus.insertMode || editStatus.insertion?.chordMode) return;
+        await this.vrvCursorContainer("resetCursorContainer", { container });
+    }
+
     async handleKeyDown(
         key: number,
         options: { ctrlKey?: boolean; shiftKey?: boolean } = {},
@@ -637,6 +651,20 @@ export class EditorController {
             action: "insertCursorByType",
             param,
         }, `Failed to insert cursor by type: ${type}`);
+        if (!ok) return;
+        await this.vrvApplyEditLayout(true);
+        this.markDocumentChanged();
+        await this.vrvRefreshStatusAndSelectChainedId();
+    }
+
+    private async vrvCursorContainer(
+        action: "insertCursorContainer" | "resetCursorContainer",
+        param: EditActionInsertCursorContainerParam | EditActionResetCursorContainerParam,
+    ): Promise<void> {
+        const ok = await this.vrvEdit({
+            action,
+            param,
+        }, `Failed to perform the ${action} action`);
         if (!ok) return;
         await this.vrvApplyEditLayout(true);
         this.markDocumentChanged();

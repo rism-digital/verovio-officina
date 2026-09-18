@@ -100,6 +100,7 @@ export type EditActionParam =
     | EditActionInsertCursorByDurParam
     | EditActionInsertCursorByPitchParam
     | EditActionInsertCursorByTypeParam
+    | EditActionInsertCursorContainerParam
     | EditActionInsertMeasureParam
     | EditActionInsertNoteParam
     | EditActionInsertRestParam
@@ -107,6 +108,7 @@ export type EditActionParam =
     | EditActionNavigationParam
     | EditActionPropertiesParam
     | EditActionResetCursorParam
+    | EditActionResetCursorContainerParam
     | EditActionSelectParam
     | EditActionSetParam
     | EditActionSetCursorParam
@@ -123,6 +125,7 @@ export type EditAction =
     | EditActionInsertCursorByDur
     | EditActionInsertCursorByPitch
     | EditActionInsertCursorByType
+    | EditActionInsertCursorContainer
     | EditActionInsertMeasure
     | EditActionInsertNote
     | EditActionInsertRest
@@ -131,6 +134,7 @@ export type EditAction =
     | EditActionProperties   
     | EditActionRedo 
     | EditActionResetCursor
+    | EditActionResetCursorContainer
     | EditActionSelect
     | EditActionSet
     | EditActionSetCursor
@@ -184,6 +188,11 @@ export type EditActionInsertCursorByType = {
     param: EditActionInsertCursorByTypeParam;
 };
 
+export type EditActionInsertCursorContainer = {
+    action: "insertCursorContainer";
+    param: EditActionInsertCursorContainerParam;
+};
+
 export type EditActionInsertMeasure = {
     action: "insertMeasure";
     param: EditActionInsertMeasureParam;
@@ -221,6 +230,11 @@ export type EditActionRedo = {
 export type EditActionResetCursor = {
     action: "resetCursor";
     param: EditActionResetCursorParam;
+};
+
+export type EditActionResetCursorContainer = {
+    action: "resetCursorContainer";
+    param: EditActionResetCursorContainerParam;
 };
 
 export type EditActionSelect = {
@@ -294,6 +308,10 @@ export type EditActionInsertCursorByTypeParam = {
     type: "copy" | "tie" | "rest";
 };
 
+export type EditActionInsertCursorContainerParam = {
+    container: "tuplet";
+};
+
 export type EditActionInsertMeasureParam = {
     elementId?: string;
     number: number;
@@ -337,6 +355,10 @@ export type EditActionPropertiesParam =
 
 export type EditActionResetCursorParam = {
     maintainChordMode?: boolean;
+};
+
+export type EditActionResetCursorContainerParam = {
+    container: "tuplet";
 };
 
 export type EditActionSelectParam = {

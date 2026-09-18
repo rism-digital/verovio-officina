@@ -249,6 +249,18 @@ export function createKeyShortcuts(
             run: async () => controller.handleKeyDown(46),
         },
         {
+            key: "Digit9",
+            shiftKey: true,
+            requiresSelection: true,
+            run: async () => controller.handleInsertCursorContainer("tuplet"),
+        },
+        {
+            key: "Digit0",
+            shiftKey: true,
+            requiresSelection: true,
+            run: async () => controller.handleResetCursorContainer("tuplet"),
+        },
+        {
             key: "Space",
             requiresSelection: true,
             run: async () => controller.handleSpace(),
