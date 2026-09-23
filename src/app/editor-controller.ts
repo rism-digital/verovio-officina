@@ -131,10 +131,9 @@ export class EditorController {
     }
 
     async applyScoreDefFromDialog(scoreDef: TreeNodeData): Promise<boolean> {
-        let scoreDefStr = (scoreDef ? JSON.stringify(scoreDef) : "");
         const ok = await this.vrvEdit({
             action: "properties",
-            param: { scoreDef: scoreDefStr },
+            param: { scoreDef: scoreDef },
         }, "Failed to apply scoreDef");
         if (!ok) {
             return false;

@@ -350,7 +350,7 @@ export type EditActionNavigationParam = {
 export type EditActionPropertiesParam =
     | Record<string, never>
     | {
-        scoreDef: string;
+        scoreDef: TreeNodeData;
     };
 
 export type EditActionResetCursorParam = {

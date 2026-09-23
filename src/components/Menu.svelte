@@ -80,7 +80,7 @@
         <div class="vrv-menu-content">
             <div class="vrv-v-separator"></div>
             <div
-                class="vrv-menu-text disabled"
+                class="vrv-menu-text"
                 data-before="Score properties"
                 on:click={() => onScoreProperties?.()}
             ></div>
