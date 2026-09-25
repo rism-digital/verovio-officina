@@ -35,6 +35,10 @@ export function loadUserPreferencesFromStorage(): UserPreferences {
             inputMode: isInputMode(parsed.inputMode)
                 ? parsed.inputMode
                 : DEFAULT_USER_PREFERENCES.inputMode,
+            autoBeam:
+                typeof parsed.autoBeam === "boolean"
+                    ? parsed.autoBeam
+                    : DEFAULT_USER_PREFERENCES.autoBeam,
             viewMode: isViewMode(parsed.viewMode)
                 ? parsed.viewMode
                 : DEFAULT_USER_PREFERENCES.viewMode,

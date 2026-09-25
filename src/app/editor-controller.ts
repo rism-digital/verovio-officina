@@ -130,6 +130,17 @@ export class EditorController {
         await this.vrvApplyEditLayout(true);
     }
 
+    async applyAutoBeam(autoBeam: boolean): Promise<void> {
+        if (!get(this.stores.editStatus).insertMode) return;
+        const ok = await this.vrvEdit({
+            action: "updateCursor",
+            param: { autoBeam },
+        }, "Failed to update the cursor auto-beam mode");
+        if (!ok) return;
+        await this.vrvApplyEditLayout(true);
+        await this.vrvRefreshStatus();
+    }
+
     async applyScoreDefFromDialog(scoreDef: TreeNodeData): Promise<boolean> {
         const ok = await this.vrvEdit({
             action: "properties",
@@ -325,6 +336,7 @@ export class EditorController {
                     elementId: selection.id,
                     inputMode: get(this.stores.userPreferences).inputMode,
                     chordMode,
+                    autoBeam: get(this.stores.userPreferences).autoBeam,
                 },
             }, "Failed to perform the setCursor action");
             if (!ok) return;

@@ -238,6 +238,7 @@
     $: canRedo = menuInteractionEnabled && $editStatus.canRedo;
     $: canRefreshLayout = menuInteractionEnabled;
     $: canToggleShowHidden = menuInteractionEnabled;
+    $: canToggleAutoBeam = menuInteractionEnabled;
 
     async function handleGlobalKeydown(event: KeyboardEvent) {
         const shortcut = shortcutByKey.get(keyShortcutMapFromEvent(event));
@@ -339,6 +340,17 @@
         showHidden = !showHidden;
         await controller.applyShowHidden(showHidden);
         statusLine.set(showHidden ? "Hidden elements shown." : "Hidden elements hidden.");
+    }
+
+    async function toggleAutoBeam() {
+        if (get(workerBusy)) return;
+        const autoBeam = !get(userPreferences).autoBeam;
+        userPreferences.update((preferences) => ({
+            ...preferences,
+            autoBeam,
+        }));
+        await controller.applyAutoBeam(autoBeam);
+        statusLine.set(autoBeam ? "Auto-beam enabled." : "Auto-beam disabled.");
     }
 
     function triggerOpenFile() {
@@ -592,10 +604,13 @@
         {canRefreshLayout}
         {showHidden}
         {canToggleShowHidden}
+        autoBeam={$userPreferences.autoBeam}
+        {canToggleAutoBeam}
         onUndo={undo}
         onRedo={redo}
         onRefreshLayout={refreshLayout}
         onToggleShowHidden={toggleShowHidden}
+        onToggleAutoBeam={toggleAutoBeam}
         onContextAction={handleToolbarAction}
     />
 

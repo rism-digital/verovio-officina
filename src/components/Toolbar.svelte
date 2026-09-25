@@ -23,16 +23,20 @@
     export let canRefreshLayout = false;
     export let showHidden = false;
     export let canToggleShowHidden = false;
+    export let autoBeam = true;
+    export let canToggleAutoBeam = false;
     export let onUndo: (() => void) | null = null;
     export let onRedo: (() => void) | null = null;
     export let onRefreshLayout: (() => void) | null = null;
     export let onToggleShowHidden: (() => void) | null = null;
+    export let onToggleAutoBeam: (() => void) | null = null;
     export let onContextAction: ((action: Action) => void) | null = null;
 
     const undoIconUrl = withBaseUrl("icons/editor/undo.png");
     const redoIconUrl = withBaseUrl("icons/editor/redo.png");
     const refreshLayoutIconUrl = withBaseUrl("icons/editor/update.png");
     const showHiddenIconUrl = withBaseUrl("icons/toolbar/show-hidden.png");
+    const autoBeamIconUrl = withBaseUrl("icons/editor/auto-beam.png");
 
     let contextBars: ResolvedContextButton[][] = [];
 
@@ -65,6 +69,11 @@
     function handleToggleShowHidden() {
         if (!canToggleShowHidden) return;
         onToggleShowHidden?.();
+    }
+
+    function handleToggleAutoBeam() {
+        if (!canToggleAutoBeam) return;
+        onToggleAutoBeam?.();
     }
 
     function handleContextAction(action: Action) {
@@ -141,6 +150,14 @@
             on:keydown={(event) => handleButtonKeydown(event, handleToggleShowHidden)}
         >
             <span class="vrv-tooltip">Show hidden elements</span>
+        </div>
+        <div
+            class="vrv-btn-icon-large vrv-toggleable {autoBeam ? 'toggled' : ''} {canToggleAutoBeam ? '' : 'disabled'}"
+            style={`background-image: url('${autoBeamIconUrl}');`}
+            on:click={handleToggleAutoBeam}
+            on:keydown={(event) => handleButtonKeydown(event, handleToggleAutoBeam)}
+        >
+            <span class="vrv-tooltip">Automatically beam inserted notes</span>
         </div>
         {#if contextBars.length > 0}
             <div class="vrv-h-separator"></div>

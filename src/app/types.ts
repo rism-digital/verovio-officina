@@ -73,6 +73,7 @@ export interface EditStatus {
         dots: number;
         accid: string;
         accidImplicit: boolean;
+        autoBeam: boolean;
     } | null;
     invalidLayout: boolean | null;
 }
@@ -378,6 +379,7 @@ export type EditActionSetCursorParam = {
     inputMode: "pitchFirst" | "durationFirst";
     chordMode: boolean;
     restMode?: boolean;
+    autoBeam: boolean;
 }
 
 export type EditActionUndo = {
@@ -388,6 +390,7 @@ export type EditActionUpdateCursorParam = {
     restMode?: boolean;
     chordMode?: boolean;
     tieMode?: string;
+    autoBeam?: boolean;
 }
 
 export type EditActionUpdatePitchParam = {

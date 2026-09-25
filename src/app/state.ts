@@ -8,6 +8,7 @@ export type PianoKeyboardMode = 'flat' | 'auto' | 'sharp';
 export type UserPreferences = {
     pianoKeyboardEnabled: boolean;
     inputMode: InputMode;
+    autoBeam: boolean;
     viewMode: ViewMode;
     zoom: number;
 };
@@ -15,6 +16,7 @@ export type UserPreferences = {
 export const DEFAULT_USER_PREFERENCES: UserPreferences = {
     pianoKeyboardEnabled: false,
     inputMode: 'durationFirst',
+    autoBeam: true,
     viewMode: 'page',
     zoom: 100,
 };
