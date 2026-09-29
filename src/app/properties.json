@@ -188,7 +188,9 @@
             "bold",
             "normal"
          ],
-         "glyph.auth": ["smufl"],
+         "glyph.auth": [
+            "smufl"
+         ],
          "glyph.name": [],
          "glyph.num": [],
          "glyph.uri": [],
@@ -499,6 +501,23 @@
          "type": "NMTOKEN"
       }
    },
+   "scoreDef": {
+      "attrs": {
+         "label": [],
+         "type": [],
+         "xml:id": []
+      },
+      "children": [
+         "pgHead",
+         "pgFoot",
+         "staffGrp"
+      ],
+      "types": {
+         "xml:id": "ID",
+         "label": "string",
+         "type": "NMTOKEN"
+      }
+   },
    "staffDef": {
       "attrs": {
          "clef.dis": [],
@@ -700,9 +719,25 @@
       },
       "children": [
          "clef",
-         "instrDef",
+         "keySig",
          "label",
-         "labelAbbr"
+         "labelAbbr",
+         "meterSig",
+         "meterSigGrp"
+      ],
+      "choice": [
+         [
+            "meterSig",
+            "meterSigGrp"
+         ]
+      ],
+      "optional": [
+         "clef",
+         "keySig",
+         "label",
+         "labelAbbr",
+         "meterSig",
+         "meterSigGrp"
       ],
       "types": {
          "xml:id": "ID",

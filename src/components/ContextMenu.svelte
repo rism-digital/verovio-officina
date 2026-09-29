@@ -10,14 +10,17 @@
     export let x = 0;
     export let y = 0;
     export let elementName = "";
+    export let customItems: ResolvedMenuEntry[] | null = null;
     export let onSelect: ((action: Action) => void) | null = null;
     export let onClose: (() => void) | null = null;
 
     let items: ResolvedMenuEntry[] = [];
     let buttonBars: ResolvedContextButton[][] = [];
 
-    $: items = resolveContextMenuItems(elementName);
-    $: buttonBars = resolveContextButtonBars(elementName);
+    $: items = customItems ?? resolveContextMenuItems(elementName);
+    $: buttonBars = customItems === null
+        ? resolveContextButtonBars(elementName)
+        : [];
     $: if (elementName && items.length === 0 && buttonBars.length === 0) close();
 
     function close() {

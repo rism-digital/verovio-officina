@@ -22,7 +22,8 @@
     export let onPrevPage: ActionHandler | null = null;
     export let onNextPage: ActionHandler | null = null;
     export let onToggleXml: ActionHandler | null = null;
-    export let onScoreProperties: ActionHandler | null = null;
+    export let onStaffGroups: ActionHandler | null = null;
+    export let onHeaderFooter: ActionHandler | null = null;
     export let onViewModeChange: ((viewMode: ViewMode) => void | Promise<void>) | null = null;
     export let onContextAction: ((action: Action) => void) | null = null;
     export let onHelp: ActionHandler | null = null;
@@ -81,8 +82,21 @@
             <div class="vrv-v-separator"></div>
             <div
                 class="vrv-menu-text"
-                data-before="Score properties"
-                on:click={() => onScoreProperties?.()}
+                data-before="Staff groups"
+                role="menuitem"
+                tabindex="0"
+                on:click={() => onStaffGroups?.()}
+                on:keydown={(event) =>
+                    handleMenuItemKeydown(event, onStaffGroups)}
+            ></div>
+            <div
+                class="vrv-menu-text"
+                data-before="Header / footer"
+                role="menuitem"
+                tabindex="0"
+                on:click={() => onHeaderFooter?.()}
+                on:keydown={(event) =>
+                    handleMenuItemKeydown(event, onHeaderFooter)}
             ></div>
         </div>
     </div>

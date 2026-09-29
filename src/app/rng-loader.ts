@@ -302,6 +302,8 @@ export class RNGLoader {
 export type ElementDef = {
     attrs: Record<string, Array<string>>;
     children: Array<string>;
+    choice?: Array<Array<string>>;
+    optional?: Array<string>;
     types: Record<string, string>;
     text?: boolean;
 };

@@ -5,6 +5,7 @@
     import type { ElementDef } from "../app/rng-loader";
 
     export let node: TreeNodeData | null = null;
+    export let readOnly = false;
     export let onEditSet: EditActionSetHandler | null = null;
 
     const readOnlyPatterns: RegExp[] = [
@@ -69,7 +70,7 @@
                         optionsAll={schemaAttrs[name] ?? null}
                         optionsBasic={null}
                         attributeType={schemaTypes[name] ?? null}
-                        readOnly={isReadOnly(elementName, name)}
+                        readOnly={readOnly || isReadOnly(elementName, name)}
                         customOptions={customOptionsFor(elementName, name)}
                         onEditAttribute={onEditSet}
                     />

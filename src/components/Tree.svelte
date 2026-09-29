@@ -3,6 +3,7 @@
     import ContextMenu from "./ContextMenu.svelte";
     import TreeCrumb from "./TreeCrumb.svelte";
     import TreeNode from "./TreeNode.svelte";
+    import type { ResolvedMenuEntry } from "../app/action-resolver";
     import type {
         Action,
         HoverElementHandler,
@@ -13,10 +14,18 @@
 
     export let ancestors: TreeNodeData[] | null = null;
     export let context: TreeNodeData | null = null;
+    export let isRoot = true;
+    export let showRootNode = false;
+    export let showBreadcrumbs = true;
+    export let selectOnContextMenu = false;
+    export let disabledElements: string[] = [];
     export let selectedId: string | null = null;
     export let onSelectElement: SelectElementHandler | null = null;
     export let onHoverElement: HoverElementHandler | null = null;
     export let onContextAction: TargetedContextActionHandler | null = null;
+    export let resolveContextMenuItems:
+        | ((node: TreeNodeData) => ResolvedMenuEntry[] | null)
+        | null = null;
 
     let breadcrumbsWrapper: HTMLDivElement | null = null;
     let treeRoot: HTMLDivElement | null = null;
@@ -69,6 +78,10 @@
         contextMenu = null;
     }
 
+    $: if (contextMenu && selectedId !== contextMenu.node.id) {
+        closeContextMenu();
+    }
+
     function handleContextAction(action: Action) {
         const currentContextMenu = contextMenu;
         if (!currentContextMenu) return;
@@ -81,26 +94,31 @@
     }
 </script>
 
-<div class="vrv-tree-breadcrumbs-wrapper" bind:this={breadcrumbsWrapper}>
-    <div class="vrv-tree-breadcrumbs">
-        <div class="vrv-tree-breadcrumb"></div>
-        {#if ancestors}
-            {#each [...ancestors].reverse() as ancestor}
-                <TreeCrumb
-                    id={ancestor.id}
-                    label={ancestor.element}
-                    onSelect={onSelectElement}
-                    onHover={onHoverElement}
-                />
-            {/each}
-        {/if}
+{#if showBreadcrumbs}
+    <div class="vrv-tree-breadcrumbs-wrapper" bind:this={breadcrumbsWrapper}>
+        <div class="vrv-tree-breadcrumbs">
+            <div class="vrv-tree-breadcrumb"></div>
+            {#if ancestors}
+                {#each [...ancestors].reverse() as ancestor}
+                    <TreeCrumb
+                        id={ancestor.id}
+                        label={ancestor.element}
+                        onSelect={onSelectElement}
+                        onHover={onHoverElement}
+                    />
+                {/each}
+            {/if}
+        </div>
     </div>
-</div>
+{/if}
 <div class="vrv-tree-root" bind:this={treeRoot}>
     {#if context}
         <TreeNode
             node={context}
-            isRoot
+            {isRoot}
+            {showRootNode}
+            {selectOnContextMenu}
+            {disabledElements}
             {selectedId}
             onSelect={onSelectElement}
             onHover={onHoverElement}
@@ -114,6 +132,7 @@
         x={contextMenu?.x ?? 0}
         y={contextMenu?.y ?? 0}
         elementName={contextMenu?.node?.element ?? ""}
+        customItems={resolveContextMenuItems?.(contextMenu.node) ?? null}
         onSelect={handleContextAction}
         onClose={closeContextMenu}
     />

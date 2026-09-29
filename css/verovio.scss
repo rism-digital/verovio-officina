@@ -1419,6 +1419,15 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             display: block;
         }
 
+        .vrv-tree-root.node-disabled > .vrv-node-children {
+            display: none;
+        }
+
+        .vrv-node-label.node-disabled {
+            cursor: default;
+            opacity: $disabled-opacity;
+        }
+
         .vrv-tree-node:not(.leaf)::before {
             cursor: pointer;
             position: absolute;
@@ -1433,6 +1442,11 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         .vrv-tree-node.open::before {
             transform: rotate(0deg);
             left: calc(-#{$node-indent} - 2px);
+        }
+
+        .vrv-tree-node.node-disabled::before {
+            cursor: default;
+            opacity: $disabled-opacity;
         }
 
     }

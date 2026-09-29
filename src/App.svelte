@@ -68,6 +68,7 @@
     let helpOpen = false;
     let exportDialogOpen = false;
     let scorePropertiesOpen = false;
+    let headerFooterOpen = false;
     let settingsOpen = false;
     let showHidden = false;
     let dialogScoreDef: TreeNodeData | null = null;
@@ -211,6 +212,7 @@
             helpOpen ||
             exportDialogOpen ||
             scorePropertiesOpen ||
+            headerFooterOpen ||
             settingsOpen ||
             xmlReloadDialogOpen ||
             Boolean(enterValueDialogState)
@@ -519,7 +521,7 @@
         localStorage.setItem(HELP_SEEN_STORAGE_KEY, "true");
     }
 
-    async function openScorePropertiesDialog() {
+    async function openStaffGroupsDialog() {
         const scoreDef = await controller.getScoreDefForDialog();
         if (!scoreDef) {
             statusLine.set("Failed to load score properties.");
@@ -529,12 +531,13 @@
         scorePropertiesOpen = true;
     }
 
-    function closeScorePropertiesDialog() {
+    function closePropertiesDialog() {
         scorePropertiesOpen = false;
+        headerFooterOpen = false;
         dialogScoreDef = null;
     }
 
-    async function confirmScorePropertiesDialog(
+    async function confirmPropertiesDialog(
         scoreDef: TreeNodeData | null,
         edited: boolean,
     ) {
@@ -546,8 +549,17 @@
             }
             statusLine.set("Applied score properties.");
         }
-        scorePropertiesOpen = false;
-        dialogScoreDef = null;
+        closePropertiesDialog();
+    }
+
+    async function openHeaderFooterDialog() {
+        const scoreDef = await controller.getScoreDefForDialog();
+        if (!scoreDef) {
+            statusLine.set("Failed to load header / footer properties.");
+            return;
+        }
+        dialogScoreDef = scoreDef;
+        headerFooterOpen = true;
     }
 
 </script>
@@ -572,7 +584,8 @@
         onNextPage={() =>
             controller.setCurrentPage(get(verovioState).currentPage + 1)}
         onToggleXml={toggleXmlMode}
-        onScoreProperties={openScorePropertiesDialog}
+        onStaffGroups={openStaffGroupsDialog}
+        onHeaderFooter={openHeaderFooterDialog}
         viewMode={$userPreferences.viewMode}
         onViewModeChange={setViewMode}
         onContextAction={handleToolbarAction}
@@ -677,10 +690,21 @@
     />
 
     <DialogScoreProperties
-        open={scorePropertiesOpen}
+        open={headerFooterOpen}
+        title="Header / footer"
         scoreDef={dialogScoreDef}
-        onConfirm={confirmScorePropertiesDialog}
-        onCancel={closeScorePropertiesDialog}
+        onConfirm={confirmPropertiesDialog}
+        onCancel={closePropertiesDialog}
+        disabledElements={["staffGrp"]}
+    />
+
+    <DialogScoreProperties
+        open={scorePropertiesOpen}
+        title="Staff groups"
+        scoreDef={dialogScoreDef}
+        onConfirm={confirmPropertiesDialog}
+        onCancel={closePropertiesDialog}
+        disabledElements={["pgHead", "staffDef"]}
     />
 
     <DialogXmlReload
