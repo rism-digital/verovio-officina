@@ -94,6 +94,11 @@ export const actionCatalog = {
             name: "Remove staff group",
             action: "remove-staff-group",
         },
+        {
+            name: "Edit staff group",
+            action: "edit-staff-group",
+            appAction: "open-staff-groups",
+        },
     ],
 };
 
@@ -188,6 +193,21 @@ export const actionDefinitions = {
                 param: {
                     operation: "delete-staff",
                     elementId: "[selection-id]",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "edit-staff-group": {
+        action: "chain",
+        param: [
+            {
+                action: "scoreDef",
+                param: {
+                    elementId: "[selection-id]",
+                    operation: "edit-staff-group",
                 },
             },
             {

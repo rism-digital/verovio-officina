@@ -4,8 +4,10 @@ export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) 
 export type ActionHandler = () => void;
 
 export type ActionValueType = "text" | "number";
+export type AppActionKey = "open-staff-groups";
 
 export type ActionMetadata = {
+    appAction?: AppActionKey;
     dialog?: string;
     dialogValue?: string | number;
     valueType?: ActionValueType;

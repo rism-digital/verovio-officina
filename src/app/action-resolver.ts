@@ -36,6 +36,7 @@ function resolveActionEntry(entry: ActionEntry): ResolvedAction | null {
         ...definition,
         label: entry.name,
         actionKey: entry.action,
+        appAction: entry.appAction,
         dialog: entry.dialog,
         valueType: entry.valueType,
         redoLayout: entry.redoLayout,

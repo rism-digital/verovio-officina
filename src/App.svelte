@@ -26,7 +26,13 @@
         resolveEnterValueDialog,
         type EnterValueDialogState
     } from "./app/toolbar-actions";
-    import type { Action, MEIExportOptions, TargetedContextAction, TreeNodeData } from "./app/types";
+    import type {
+        Action,
+        AppActionKey,
+        MEIExportOptions,
+        TargetedContextAction,
+        TreeNodeData,
+    } from "./app/types";
     import type { InputMode, UserPreferences, ViewMode } from "./app/state";
     import {
         DEFAULT_USER_PREFERENCES,
@@ -56,6 +62,12 @@
         basic: false,
         removeIds: false,
         ignoreHeader: false,
+    };
+    const appActionHandlers: Record<
+        AppActionKey,
+        (action: TargetedContextAction) => void | Promise<void>
+    > = {
+        "open-staff-groups": () => openStaffGroupsDialog(),
     };
 
     let fileInput: HTMLInputElement | null = null;
@@ -456,6 +468,11 @@
     }
 
     async function handleTargetedContextAction(action: TargetedContextAction) {
+        if (action.appAction) {
+            await appActionHandlers[action.appAction](action);
+            return;
+        }
+
         const ok = await controller.handleEditAction(action);
         if (ok) {
             statusLine.set(`${action.label} for <${action.targetElement}>.`);
