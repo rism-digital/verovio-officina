@@ -10,7 +10,14 @@ export type ActionCatalogSubmenuEntry = {
     submenu: ActionCatalogEntry[];
 };
 
-export type ActionCatalogEntry = ActionEntry | ActionCatalogSubmenuEntry;
+export type ActionCatalogSeparatorEntry = {
+    separator: true;
+};
+
+export type ActionCatalogEntry =
+    | ActionEntry
+    | ActionCatalogSubmenuEntry
+    | ActionCatalogSeparatorEntry;
 
 export type ContextButtonEntry = ActionEntry & {
     icon: string;

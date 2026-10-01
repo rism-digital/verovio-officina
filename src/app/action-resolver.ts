@@ -11,7 +11,8 @@ export type ResolvedMenuAction = ResolvedAction;
 
 export type ResolvedMenuEntry =
     | (ResolvedAction & { kind: "action" })
-    | { kind: "submenu"; label: string; items: ResolvedMenuEntry[] };
+    | { kind: "submenu"; label: string; items: ResolvedMenuEntry[] }
+    | { kind: "separator" };
 
 type ResolveContextButtonBarsOptions = {
     includeDialogs?: boolean;
@@ -20,6 +21,12 @@ type ResolveContextButtonBarsOptions = {
 
 function isActionEntry(entry: ActionCatalogEntry): entry is ActionEntry {
     return "action" in entry;
+}
+
+function isSeparatorEntry(
+    entry: ActionCatalogEntry,
+): entry is Extract<ActionCatalogEntry, { separator: true }> {
+    return "separator" in entry;
 }
 
 function resolveActionEntry(entry: ActionEntry): ResolvedAction | null {
@@ -52,6 +59,15 @@ export function resolveMenuActions(): ResolvedMenuAction[] {
 function resolveMenuEntries(entries: ActionCatalogEntry[]): ResolvedMenuEntry[] {
     const resolvedItems: ResolvedMenuEntry[] = [];
     for (const entry of entries) {
+        if (isSeparatorEntry(entry)) {
+            if (
+                resolvedItems.length > 0
+                && resolvedItems[resolvedItems.length - 1]?.kind !== "separator"
+            ) {
+                resolvedItems.push({ kind: "separator" });
+            }
+            continue;
+        }
         if (isActionEntry(entry)) {
             if (entry.dialog) continue;
             const resolvedAction = resolveActionEntry(entry);
@@ -69,6 +85,9 @@ function resolveMenuEntries(entries: ActionCatalogEntry[]): ResolvedMenuEntry[] 
             label: entry.name,
             items: submenuItems,
         });
+    }
+    if (resolvedItems[resolvedItems.length - 1]?.kind === "separator") {
+        resolvedItems.pop();
     }
     return resolvedItems;
 }

@@ -110,11 +110,13 @@ export type EditActionParam =
     | EditActionPropertiesParam
     | EditActionResetCursorParam
     | EditActionResetCursorContainerParam
+    | EditActionScoreDefinitionParam
     | EditActionSelectParam
     | EditActionSetParam
     | EditActionSetCursorParam
     | EditActionUpdateCursorParam
-    | EditActionUpdatePitchParam;
+    | EditActionUpdatePitchParam
+    | EditActionUpdateScoreDefinitionParam;
 
 export type EditAction =
     | EditActionChain
@@ -136,12 +138,14 @@ export type EditAction =
     | EditActionRedo 
     | EditActionResetCursor
     | EditActionResetCursorContainer
+    | EditActionScoreDefinition
     | EditActionSelect
     | EditActionSet
     | EditActionSetCursor
     | EditActionUndo
     | EditActionUpdateCursor
-    | EditActionUpdatePitch;
+    | EditActionUpdatePitch
+    | EditActionUpdateScoreDefinition;
 
 // Actions
 
@@ -238,6 +242,11 @@ export type EditActionResetCursorContainer = {
     param: EditActionResetCursorContainerParam;
 };
 
+export type EditActionScoreDefinition = {
+    action: "scoreDefinition";
+    param: EditActionScoreDefinitionParam;
+};
+
 export type EditActionSelect = {
     action: "select";
     param: EditActionSelectParam;
@@ -261,6 +270,11 @@ export type EditActionUpdateCursor = {
 export type EditActionUpdatePitch = {
     action: "updatePitch";
     param: EditActionUpdatePitchParam;
+};
+
+export type EditActionUpdateScoreDefinition = {
+    action: "updateScoreDefinition";
+    param: EditActionUpdateScoreDefinitionParam;
 };
 
 // ActionParams
@@ -362,6 +376,10 @@ export type EditActionResetCursorContainerParam = {
     container: "tuplet" | "beam" | "graceGrp";
 };
 
+export type EditActionScoreDefinitionParam = {
+    elementId?: string;
+};
+
 export type EditActionSelectParam = {
     elementId: string;
     secondary?: boolean;
@@ -400,3 +418,18 @@ export type EditActionUpdatePitchParam = {
     accid?: string;
     midi?: number;
 }
+
+export type EditActionUpdateScoreDefinitionParam = {
+    elementId?: string;
+    scoreDef?: TreeNodeData;
+    staffN?: string;
+    operation?:
+        | "add-staff-above"
+        | "add-staff-below"
+        | "delete-staff"
+        | "move-staff-up"
+        | "move-staff-down"
+        | "add-staff-group"
+        | "remove-staff-group"
+        | "edit-staff-group";
+};

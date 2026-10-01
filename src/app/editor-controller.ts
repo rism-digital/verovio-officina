@@ -143,7 +143,7 @@ export class EditorController {
 
     async applyScoreDefFromDialog(scoreDef: TreeNodeData): Promise<boolean> {
         const ok = await this.vrvEdit({
-            action: "properties",
+            action: "updateScoreDefinition",
             param: { scoreDef: scoreDef },
         }, "Failed to apply scoreDef");
         if (!ok) {
@@ -216,7 +216,7 @@ export class EditorController {
     async getScoreDefForDialog(): Promise<TreeNodeData | null> {
         try {
             const scoreDefContextOk = await this.vrvEdit({
-                action: "properties",
+                action: "scoreDefinition",
                 param: {},
             }, "Failed to load scoreDef");
             if (!scoreDefContextOk) {

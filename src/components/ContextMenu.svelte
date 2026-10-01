@@ -97,7 +97,7 @@
                     on:click={() => handleAction(item)}
                     on:keydown={(event) => handleActionKeydown(event, item)}
                 ></div>
-            {:else}
+            {:else if item.kind === "submenu"}
                 <div class="vrv-submenu">
                     <div
                         class="vrv-submenu-text"
@@ -121,6 +121,8 @@
                         {/each}
                     </div>
                 </div>
+            {:else}
+                <div class="vrv-v-separator" role="separator"></div>
             {/if}
         {/each}
     </div>

@@ -420,7 +420,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             }
 
             // Activate sub-submenu - !important because we inherit from submenu-content
-            .vrv-submenu:hover .vrv-submenu-content {
+            .vrv-submenu:hover:not(.disabled) .vrv-submenu-content {
                 display: flex !important;
             }
         }

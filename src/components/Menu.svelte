@@ -24,7 +24,9 @@
     export let onToggleXml: ActionHandler | null = null;
     export let onStaffGroups: ActionHandler | null = null;
     export let onHeaderFooter: ActionHandler | null = null;
-    export let onViewModeChange: ((viewMode: ViewMode) => void | Promise<void>) | null = null;
+    export let onViewModeChange:
+        | ((viewMode: ViewMode) => void | Promise<void>)
+        | null = null;
     export let onContextAction: ((action: Action) => void) | null = null;
     export let onHelp: ActionHandler | null = null;
     export let onSettings: ActionHandler | null = null;
@@ -40,13 +42,19 @@
 
     $: addMeasureItems = resolveMenuActions();
 
-    function handleMenuItemKeydown(event: KeyboardEvent, handler: ActionHandler | null) {
+    function handleMenuItemKeydown(
+        event: KeyboardEvent,
+        handler: ActionHandler | null,
+    ) {
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
         handler?.();
     }
 
-    function handleViewModeKeydown(event: KeyboardEvent, nextViewMode: ViewMode) {
+    function handleViewModeKeydown(
+        event: KeyboardEvent,
+        nextViewMode: ViewMode,
+    ) {
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
         onViewModeChange?.(nextViewMode);
@@ -91,6 +99,21 @@
             ></div>
             <div
                 class="vrv-menu-text"
+                data-before="Staff definition"
+                role="menuitem"
+            ></div>
+            <div
+                class="vrv-menu-text"
+                data-before="Key signature"
+                role="menuitem"
+            ></div>
+            <div
+                class="vrv-menu-text"
+                data-before="Time signature"
+                role="menuitem"
+            ></div>
+            <div
+                class="vrv-menu-text"
                 data-before="Header / footer"
                 role="menuitem"
                 tabindex="0"
@@ -98,6 +121,30 @@
                 on:keydown={(event) =>
                     handleMenuItemKeydown(event, onHeaderFooter)}
             ></div>
+            <div class="vrv-v-separator"></div>
+            <div class="vrv-submenu">
+                <div
+                    class="vrv-submenu-text disabled"
+                    data-before="Score redefinition"
+                ></div>
+                <div class="vrv-submenu-content">
+                    <div class="vrv-menu-text" data-before="Staff group"></div>
+                    <div
+                        class="vrv-menu-text"
+                        data-before="Staff definition"
+                    ></div>
+                    <div
+                        class="vrv-menu-text"
+                        data-before="Key signature"
+                        role="menuitem"
+                    ></div>
+                    <div
+                        class="vrv-menu-text"
+                        data-before="Time signature"
+                        role="menuitem"
+                    ></div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="vrv-menu">
@@ -105,7 +152,9 @@
         <div class="vrv-menu-content">
             <div class="vrv-v-separator"></div>
             <div
-                class="vrv-menu-text {viewMode === 'page' ? 'vrv-menu-checked' : ''}"
+                class="vrv-menu-text {viewMode === 'page'
+                    ? 'vrv-menu-checked'
+                    : ''}"
                 data-before="Page mode"
                 role="menuitem"
                 tabindex="0"
@@ -113,12 +162,15 @@
                 on:keydown={(event) => handleViewModeKeydown(event, "page")}
             ></div>
             <div
-                class="vrv-menu-text {viewMode === 'responsive' ? 'vrv-menu-checked' : ''}"
+                class="vrv-menu-text {viewMode === 'responsive'
+                    ? 'vrv-menu-checked'
+                    : ''}"
                 data-before="Responsive mode"
                 role="menuitem"
                 tabindex="0"
                 on:click={() => onViewModeChange?.("responsive")}
-                on:keydown={(event) => handleViewModeKeydown(event, "responsive")}
+                on:keydown={(event) =>
+                    handleViewModeKeydown(event, "responsive")}
             ></div>
         </div>
     </div>
@@ -209,7 +261,8 @@
                 role="button"
                 tabindex="0"
                 on:click={() => onResetDefault?.()}
-                on:keydown={(event) => handleMenuItemKeydown(event, onResetDefault)}
+                on:keydown={(event) =>
+                    handleMenuItemKeydown(event, onResetDefault)}
             ></div>
             <div
                 class="vrv-menu-text"

@@ -57,7 +57,44 @@ export const actionCatalog = {
             name: "Delete",
             action: "delete",
         },
-    ]
+    ],
+    staff: [
+        
+        {
+            name: "Add staff above",
+            action: "add-staff-above",
+        },
+        {
+            name: "Add staff below",
+            action: "add-staff-below",
+        },
+        {
+            name: "Delete staff",
+            action: "delete-staff",
+        },
+        {
+            separator: true,
+        },
+        {
+            name: "Move staff up",
+            action: "move-staff-up",
+        },
+        {
+            name: "Move staff down",
+            action: "move-staff-down",
+        },
+        {
+            separator: true,
+        },
+        {
+            name: "Add staff group",
+            action: "add-staff-group",
+        },
+        {
+            name: "Remove staff group",
+            action: "remove-staff-group",
+        },
+    ],
 };
 
 const controlEventPlace = [
@@ -128,6 +165,112 @@ export const menuActions = [
 ]
 
 export const actionDefinitions = {
+    "add-staff-above": {
+        action: "chain",
+        param: [
+            {
+                action: "scoreDef",
+                param: {
+                    operation: "add-staff-above",
+                    elementId: "[selection-id]",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "delete-staff": {
+        action: "chain",
+        param: [
+            {
+                action: "scoreDef",
+                param: {
+                    operation: "delete-staff",
+                    elementId: "[selection-id]",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "add-staff-below": {
+        action: "chain",
+        param: [
+            {
+                action: "scoreDef",
+                param: {
+                    operation: "add-staff-below",
+                    elementId: "[selection-id]",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "move-staff-up": {
+        action: "chain",
+        param: [
+            {
+                action: "scoreDef",
+                param: {
+                    operation: "move-staff-up",
+                    elementId: "[selection-id]",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "move-staff-down": {
+        action: "chain",
+        param: [
+            {
+                action: "scoreDef",
+                param: {
+                    operation: "move-staff-down",
+                    elementId: "[selection-id]",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "add-staff-group": {
+        action: "chain",
+        param: [
+            {
+                action: "scoreDef",
+                param: {
+                    operation: "add-staff-group",
+                    top: "[selection-id]",
+                    bottom: "[selection-secondary-id]",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "remove-staff-group": {
+        action: "chain",
+        param: [
+            {
+                action: "scoreDef",
+                param: {
+                    operation: "remove-staff-group",
+                    elementId: "[selection-id]",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
     "add-accidental-flat": {
         action: "chain",
         param: [
