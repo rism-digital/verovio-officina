@@ -30,6 +30,7 @@
         Action,
         AppActionKey,
         MEIExportOptions,
+        ScoreDefinitionUpdate,
         TargetedContextAction,
         TreeNodeData,
     } from "./app/types";
@@ -67,7 +68,7 @@
         AppActionKey,
         (action: TargetedContextAction) => void | Promise<void>
     > = {
-        "open-staff-groups": () => openStaffGroupsDialog(),
+        "open-staff-def": () => openStaffDefDialog(),
     };
 
     let fileInput: HTMLInputElement | null = null;
@@ -79,11 +80,14 @@
     let aboutOpen = false;
     let helpOpen = false;
     let exportDialogOpen = false;
-    let scorePropertiesOpen = false;
-    let headerFooterOpen = false;
+    let scorePropStaffGrpOpen = false;
+    let scorePropStaffDefOpen = false;
+    let scorePropKeySigOpen = false;
+    let scorePropMeterSigOpen = false;
+    let scorePropHeaderFooterOpen = false;
     let settingsOpen = false;
     let showHidden = false;
-    let dialogScoreDef: TreeNodeData | null = null;
+    let dialogSubTree: TreeNodeData | null = null;
     let xmlReloadDialogOpen = false;
     let enterValueDialogState: EnterValueDialogState | null = null;
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
@@ -223,8 +227,11 @@
             aboutOpen ||
             helpOpen ||
             exportDialogOpen ||
-            scorePropertiesOpen ||
-            headerFooterOpen ||
+            scorePropStaffGrpOpen ||
+            scorePropStaffDefOpen ||
+            scorePropMeterSigOpen ||
+            scorePropKeySigOpen ||
+            scorePropHeaderFooterOpen ||
             settingsOpen ||
             xmlReloadDialogOpen ||
             Boolean(enterValueDialogState)
@@ -538,28 +545,72 @@
         localStorage.setItem(HELP_SEEN_STORAGE_KEY, "true");
     }
 
-    async function openStaffGroupsDialog() {
-        const scoreDef = await controller.getScoreDefForDialog();
-        if (!scoreDef) {
+    async function openStaffDefDialog() {
+        const subTree = await controller.getSubTreeForPropDialog("staffDef");
+        if (!subTree) {
             statusLine.set("Failed to load score properties.");
             return;
         }
-        dialogScoreDef = scoreDef;
-        scorePropertiesOpen = true;
+        dialogSubTree = subTree;
+        scorePropStaffDefOpen = true;
+    }
+
+    async function openStaffGroupsDialog() {
+        const subTree = await controller.getSubTreeForPropDialog("staffGrp");
+        if (!subTree) {
+            statusLine.set("Failed to load score properties.");
+            return;
+        }
+        dialogSubTree = subTree;
+        scorePropStaffGrpOpen = true;
+    }
+
+    async function openMeterSigDialog() {
+        const subTree = await controller.getSubTreeForPropDialog("meterSig");
+        if (!subTree) {
+            statusLine.set("Failed to load score properties.");
+            return;
+        }
+        dialogSubTree = subTree;
+        scorePropMeterSigOpen = true;
+    }
+
+    async function openKeySigDialog() {
+        const subTree = await controller.getSubTreeForPropDialog("keySig");
+        if (!subTree) {
+            statusLine.set("Failed to load score properties.");
+            return;
+        }
+        dialogSubTree = subTree;
+        scorePropKeySigOpen = true;
+    }
+
+    async function openHeaderFooterDialog() {
+        const subTree = await controller.getSubTreeForPropDialog("scoreDef");
+        if (!subTree) {
+            statusLine.set("Failed to load header / footer properties.");
+            return;
+        }
+        dialogSubTree = subTree;
+        scorePropHeaderFooterOpen = true;
     }
 
     function closePropertiesDialog() {
-        scorePropertiesOpen = false;
-        headerFooterOpen = false;
-        dialogScoreDef = null;
+        scorePropStaffGrpOpen = false;
+        scorePropStaffDefOpen = false;
+        scorePropKeySigOpen = false;
+        scorePropMeterSigOpen = false;
+        scorePropHeaderFooterOpen = false;
+        dialogSubTree = null;
     }
 
     async function confirmPropertiesDialog(
-        scoreDef: TreeNodeData | null,
+        subTree: TreeNodeData | null,
         edited: boolean,
+        update: ScoreDefinitionUpdate,
     ) {
-        if (edited && scoreDef) {
-            const ok = await controller.applyScoreDefFromDialog(scoreDef);
+        if (edited && subTree) {
+            const ok = await controller.applyScoreDefFromDialog(subTree, update);
             if (!ok) {
                 statusLine.set("Failed to apply score properties.");
                 return;
@@ -567,16 +618,6 @@
             statusLine.set("Applied score properties.");
         }
         closePropertiesDialog();
-    }
-
-    async function openHeaderFooterDialog() {
-        const scoreDef = await controller.getScoreDefForDialog();
-        if (!scoreDef) {
-            statusLine.set("Failed to load header / footer properties.");
-            return;
-        }
-        dialogScoreDef = scoreDef;
-        headerFooterOpen = true;
     }
 
 </script>
@@ -602,6 +643,8 @@
             controller.setCurrentPage(get(verovioState).currentPage + 1)}
         onToggleXml={toggleXmlMode}
         onStaffGroups={openStaffGroupsDialog}
+        onKeySig={openKeySigDialog}
+        onMeterSig={openMeterSigDialog}
         onHeaderFooter={openHeaderFooterDialog}
         viewMode={$userPreferences.viewMode}
         onViewModeChange={setViewMode}
@@ -707,21 +750,53 @@
     />
 
     <DialogScoreProperties
-        open={headerFooterOpen}
-        title="Header / footer"
-        scoreDef={dialogScoreDef}
-        onConfirm={confirmPropertiesDialog}
-        onCancel={closePropertiesDialog}
-        disabledElements={["staffGrp"]}
-    />
-
-    <DialogScoreProperties
-        open={scorePropertiesOpen}
+        open={scorePropStaffGrpOpen}
         title="Staff groups"
-        scoreDef={dialogScoreDef}
+        subTree={dialogSubTree}
+        update="staffGrp"
         onConfirm={confirmPropertiesDialog}
         onCancel={closePropertiesDialog}
         disabledElements={["pgHead", "staffDef"]}
+    />
+
+    <DialogScoreProperties
+        open={scorePropStaffDefOpen}
+        title="Staff definition"
+        subTree={dialogSubTree}
+        update="staffDef"
+        onConfirm={confirmPropertiesDialog}
+        onCancel={closePropertiesDialog}
+        disabledElements={[]}
+    />
+
+    <DialogScoreProperties
+        open={scorePropMeterSigOpen}
+        title="Meter or meter group signature"
+        subTree={dialogSubTree}
+        update="meterSig"
+        onConfirm={confirmPropertiesDialog}
+        onCancel={closePropertiesDialog}
+        disabledElements={[]}
+    />
+
+    <DialogScoreProperties
+        open={scorePropKeySigOpen}
+        title="Key signature"
+        subTree={dialogSubTree}
+        update="keySig"
+        onConfirm={confirmPropertiesDialog}
+        onCancel={closePropertiesDialog}
+        disabledElements={[]}
+    />
+
+    <DialogScoreProperties
+        open={scorePropHeaderFooterOpen}
+        title="Header and footer"
+        subTree={dialogSubTree}
+        update="scoreDef"
+        onConfirm={confirmPropertiesDialog}
+        onCancel={closePropertiesDialog}
+        disabledElements={["staffGrp"]}
     />
 
     <DialogXmlReload

@@ -6,6 +6,7 @@ import type {
     EditAction,
     EditStatus,
     MEIExportOptions,
+    ScoreDefinitionUpdate,
     TreeNodeData,
     ViewModel,
     EditActionParam,
@@ -141,17 +142,20 @@ export class EditorController {
         await this.vrvRefreshStatus();
     }
 
-    async applyScoreDefFromDialog(scoreDef: TreeNodeData): Promise<boolean> {
+    async applyScoreDefFromDialog(
+        subTree: TreeNodeData,
+        update: ScoreDefinitionUpdate,
+    ): Promise<boolean> {
         const ok = await this.vrvEdit({
             action: "updateScoreDefinition",
-            param: { scoreDef: scoreDef },
+            param: { subTree, update },
         }, "Failed to apply scoreDef");
         if (!ok) {
             return false;
         }
         await this.vrvApplyEditLayout(true);
         this.markDocumentChanged();
-        await this.vrvRefreshContextFromSelection();
+        await this.vrvRefreshStatus();
         return true;
     }
 
@@ -213,20 +217,22 @@ export class EditorController {
         return zoomLevels[Math.max(prev, 0)];
     }
 
-    async getScoreDefForDialog(): Promise<TreeNodeData | null> {
+    async getSubTreeForPropDialog(
+        level: ScoreDefinitionUpdate,
+    ): Promise<TreeNodeData | null> {
         try {
-            const scoreDefContextOk = await this.vrvEdit({
+            const scoreDefinitionOk = await this.vrvEdit({
                 action: "scoreDefinition",
-                param: {},
+                param: { level },
             }, "Failed to load scoreDef");
-            if (!scoreDefContextOk) {
+            if (!scoreDefinitionOk) {
                 return null;
             }
-            const scoreDef = await this.bridge.verovio.editResponseScoreDef();
+            const subTree = await this.bridge.verovio.editResponseScoreDef();
             this.stores.workerBusy.set(false);
-            return scoreDef;
+            return subTree;
         } catch (error) {
-            console.error("Failed to load scoreDef", error);
+            console.error("Failed to load sub tree", error);
             this.stores.workerBusy.set(false);
             return null;
         }

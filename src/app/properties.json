@@ -501,6 +501,43 @@
          "type": "NMTOKEN"
       }
    },
+   "keySig": {
+      "attrs": {
+         "label": [],
+         "sig": [],
+         "type": [],
+         "xml:id": []
+      },
+      "children": [],
+      "types": {
+         "xml:id": "ID",
+         "label": "string",
+         "type": "NMTOKEN",
+         "sig": "string"
+      }
+   },
+   "meterSig": {
+      "attrs": {
+         "label": [],
+         "count": [],
+         "sym": [
+            "common",
+            "cut",
+            "open"
+         ],
+         "unit": [],
+         "type": [],
+         "xml:id": []
+      },
+      "children": [],
+      "types": {
+         "xml:id": "ID",
+         "label": "string",
+         "type": "NMTOKEN",
+         "count": "string",
+         "unit": "string"
+      }
+   },
    "scoreDef": {
       "attrs": {
          "label": [],

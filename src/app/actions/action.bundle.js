@@ -95,9 +95,12 @@ export const actionCatalog = {
             action: "remove-staff-group",
         },
         {
-            name: "Edit staff group",
+            separator: true,
+        },
+        {
+            name: "Edit staff definition",
             action: "edit-staff-group",
-            appAction: "open-staff-groups",
+            appAction: "open-staff-def",
         },
     ],
 };
@@ -174,9 +177,24 @@ export const actionDefinitions = {
         action: "chain",
         param: [
             {
-                action: "scoreDef",
+                action: "updateScoreDefinition",
                 param: {
-                    operation: "add-staff-above",
+                    update: "insertAbove",
+                    elementId: "[selection-id]",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "add-staff-below": {
+        action: "chain",
+        param: [
+            {
+                action: "updateScoreDefinition",
+                param: {
+                    update: "insertBelow",
                     elementId: "[selection-id]",
                 },
             },
@@ -189,9 +207,9 @@ export const actionDefinitions = {
         action: "chain",
         param: [
             {
-                action: "scoreDef",
+                action: "updateScoreDefinition",
                 param: {
-                    operation: "delete-staff",
+                    update: "deleteStaff",
                     elementId: "[selection-id]",
                 },
             },
@@ -215,28 +233,13 @@ export const actionDefinitions = {
             },
         ],
     },
-    "add-staff-below": {
-        action: "chain",
-        param: [
-            {
-                action: "scoreDef",
-                param: {
-                    operation: "add-staff-below",
-                    elementId: "[selection-id]",
-                },
-            },
-            {
-                action: "commit",
-            },
-        ],
-    },
     "move-staff-up": {
         action: "chain",
         param: [
             {
-                action: "scoreDef",
+                action: "updateScoreDefinition",
                 param: {
-                    operation: "move-staff-up",
+                    update: "moveUp",
                     elementId: "[selection-id]",
                 },
             },
@@ -249,9 +252,9 @@ export const actionDefinitions = {
         action: "chain",
         param: [
             {
-                action: "scoreDef",
+                action: "updateScoreDefinition",
                 param: {
-                    operation: "move-staff-down",
+                    update: "moveDown",
                     elementId: "[selection-id]",
                 },
             },

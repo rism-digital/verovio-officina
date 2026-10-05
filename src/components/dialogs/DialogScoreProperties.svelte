@@ -5,6 +5,7 @@
     import ScorePropertiesAttributeList from "../ScorePropertiesAttributeList.svelte";
     import type {
         EditActionSetParam,
+        ScoreDefinitionUpdate,
         TargetedContextAction,
         TreeNodeData,
     } from "../../app/types";
@@ -13,10 +14,15 @@
 
     export let open = false;
     export let title = "Score properties";
-    export let scoreDef: TreeNodeData | null = null;
+    export let subTree: TreeNodeData | null = null;
+    export let update: ScoreDefinitionUpdate = "scoreDef";
     export let disabledElements: string[] = [];
     export let preventDelete: string[] = ["staffGrp", "staffDef"];
-    export let onConfirm: ((scoreDef: TreeNodeData | null, edited: boolean) => void) | null = null;
+    export let onConfirm: ((
+        scoreDef: TreeNodeData | null,
+        edited: boolean,
+        update: ScoreDefinitionUpdate,
+    ) => void) | null = null;
     export let onCancel: (() => void) | null = null;
 
     let selectedNodeId: string | null = null;
@@ -240,17 +246,16 @@
         selectedNodeId = null;
         localScoreDef = null;
         initialSerializedScoreDef = "";
-    } else if (!localScoreDef && scoreDef) {
-        localScoreDef = cloneScoreDef(scoreDef);
+    } else if (!localScoreDef && subTree) {
+        localScoreDef = cloneScoreDef(subTree);
         initialSerializedScoreDef = serializeScoreDef(localScoreDef);
-        console.log(initialSerializedScoreDef)
         selectedNodeId = localScoreDef?.id ?? null;
     } else if (localScoreDef && !findNodeById(localScoreDef, selectedNodeId)) {
         selectedNodeId = localScoreDef.id;
     }
 
     function handleOk() {
-        onConfirm?.(localScoreDef, isEdited);
+        onConfirm?.(localScoreDef, isEdited, update);
     }
 
     function handleCancel() {

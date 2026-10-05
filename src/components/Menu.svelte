@@ -23,6 +23,8 @@
     export let onNextPage: ActionHandler | null = null;
     export let onToggleXml: ActionHandler | null = null;
     export let onStaffGroups: ActionHandler | null = null;
+    export let onMeterSig: ActionHandler | null = null;
+    export let onKeySig: ActionHandler | null = null;
     export let onHeaderFooter: ActionHandler | null = null;
     export let onViewModeChange:
         | ((viewMode: ViewMode) => void | Promise<void>)
@@ -90,7 +92,7 @@
             <div class="vrv-v-separator"></div>
             <div
                 class="vrv-menu-text"
-                data-before="Staff groups"
+                data-before="Staff group properties"
                 role="menuitem"
                 tabindex="0"
                 on:click={() => onStaffGroups?.()}
@@ -99,18 +101,21 @@
             ></div>
             <div
                 class="vrv-menu-text"
-                data-before="Staff definition"
-                role="menuitem"
-            ></div>
-            <div
-                class="vrv-menu-text"
                 data-before="Key signature"
                 role="menuitem"
+                tabindex="0"
+                on:click={() => onKeySig?.()}
+                on:keydown={(event) =>
+                    handleMenuItemKeydown(event, onKeySig)}
             ></div>
             <div
                 class="vrv-menu-text"
-                data-before="Time signature"
+                data-before="Meter signature"
                 role="menuitem"
+                tabindex="0"
+                on:click={() => onMeterSig?.()}
+                on:keydown={(event) =>
+                    handleMenuItemKeydown(event, onMeterSig)}
             ></div>
             <div
                 class="vrv-menu-text"

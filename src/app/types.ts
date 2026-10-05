@@ -4,7 +4,8 @@ export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) 
 export type ActionHandler = () => void;
 
 export type ActionValueType = "text" | "number";
-export type AppActionKey = "open-staff-groups";
+export type AppActionKey = "open-staff-def";
+export type ScoreDefinitionUpdate = "scoreDef" | "staffGrp" | "staffDef" | "keySig" | "meterSig";
 
 export type ActionMetadata = {
     appAction?: AppActionKey;
@@ -379,7 +380,7 @@ export type EditActionResetCursorContainerParam = {
 };
 
 export type EditActionScoreDefinitionParam = {
-    elementId?: string;
+    level: ScoreDefinitionUpdate;
 };
 
 export type EditActionSelectParam = {
@@ -422,10 +423,13 @@ export type EditActionUpdatePitchParam = {
 }
 
 export type EditActionUpdateScoreDefinitionParam = {
-    elementId?: string;
-    scoreDef?: TreeNodeData;
-    staffN?: string;
-    operation?:
+    subTree?: TreeNodeData;
+    update:
+        | "scoreDef"
+        | "staffGrp"
+        | "staffDef"
+        | "keySig"
+        | "meterSig"
         | "add-staff-above"
         | "add-staff-below"
         | "delete-staff"
