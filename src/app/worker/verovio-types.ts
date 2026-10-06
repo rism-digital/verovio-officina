@@ -6,6 +6,7 @@ export type VerovioOptions = {
     appXPathQuery?: Array<string>;
     breaks: "auto" | "encoded" | "none";
     choiceXPathQuery?: Array<string>;
+    convertAttributes: boolean;
     footer: string;
     justifyVertically: boolean;
     measureMinWidth: number;
