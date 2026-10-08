@@ -69,6 +69,9 @@
         (action: TargetedContextAction) => void | Promise<void>
     > = {
         "open-staff-def": () => openStaffDefDialog(),
+        "open-staff-groups": () => openStaffGroupsDialog(true),
+        "open-key-signature": () => openKeySigDialog(true),
+        "open-meter-signature": () => openMeterSigDialog(true),
     };
 
     let fileInput: HTMLInputElement | null = null;
@@ -88,6 +91,7 @@
     let settingsOpen = false;
     let showHidden = false;
     let dialogSubTree: TreeNodeData | null = null;
+    let dialogSelected = false;
     let xmlReloadDialogOpen = false;
     let enterValueDialogState: EnterValueDialogState | null = null;
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
@@ -255,6 +259,7 @@
     $: canMenuGoPrev = canNavigateView && $verovioState.currentPage > 1;
     $: canMenuGoNext =
         canNavigateView && $verovioState.currentPage < $verovioState.pageCount;
+    $: canHeaderFooter = $editStatus.selection?.element !== "scoreDef";
     $: canUndo = menuInteractionEnabled && $editStatus.canUndo;
     $: canRedo = menuInteractionEnabled && $editStatus.canRedo;
     $: canRefreshLayout = menuInteractionEnabled;
@@ -552,36 +557,40 @@
             return;
         }
         dialogSubTree = subTree;
+        dialogSelected = false;
         scorePropStaffDefOpen = true;
     }
 
-    async function openStaffGroupsDialog() {
-        const subTree = await controller.getSubTreeForPropDialog("staffGrp");
+    async function openStaffGroupsDialog(selected = false) {
+        const subTree = await controller.getSubTreeForPropDialog("staffGrp", selected);
         if (!subTree) {
             statusLine.set("Failed to load score properties.");
             return;
         }
         dialogSubTree = subTree;
+        dialogSelected = selected;
         scorePropStaffGrpOpen = true;
     }
 
-    async function openMeterSigDialog() {
-        const subTree = await controller.getSubTreeForPropDialog("meterSig");
+    async function openMeterSigDialog(selected = false) {
+        const subTree = await controller.getSubTreeForPropDialog("meterSig", selected);
         if (!subTree) {
             statusLine.set("Failed to load score properties.");
             return;
         }
         dialogSubTree = subTree;
+        dialogSelected = selected;
         scorePropMeterSigOpen = true;
     }
 
-    async function openKeySigDialog() {
-        const subTree = await controller.getSubTreeForPropDialog("keySig");
+    async function openKeySigDialog(selected = false) {
+        const subTree = await controller.getSubTreeForPropDialog("keySig", selected);
         if (!subTree) {
             statusLine.set("Failed to load score properties.");
             return;
         }
         dialogSubTree = subTree;
+        dialogSelected = selected;
         scorePropKeySigOpen = true;
     }
 
@@ -592,6 +601,7 @@
             return;
         }
         dialogSubTree = subTree;
+        dialogSelected = false;
         scorePropHeaderFooterOpen = true;
     }
 
@@ -602,6 +612,7 @@
         scorePropMeterSigOpen = false;
         scorePropHeaderFooterOpen = false;
         dialogSubTree = null;
+        dialogSelected = false;
     }
 
     async function confirmPropertiesDialog(
@@ -610,7 +621,11 @@
         update: ScoreDefinitionUpdate,
     ) {
         if (edited && subTree) {
-            const ok = await controller.applyScoreDefFromDialog(subTree, update);
+            const ok = await controller.applyScoreDefFromDialog(
+                subTree,
+                update,
+                dialogSelected,
+            );
             if (!ok) {
                 statusLine.set("Failed to apply score properties.");
                 return;
@@ -646,6 +661,7 @@
         onKeySig={openKeySigDialog}
         onMeterSig={openMeterSigDialog}
         onHeaderFooter={openHeaderFooterDialog}
+        canScoreDef={canHeaderFooter}
         viewMode={$userPreferences.viewMode}
         onViewModeChange={setViewMode}
         onContextAction={handleToolbarAction}

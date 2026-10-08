@@ -4,7 +4,11 @@ export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) 
 export type ActionHandler = () => void;
 
 export type ActionValueType = "text" | "number";
-export type AppActionKey = "open-staff-def";
+export type AppActionKey =
+    | "open-staff-def"
+    | "open-staff-groups"
+    | "open-key-signature"
+    | "open-meter-signature";
 export type ScoreDefinitionUpdate = "scoreDef" | "staffGrp" | "staffDef" | "keySig" | "meterSig";
 
 export type ActionMetadata = {
@@ -113,13 +117,20 @@ export type EditActionParam =
     | EditActionPropertiesParam
     | EditActionResetCursorParam
     | EditActionResetCursorContainerParam
-    | EditActionScoreDefinitionParam
+    | EditActionGetScoreDefKeySigParam
+    | EditActionSetScoreDefKeySigParam
+    | EditActionGetScoreDefMeterSigParam
+    | EditActionSetScoreDefMeterSigParam
+    | EditActionGetScoreDefStaffGrpParam
+    | EditActionSetScoreDefStaffGrpParam
+    | EditActionSetScoreDefParam
+    | EditActionSetScoreDefStaffDefParam
     | EditActionSelectParam
     | EditActionSetParam
     | EditActionSetCursorParam
     | EditActionUpdateCursorParam
     | EditActionUpdatePitchParam
-    | EditActionUpdateScoreDefinitionParam;
+    | EditActionUpdateScoreDefParam;
 
 export type EditAction =
     | EditActionChain
@@ -141,14 +152,23 @@ export type EditAction =
     | EditActionRedo 
     | EditActionResetCursor
     | EditActionResetCursorContainer
-    | EditActionScoreDefinition
+    | EditActionGetScoreDef
+    | EditActionSetScoreDef
+    | EditActionGetScoreDefKeySig
+    | EditActionSetScoreDefKeySig
+    | EditActionGetScoreDefMeterSig
+    | EditActionSetScoreDefMeterSig
+    | EditActionGetScoreDefStaffGrp
+    | EditActionSetScoreDefStaffGrp
+    | EditActionGetScoreDefStaffDef
+    | EditActionSetScoreDefStaffDef
     | EditActionSelect
     | EditActionSet
     | EditActionSetCursor
     | EditActionUndo
     | EditActionUpdateCursor
     | EditActionUpdatePitch
-    | EditActionUpdateScoreDefinition;
+    | EditActionUpdateScoreDef;
 
 // Actions
 
@@ -245,9 +265,54 @@ export type EditActionResetCursorContainer = {
     param: EditActionResetCursorContainerParam;
 };
 
-export type EditActionScoreDefinition = {
-    action: "scoreDefinition";
-    param: EditActionScoreDefinitionParam;
+export type EditActionGetScoreDef = {
+    action: "getScoreDef";
+    param: {}
+};
+
+export type EditActionSetScoreDef = {
+    action: "setScoreDef";
+    param: EditActionSetScoreDefParam;
+};
+
+export type EditActionGetScoreDefKeySig = {
+    action: "getScoreDefKeySig";
+    param: EditActionGetScoreDefKeySigParam;
+};
+
+export type EditActionSetScoreDefKeySig = {
+    action: "setScoreDefKeySig";
+    param: EditActionSetScoreDefKeySigParam;
+};
+
+export type EditActionGetScoreDefMeterSig = {
+    action: "getScoreDefMeterSig";
+    param: EditActionGetScoreDefMeterSigParam;
+};
+
+export type EditActionSetScoreDefMeterSig = {
+    action: "setScoreDefMeterSig";
+    param: EditActionSetScoreDefMeterSigParam;
+};
+
+export type EditActionGetScoreDefStaffGrp = {
+    action: "getScoreDefStaffGrp";
+    param: EditActionGetScoreDefStaffGrpParam;
+};
+
+export type EditActionSetScoreDefStaffGrp = {
+    action: "setScoreDefStaffGrp";
+    param: EditActionSetScoreDefStaffGrpParam;
+};
+
+export type EditActionGetScoreDefStaffDef = {
+    action: "getScoreDefStaffDef";
+    param: {}
+};
+
+export type EditActionSetScoreDefStaffDef = {
+    action: "setScoreDefStaffDef";
+    param: EditActionSetScoreDefStaffDefParam;
 };
 
 export type EditActionSelect = {
@@ -275,9 +340,9 @@ export type EditActionUpdatePitch = {
     param: EditActionUpdatePitchParam;
 };
 
-export type EditActionUpdateScoreDefinition = {
-    action: "updateScoreDefinition";
-    param: EditActionUpdateScoreDefinitionParam;
+export type EditActionUpdateScoreDef = {
+    action: "updateScoreDef";
+    param: EditActionUpdateScoreDefParam;
 };
 
 // ActionParams
@@ -379,8 +444,39 @@ export type EditActionResetCursorContainerParam = {
     container: "tuplet" | "beam" | "graceGrp";
 };
 
-export type EditActionScoreDefinitionParam = {
-    level: ScoreDefinitionUpdate;
+export type EditActionGetScoreDefKeySigParam = {
+    selected?: boolean;
+};
+
+export type EditActionSetScoreDefKeySigParam = {
+    subTree: TreeNodeData;
+    selected?: boolean;
+};
+
+export type EditActionGetScoreDefMeterSigParam = {
+    selected?: boolean;
+};
+
+export type EditActionSetScoreDefMeterSigParam = {
+    subTree: TreeNodeData;
+    selected?: boolean;
+};
+
+export type EditActionGetScoreDefStaffGrpParam = {
+    selected?: boolean;
+};
+
+export type EditActionSetScoreDefStaffGrpParam = {
+    subTree: TreeNodeData;
+    selected?: boolean;
+};
+
+export type EditActionSetScoreDefParam = {
+    subTree: TreeNodeData;
+};
+
+export type EditActionSetScoreDefStaffDefParam = {
+    subTree: TreeNodeData;
 };
 
 export type EditActionSelectParam = {
@@ -422,20 +518,17 @@ export type EditActionUpdatePitchParam = {
     midi?: number;
 }
 
-export type EditActionUpdateScoreDefinitionParam = {
-    subTree?: TreeNodeData;
+export type EditActionUpdateScoreDefParam = {
+    elementId?: string;
+    top?: string;
+    bottom?: string;
     update:
-        | "scoreDef"
-        | "staffGrp"
-        | "staffDef"
-        | "keySig"
-        | "meterSig"
-        | "add-staff-above"
-        | "add-staff-below"
-        | "delete-staff"
-        | "move-staff-up"
-        | "move-staff-down"
-        | "add-staff-group"
-        | "remove-staff-group"
-        | "edit-staff-group";
+        | "insertAbove"
+        | "insertBelow"
+        | "deleteStaff"
+        | "moveUp"
+        | "moveDown"
+        | "addStaffGroup"
+        | "removeStaffGroup"
+        | "editStaffDefinition";
 };

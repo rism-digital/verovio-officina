@@ -58,6 +58,23 @@ export const actionCatalog = {
             action: "delete",
         },
     ],
+    scoreDef: [
+        {
+            name: "Staff group properties",
+            action: "open-staff-groups",
+            appAction: "open-staff-groups",
+        },
+        {
+            name: "Key signature",
+            action: "open-key-signature",
+            appAction: "open-key-signature",
+        },
+        {
+            name: "Meter signature",
+            action: "open-meter-signature",
+            appAction: "open-meter-signature",
+        },
+    ],
     staff: [
         
         {
@@ -99,7 +116,7 @@ export const actionCatalog = {
         },
         {
             name: "Edit staff definition",
-            action: "edit-staff-group",
+            action: "edit-staff-definition",
             appAction: "open-staff-def",
         },
     ],
@@ -173,11 +190,29 @@ export const menuActions = [
 ]
 
 export const actionDefinitions = {
+    "open-staff-groups": {
+        action: "getScoreDefStaffGrp",
+        param: {
+            selected: true,
+        },
+    },
+    "open-key-signature": {
+        action: "getScoreDefKeySig",
+        param: {
+            selected: true,
+        },
+    },
+    "open-meter-signature": {
+        action: "getScoreDefMeterSig",
+        param: {
+            selected: true,
+        },
+    },
     "add-staff-above": {
         action: "chain",
         param: [
             {
-                action: "updateScoreDefinition",
+                action: "updateScoreDef",
                 param: {
                     update: "insertAbove",
                     elementId: "[selection-id]",
@@ -192,7 +227,7 @@ export const actionDefinitions = {
         action: "chain",
         param: [
             {
-                action: "updateScoreDefinition",
+                action: "updateScoreDef",
                 param: {
                     update: "insertBelow",
                     elementId: "[selection-id]",
@@ -207,7 +242,7 @@ export const actionDefinitions = {
         action: "chain",
         param: [
             {
-                action: "updateScoreDefinition",
+                action: "updateScoreDef",
                 param: {
                     update: "deleteStaff",
                     elementId: "[selection-id]",
@@ -218,26 +253,14 @@ export const actionDefinitions = {
             },
         ],
     },
-    "edit-staff-group": {
-        action: "chain",
-        param: [
-            {
-                action: "scoreDef",
-                param: {
-                    elementId: "[selection-id]",
-                    operation: "edit-staff-group",
-                },
-            },
-            {
-                action: "commit",
-            },
-        ],
+    "edit-staff-definition": {
+        action: "getStaffDef",
     },
     "move-staff-up": {
         action: "chain",
         param: [
             {
-                action: "updateScoreDefinition",
+                action: "updateScoreDef",
                 param: {
                     update: "moveUp",
                     elementId: "[selection-id]",
@@ -252,7 +275,7 @@ export const actionDefinitions = {
         action: "chain",
         param: [
             {
-                action: "updateScoreDefinition",
+                action: "updateScoreDef",
                 param: {
                     update: "moveDown",
                     elementId: "[selection-id]",
@@ -267,9 +290,9 @@ export const actionDefinitions = {
         action: "chain",
         param: [
             {
-                action: "scoreDef",
+                action: "updateScoreDef",
                 param: {
-                    operation: "add-staff-group",
+                    update: "addStaffGroup",
                     top: "[selection-id]",
                     bottom: "[selection-secondary-id]",
                 },
@@ -283,9 +306,9 @@ export const actionDefinitions = {
         action: "chain",
         param: [
             {
-                action: "scoreDef",
+                action: "updateScoreDef",
                 param: {
-                    operation: "remove-staff-group",
+                    update: "removeStaffGroup",
                     elementId: "[selection-id]",
                 },
             },

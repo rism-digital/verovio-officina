@@ -11,6 +11,7 @@
     export let canZoomOut = true;
     export let canGoPrev = false;
     export let canGoNext = false;
+    export let canScoreDef = true;
     export let xmlMode = false;
     export let viewMode: ViewMode = "page";
 
@@ -91,7 +92,7 @@
         <div class="vrv-menu-content">
             <div class="vrv-v-separator"></div>
             <div
-                class="vrv-menu-text"
+                class="vrv-menu-text {canScoreDef ? '' : 'disabled'}"
                 data-before="Staff group properties"
                 role="menuitem"
                 tabindex="0"
@@ -100,7 +101,7 @@
                     handleMenuItemKeydown(event, onStaffGroups)}
             ></div>
             <div
-                class="vrv-menu-text"
+                class="vrv-menu-text {canScoreDef ? '' : 'disabled'}"
                 data-before="Key signature"
                 role="menuitem"
                 tabindex="0"
@@ -109,7 +110,7 @@
                     handleMenuItemKeydown(event, onKeySig)}
             ></div>
             <div
-                class="vrv-menu-text"
+                class="vrv-menu-text  {canScoreDef ? '' : 'disabled'}"
                 data-before="Meter signature"
                 role="menuitem"
                 tabindex="0"
@@ -126,30 +127,6 @@
                 on:keydown={(event) =>
                     handleMenuItemKeydown(event, onHeaderFooter)}
             ></div>
-            <div class="vrv-v-separator"></div>
-            <div class="vrv-submenu">
-                <div
-                    class="vrv-submenu-text disabled"
-                    data-before="Score redefinition"
-                ></div>
-                <div class="vrv-submenu-content">
-                    <div class="vrv-menu-text" data-before="Staff group"></div>
-                    <div
-                        class="vrv-menu-text"
-                        data-before="Staff definition"
-                    ></div>
-                    <div
-                        class="vrv-menu-text"
-                        data-before="Key signature"
-                        role="menuitem"
-                    ></div>
-                    <div
-                        class="vrv-menu-text"
-                        data-before="Time signature"
-                        role="menuitem"
-                    ></div>
-                </div>
-            </div>
         </div>
     </div>
     <div class="vrv-menu">

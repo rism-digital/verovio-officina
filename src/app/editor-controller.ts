@@ -156,11 +156,10 @@ export class EditorController {
     async applyScoreDefFromDialog(
         subTree: TreeNodeData,
         update: ScoreDefinitionUpdate,
+        selected = false,
     ): Promise<boolean> {
-        const ok = await this.vrvEdit({
-            action: "updateScoreDefinition",
-            param: { subTree, update },
-        }, "Failed to apply scoreDef");
+        const editAction = this.getSetScoreDefAction(subTree, update, selected);
+        const ok = await this.vrvEdit(editAction, "Failed to apply scoreDef");
         if (!ok) {
             return false;
         }
@@ -230,13 +229,13 @@ export class EditorController {
 
     async getSubTreeForPropDialog(
         level: ScoreDefinitionUpdate,
+        selected = false,
     ): Promise<TreeNodeData | null> {
         try {
-            const scoreDefinitionOk = await this.vrvEdit({
-                action: "scoreDefinition",
-                param: { level },
-            }, "Failed to load scoreDef");
-            if (!scoreDefinitionOk) {
+            const editAction = this.getScoreDefAction(level, selected);
+            console.log(editAction);
+            const scoreDefOk = await this.vrvEdit(editAction, "Failed to load scoreDef");
+            if (!scoreDefOk) {
                 return null;
             }
             const subTree = await this.bridge.verovio.editResponseScoreDef();
@@ -246,6 +245,70 @@ export class EditorController {
             console.error("Failed to load sub tree", error);
             this.stores.workerBusy.set(false);
             return null;
+        }
+    }
+
+    private getScoreDefAction(level: ScoreDefinitionUpdate, selected: boolean): EditAction {
+        switch (level) {
+            case "scoreDef":
+                return { 
+                    action: "getScoreDef",
+                    param: {},
+                };
+            case "staffGrp":
+                return {
+                    action: "getScoreDefStaffGrp",
+                    param: { selected },
+                };
+            case "keySig":
+                return {
+                    action: "getScoreDefKeySig",
+                    param: { selected },
+                };
+            case "meterSig":
+                return {
+                    action: "getScoreDefMeterSig",
+                    param: { selected },
+                };
+            case "staffDef":
+                return {
+                    action: "getScoreDefStaffDef",
+                    param: {},
+                };
+        }
+    }
+
+    private getSetScoreDefAction(
+        subTree: TreeNodeData,
+        update: ScoreDefinitionUpdate,
+        selected: boolean,
+    ): EditAction {
+        switch (update) {
+            case "scoreDef":
+                return {
+                    action: "setScoreDef",
+                    param: { subTree },
+                };
+            case "staffGrp":
+                return {
+                    action: "setScoreDefStaffGrp",
+                    param: { subTree, selected },
+                };
+            case "keySig":
+                return {
+                    action: "setScoreDefKeySig",
+                    param: { subTree, selected },
+                };
+            case "meterSig":
+                return {
+                    action: "setScoreDefMeterSig",
+                    param: { subTree, selected },
+                };
+            case "staffDef":
+                return {
+                    action: "setScoreDefStaffDef",
+                    param: { subTree },
+                };
         }
     }
 
