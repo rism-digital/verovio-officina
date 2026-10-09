@@ -8,6 +8,14 @@ export const actionCatalog = {
             name: "Insert one measure after",
             action: "add-measure-after",
         },
+        {
+            name: "Insert score definition before",
+            action: "add-score-definition-before",
+        },
+        {
+            name: "Insert score definition after",
+            action: "add-score-definition-after",
+        },
     ],
     note: [
         {
@@ -105,14 +113,11 @@ export const actionCatalog = {
         },
         {
             name: "Add staff group",
-            action: "add-staff-group",
+            action: "add-staff-group-disabled",
         },
         {
             name: "Remove staff group",
-            action: "remove-staff-group",
-        },
-        {
-            separator: true,
+            action: "remove-staff-group-diabled",
         },
         {
             name: "Edit staff definition",
@@ -751,6 +756,36 @@ export const actionDefinitions = {
         param: [
             {
                 action: "insertMeasure",
+                param: {
+                    elementId: "[selection-id]",
+                    number: 1,
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "add-score-definition-before": {
+        action: "chain",
+        param: [
+            {
+                action: "insertScoreDef",
+                param: {
+                    elementId: "[selection-id]",
+                    insertBefore: true,
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "add-score-definition-after": {
+        action: "chain",
+        param: [
+            {
+                action: "insertScoreDef",
                 param: {
                     elementId: "[selection-id]",
                     number: 1,

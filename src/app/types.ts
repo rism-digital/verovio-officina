@@ -110,6 +110,7 @@ export type EditActionParam =
     | EditActionInsertCursorByTypeParam
     | EditActionInsertCursorContainerParam
     | EditActionInsertMeasureParam
+    | EditActionInsertScoreDefParam
     | EditActionInsertNoteParam
     | EditActionInsertRestParam
     | EditActionKeyDownParam
@@ -224,6 +225,11 @@ export type EditActionInsertCursorContainer = {
 export type EditActionInsertMeasure = {
     action: "insertMeasure";
     param: EditActionInsertMeasureParam;
+};
+
+export type EditActionInsertScoreDef = {
+    action: "insertScoreDef";
+    param: EditActionInsertScoreDefParam;
 };
 
 export type EditActionInsertNote = {
@@ -398,6 +404,11 @@ export type EditActionInsertCursorContainerParam = {
 export type EditActionInsertMeasureParam = {
     elementId?: string;
     number: number;
+    insertBefore?: boolean;
+};
+
+export type EditActionInsertScoreDefParam = {
+    elementId?: string;
     insertBefore?: boolean;
 };
 
