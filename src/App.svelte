@@ -714,6 +714,7 @@
         <MainPanel
             view={$viewModel}
             viewMode={$userPreferences.viewMode}
+            zoom={$userPreferences.zoom}
             selection={$editStatus.selection}
             insertMode={$editStatus.insertMode}
             pianoKeyboardEnabled={$userPreferences.pianoKeyboardEnabled}
@@ -727,6 +728,7 @@
             onTextParentDoubleClick={(id) => controller.vrvSelectCustom(id, "textParent")}
             onAttributeEdit={(param, commit) =>
                 controller.vrvSet(param, commit)}
+            onElementDrag={(param) => controller.vrvDrag(param)}
             onTargetedContextAction={handleTargetedContextAction}
             editResponseContent={$editResponseContent}
             {rngMEIAll}

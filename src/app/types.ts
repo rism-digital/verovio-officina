@@ -1,6 +1,9 @@
 export type SelectElementHandler = (id: string) => void | Promise<void>;
 export type HoverElementHandler = (id: string | null) => void;
 export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) => void;
+export type EditActionDragHandler = (
+    param: EditActionDragParam,
+) => void | Promise<void>;
 export type ActionHandler = () => void;
 
 export type ActionValueType = "text" | "number";
@@ -103,6 +106,7 @@ export type EditActionParam =
     | EditActionChainParam
     | EditActionContextParam
     | EditActionDeleteParam
+    | EditActionDragParam
     | EditActionInsertParam
     | EditActionInsertControlParam
     | EditActionInsertCursorByDurParam
@@ -138,6 +142,7 @@ export type EditAction =
     | EditActionCommit
     | EditActionContext
     | EditActionDelete
+    | EditActionDrag
     | EditActionInsert
     | EditActionInsertControl
     | EditActionInsertCursorByDur
@@ -190,6 +195,11 @@ export type EditActionContext = {
 export type EditActionDelete = {
     action: "delete";
     param: EditActionDeleteParam;
+};
+
+export type EditActionDrag = {
+    action: "drag";
+    param: EditActionDragParam;
 };
 
 export type EditActionInsert = {
@@ -363,6 +373,16 @@ export type EditActionDeleteParam = {
     elementId: string;   
     backspace?: boolean;
 }
+
+export type EditActionDragParam =
+    | { phase: "start" }
+    | { phase: "move"; dx: number; dy: number }
+    | { phase: "end" };
+
+export type EditActionDragMoveParam = Extract<
+    EditActionDragParam,
+    { phase: "move" }
+>;
 
 export type EditActionInsertParam = {
     elementName: string;

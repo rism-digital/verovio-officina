@@ -2,6 +2,7 @@ import { get, type Writable } from "svelte/store";
 import { actionDefinitions } from "./actions/action.bundle";
 import type {
     EditActionSetParam,
+    EditActionDragParam,
     EditResponseContent,
     EditAction,
     EditStatus,
@@ -746,6 +747,26 @@ export class EditorController {
         await this.vrvApplyEditLayout(true);
         this.markDocumentChanged();
         await this.vrvRefreshStatusAndSelectChainedId();
+    }
+
+    async vrvDrag(param: EditActionDragParam): Promise<void> {
+        const ok = await this.vrvEdit({
+            action: "drag",
+            param,
+        }, "Failed to drag the selected element");
+        if (!ok) return;
+
+        if (param.phase === "start") return;
+
+        const commit = param.phase === "end";
+        await this.vrvApplyEditLayout(commit);
+        if (commit) {
+            this.markDocumentChanged();
+        }
+        await this.vrvRefreshStatus();
+        if (commit) {
+            await this.vrvRefreshContextFromSelection();
+        }
     }
 
     private async vrvCursorContainer(

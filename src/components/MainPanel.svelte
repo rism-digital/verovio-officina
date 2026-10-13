@@ -5,6 +5,8 @@
     import { withBaseUrl } from "../app/asset-url";
     import type {
         Action,
+        EditActionDragHandler,
+        EditActionDragMoveParam,
         EditActionSetParam,
         EditActionSetHandler,
         EditResponseContent,
@@ -19,6 +21,7 @@
 
     export let view: ViewModel;
     export let viewMode: ViewMode = "page";
+    export let zoom = 100;
     export let selection: EditStatus["selection"] = null;
     export let insertMode = false;
     export let pianoKeyboardEnabled = false;
@@ -29,6 +32,7 @@
     export let onNoteDoubleClick: SelectElementHandler | null = null;
     export let onTextParentDoubleClick: SelectElementHandler | null = null;
     export let onAttributeEdit: EditActionSetHandler | null = null;
+    export let onElementDrag: EditActionDragHandler | null = null;
     export let onPianoKeyboardOctaveChange: ((octave: number) => void | Promise<void>) | null = null;
     export let onPianoKeyboardMidiSelect: ((midi: number) => void | Promise<void>) | null = null;
     export let onTargetedContextAction: TargetedContextActionHandler | null = null;
@@ -70,6 +74,15 @@
         targetId: string;
         targetElement: string;
     } | null = null;
+    let dragState: {
+        startX: number;
+        startY: number;
+        scale: number;
+        moved: boolean;
+    } | null = null;
+    let pendingDragParam: EditActionDragMoveParam | null = null;
+    let dragStartPromise: Promise<void> | null = null;
+    let liveDragPromise: Promise<void> | null = null;
 
     function emitSize(width: number, height: number) {
         if (!onResize) return;
@@ -107,6 +120,7 @@
     onDestroy(() => {
         resizeObserver?.disconnect();
         resizeObserver = null;
+        cancelDrag();
         if (resizeTimer) {
             clearTimeout(resizeTimer);
             resizeTimer = null;
@@ -248,6 +262,94 @@
         return null;
     }
 
+    function dragDelta(
+        event: MouseEvent,
+        state: NonNullable<typeof dragState>,
+    ): EditActionDragMoveParam {
+        return {
+            phase: "move",
+            dx: (event.clientX - state.startX) / state.scale,
+            dy: (event.clientY - state.startY) / state.scale,
+        };
+    }
+
+    async function flushLiveDrag() {
+        await dragStartPromise;
+        while (pendingDragParam) {
+            const param = pendingDragParam;
+            pendingDragParam = null;
+            await onElementDrag?.(param);
+        }
+        liveDragPromise = null;
+    }
+
+    function queueLiveDrag(param: EditActionDragMoveParam) {
+        pendingDragParam = param;
+        dragStartPromise ??= Promise.resolve(
+            onElementDrag?.({ phase: "start" }),
+        );
+        if (!liveDragPromise) {
+            liveDragPromise = flushLiveDrag();
+        }
+    }
+
+    function onSelectedElementDrag(event: MouseEvent) {
+        if (!dragState) return;
+        event.preventDefault();
+        const param = dragDelta(event, dragState);
+        dragState.moved ||= param.dx !== 0 || param.dy !== 0;
+        console.log("Drag delta", param.dx, param.dy);
+        if (dragState.moved) {
+            queueLiveDrag(param);
+        }
+    }
+
+    function removeDragListeners() {
+        dragState = null;
+        window.removeEventListener("mousemove", onSelectedElementDrag);
+        window.removeEventListener("mouseup", finishDrag);
+    }
+
+    function cancelDrag() {
+        const wasDragging = dragStartPromise !== null;
+        removeDragListeners();
+        pendingDragParam = null;
+        if (wasDragging) {
+            const precedingActions = liveDragPromise ?? dragStartPromise ?? Promise.resolve();
+            void precedingActions.then(() => onElementDrag?.({ phase: "end" }));
+        }
+        dragStartPromise = null;
+    }
+
+    async function finishDrag(event: MouseEvent) {
+        const completedDrag = dragState;
+        if (!completedDrag) return;
+        const param = dragDelta(event, completedDrag);
+        const moved = completedDrag.moved
+            || param.dx !== 0
+            || param.dy !== 0;
+        removeDragListeners();
+        if (!moved) return;
+        dragStartPromise ??= Promise.resolve(
+            onElementDrag?.({ phase: "start" }),
+        );
+        await (liveDragPromise ?? dragStartPromise);
+        await onElementDrag?.(param);
+        await onElementDrag?.({ phase: "end" });
+        dragStartPromise = null;
+    }
+
+    function startDrag(event: MouseEvent) {
+        dragState = {
+            startX: event.clientX,
+            startY: event.clientY,
+            scale: Math.max(zoom, 1) / 100,
+            moved: false,
+        };
+        window.addEventListener("mousemove", onSelectedElementDrag);
+        window.addEventListener("mouseup", finishDrag);
+    }
+
     async function onSVGOverlayMouseDown(event: MouseEvent) {
         event.stopPropagation();
 
@@ -256,8 +358,22 @@
             return;
         }
 
+        const target = <SVGElement>event.target;
+        const draggableNode = getClosestMEIElement(target, ["note", "rest"]);
+        const draggableSelection =
+            !insertMode
+            && event.button === 0
+            && !event.shiftKey
+            && selection?.id === draggableNode?.id
+            && (selection?.element === "note" || selection?.element === "rest");
+        if (draggableSelection && draggableNode) {
+            closeOverlayContextMenu();
+            startDrag(event);
+            return;
+        }
+
         // Get MEI element
-        let node: SVGGElement | null = getClosestMEIElement(<SVGElement>event.target);
+        let node: SVGGElement | null = getClosestMEIElement(target);
         if (!node || !node.id) {
             return; // this should never happen, but as a safety
         }
