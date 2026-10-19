@@ -414,7 +414,7 @@ export type EditActionInsertCursorByPitchParam = {
 };
 
 export type EditActionInsertCursorByTypeParam = {
-    type: "copy" | "tie" | "rest";
+    type: "copy" | "tie" | "rest" | "note";
 };
 
 export type EditActionInsertCursorContainerParam = {
@@ -524,7 +524,7 @@ export type EditActionSetParam = {
 
 export type EditActionSetCursorParam = {
     elementId?: string;
-    inputMode: "pitchFirst" | "durationFirst";
+    inputMode: "pitchFirst" | "durationFirst" | "combined";
     chordMode: boolean;
     restMode?: boolean;
     autoBeam: boolean;

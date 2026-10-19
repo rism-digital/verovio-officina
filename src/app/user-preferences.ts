@@ -11,7 +11,9 @@ import {
 const USER_PREFERENCES_STORAGE_KEY = "verovio-user-preferences";
 
 function isInputMode(value: unknown): value is InputMode {
-    return value === "pitchFirst" || value === "durationFirst";
+    return value === "pitchFirst"
+        || value === "durationFirst"
+        || value === "combined";
 }
 
 function isViewMode(value: unknown): value is ViewMode {

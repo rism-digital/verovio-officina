@@ -2,12 +2,13 @@ Verovio Officina lets you edit a score directly from the notation view. For the 
 
 ### Insert Modes
 
-There are two insert modes. They use the same editing commands, but in a different order.
+There are three insert modes. They use the same editing commands, but in a different order.
 
 | Mode | How it works |
 | --- | --- |
 | Duration first | Choose the duration first, then enter a pitch or rest. This is useful when writing rhythmic patterns. |
 | Pitch first | Choose the pitch first, then adjust the duration. This is useful when entering melodic lines from the keyboard. |
+| Combined | Choose the pitch and adjust the duration in any order, then enter the note with `Tab` – or rest with `Space`. |
 
 The insert mode is activated with `Enter`.
 
@@ -69,13 +70,29 @@ In pitch-first mode, choose the pitch first, then use the duration keys to updat
 | `Shift+=` | Set the cursor to copy mode. |
 | `1` to `7` | Insert a note with the selected pitch or a rest. |
 
+### Combined Mode
+
+In combined mode, duration and pitch changes update the cursor without inserting. Use an explicit insertion key once the cursor has the desired values.
+
+| Shortcut | Action |
+| --- | --- |
+| `1` to `7` | Select the cursor duration. |
+| `A` to `G` | Select the cursor pitch. |
+| Piano keys | Select the cursor pitch when the piano keyboard is enabled. |
+| `.` | Toggle the cursor duration dot. |
+| `+`, `-`, or `*` | Set the cursor accidental. |
+| `Tab` | Insert a note with the cursor values. |
+| `Space` | Insert a rest with the cursor values. |
+| `=` | Copy the current note or chord and add a tie. |
+| `Shift+=` | Copy the current note or chord without adding a tie. |
+
 ### Chord Mode
 
-Chord mode can be activated with `Enter` once in insert mode, or with `Shift-Enter` to edit an existing note or chord. Moving to the insertion of the next chord is done by pressing `ArrowRight` in pitch-first mode, and `Enter` in duration-first mode. In both insert modes, pressing `Esc` moves to the next insertion and leaves chord mode.
+Chord mode can be activated with `Enter` once in insert mode, or with `Shift-Enter` to edit an existing note or chord. Moving to the insertion of the next chord is done by pressing `ArrowRight` in pitch-first mode, `Enter` in duration-first mode, or `Tab` in combined mode. In all input modes, pressing `Esc` moves to the next insertion and leaves chord mode.
 
 ### Ties and Chord Copy
 
-When on a chord in insert mode, pressing `=` will enter a tied chord with the current duration in duration-first insert mode, or change the cursor to tie in pitch-first. Pressing `Shift-=` does the same but without adding the ties to the chord copy.
+When on a chord in insert mode, pressing `=` will enter a tied chord with the current duration in duration-first or combined mode, or change the cursor to tie in pitch-first mode. Pressing `Shift-=` does the same but without adding the ties to the chord copy.
 
 ### Containers
 

@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 import type { EditResponseContent, EditStatus, ViewModel } from './types';
 
-export type InputMode = 'pitchFirst' | 'durationFirst';
+export type InputMode = 'pitchFirst' | 'durationFirst' | 'combined';
 export type ViewMode = 'page' | 'responsive';
 export type PianoKeyboardMode = 'flat' | 'auto' | 'sharp';
 

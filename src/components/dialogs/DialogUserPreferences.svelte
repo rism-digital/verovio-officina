@@ -40,6 +40,7 @@
         <select class="vrv-dialog-input" bind:value={inputMode}>
             <option value="durationFirst">Duration first</option>
             <option value="pitchFirst">Pitch first</option>
+            <option value="combined">Combined</option>
         </select>
     </div>
 </Dialog>

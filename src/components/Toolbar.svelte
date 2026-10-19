@@ -117,6 +117,16 @@
                 on:click={() => onInputModeChange("pitchFirst")}
                 on:keydown={(event) => handleButtonKeydown(event, () => onInputModeChange("pitchFirst"))}
             ></div>
+            <div
+                class="vrv-btn-icon-large vrv-toggleable {inputMode === 'combined' ? 'toggled' : ''} {insertMode ? 'disabled' : ''}"
+                style={`background-image: url("/icons/toolbar/input-combined.png");`}
+                role="button"
+                tabindex="0"
+                aria-pressed={inputMode === "combined"}
+                aria-disabled={insertMode}
+                on:click={() => onInputModeChange("combined")}
+                on:keydown={(event) => handleButtonKeydown(event, () => onInputModeChange("combined"))}
+            ></div>
         </div>
         <div class="vrv-h-separator"></div>
         <div

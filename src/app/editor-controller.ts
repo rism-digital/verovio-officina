@@ -503,7 +503,8 @@ export class EditorController {
     }
 
     async handlePitchAccidentalMode(accid: "s" | "f" | "n"): Promise<void> {
-        if (get(this.stores.userPreferences).pianoKeyboardEnabled) {
+        const { inputMode, pianoKeyboardEnabled } = get(this.stores.userPreferences);
+        if (pianoKeyboardEnabled && inputMode !== "combined") {
             this.stores.pianoKeyboardMode.set(
                 accid === "s" ? "sharp" : accid === "f" ? "flat" : "auto",
             );
@@ -561,7 +562,7 @@ export class EditorController {
     async handleSpace(): Promise<void> {
         const editStatus = get(this.stores.editStatus);
         const inputMode = get(this.stores.userPreferences).inputMode;
-        if (editStatus.insertMode && inputMode === "durationFirst" && !editStatus.insertion?.chordMode) {
+        if (editStatus.insertMode && inputMode !== "pitchFirst" && !editStatus.insertion?.chordMode) {
             await this.vrvInsertCursorByType("rest");
             return;
         }
@@ -574,7 +575,7 @@ export class EditorController {
         const inputMode = get(this.stores.userPreferences).inputMode;
         if (!editStatus.insertMode || !selection?.id) return;
 
-        if (inputMode === "durationFirst") {
+        if (inputMode !== "pitchFirst") {
             await this.vrvInsertCursorByType(insertType);
             return;
         }
@@ -732,11 +733,11 @@ export class EditorController {
         }
     }
 
-    async vrvInsertCursorByType(type: "rest" | "copy" | "tie"): Promise<void> {
+    async vrvInsertCursorByType(type: "rest" | "copy" | "tie" | "note"): Promise<void> {
         const selection = get(this.stores.editStatus).selection;
         const insertMode = get(this.stores.editStatus).insertMode;
-        const durationFirst = get(this.stores.userPreferences).inputMode === "durationFirst";
-        if (!selection?.id || !insertMode || !durationFirst) return;
+        const inputMode = get(this.stores.userPreferences).inputMode;
+        if (!selection?.id || !insertMode || inputMode === "pitchFirst") return;
 
         const param: EditActionInsertCursorByTypeParam = { type };
         const ok = await this.vrvEdit({

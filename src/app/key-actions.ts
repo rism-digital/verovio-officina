@@ -1,5 +1,6 @@
 import type { EditorController } from "./editor-controller";
 import { pianoKeyboardShortcuts } from "./piano-keyboard";
+import type { InputMode } from "./state";
 
 export type KeyShortcutContext = {
     event: KeyboardEvent;
@@ -16,6 +17,8 @@ export type KeyShortcut = {
     primaryKey?: boolean;
     shiftKey?: boolean;
     requiresSelection?: boolean;
+    requiresInsertMode?: boolean;
+    inputModes?: InputMode[];
     run: KeyShortcutHandler;
 };
 
@@ -286,6 +289,13 @@ export function createKeyShortcuts(
             key: "Space",
             requiresSelection: true,
             run: async () => controller.handleSpace(),
+        },
+        {
+            key: "Tab",
+            requiresSelection: true,
+            requiresInsertMode: true,
+            inputModes: ["combined"],
+            run: async () => controller.vrvInsertCursorByType("note"),
         },
         {
             key: "Equal",

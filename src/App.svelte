@@ -270,8 +270,14 @@
         const shortcut = shortcutByKey.get(keyShortcutMapFromEvent(event));
         if (!shortcut) return;
         if (!canHandleGlobalShortcut(event)) return;
-        const currentSelection = get(editStatus).selection;
+        const currentEditStatus = get(editStatus);
+        const currentSelection = currentEditStatus.selection;
         if (shortcut.requiresSelection && !currentSelection?.id) return;
+        if (shortcut.requiresInsertMode && !currentEditStatus.insertMode) return;
+        if (
+            shortcut.inputModes
+            && !shortcut.inputModes.includes(get(userPreferences).inputMode)
+        ) return;
         event.preventDefault();
         if (get(workerBusy)) return;
         await shortcut.run({
