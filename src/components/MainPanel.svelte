@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onDestroy, onMount, tick } from "svelte";
     import ContextMenu from "./ContextMenu.svelte";
+    import ContextPanel from "./ContextPanel.svelte";
     import SidePanel from "./SidePanel.svelte";
     import { withBaseUrl } from "../app/asset-url";
     import type {
@@ -504,5 +505,6 @@
                 ></Keyboard>
             {/if}
         </div>
+        <ContextPanel />
     </div>
 </div>

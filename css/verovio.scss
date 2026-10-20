@@ -241,6 +241,39 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             overflow: hidden;
         }
 
+        .vrv-context-panel {
+            min-width: $editor-tool-panel-width;
+            max-width: $editor-tool-panel-width;
+            background: $background;
+            padding: 8px;
+            border-left: 2px solid $background;
+            color: $text-color;
+
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+
+            .vrv-legend > button.icon {
+                appearance: none;
+                background: transparent;
+                border: 0;
+                color: inherit;
+                cursor: pointer;
+                font: inherit;
+                padding: 0;
+            }
+
+            .vrv-context-toolbar {
+                min-height: $btn-height;
+            }
+
+            .vrv-context-toolbar-section {
+                flex-grow: 0;
+            }
+        }
+
         .vrv-v-split {
             display: flex;
             flex-direction: column;
