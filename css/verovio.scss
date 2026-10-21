@@ -274,7 +274,9 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             }
 
             .vrv-context-toolbar-section {
-                flex-grow: 0;
+                flex: 0 0 auto;
+                min-height: 0;
+                overflow: visible;
             }
 
             .vrv-context-tool-button {

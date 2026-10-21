@@ -127,6 +127,27 @@ export const actionCatalog = {
     ],
 };
 
+const articulations = [
+    { name: "Accent", action: "add-articulation-acc", icon: "icons/editor/artic-E4A0.png" },
+    { name: "Soft accent", action: "add-articulation-acc-soft", icon: "icons/editor/artic-ED40.png" },
+    { name: "Staccato", action: "add-articulation-stacc", icon: "icons/editor/artic-E4A2.png" },
+    { name: "Tenuto", action: "add-articulation-ten", icon: "icons/editor/artic-E4A4.png" },
+    { name: "Staccatissimo", action: "add-articulation-stacciss", icon: "icons/editor/artic-E4A8.png" },
+    { name: "Marcato", action: "add-articulation-marc", icon: "icons/editor/artic-E4AC.png" },
+    { name: "Spiccato", action: "add-articulation-spicc", icon: "icons/editor/artic-E4A6.png" },
+    { name: "Down bow", action: "add-articulation-dnbow", icon: "icons/editor/artic-E610.png" },
+    { name: "Up bow", action: "add-articulation-upbow", icon: "icons/editor/artic-E612.png" },
+    { name: "Harmonic", action: "add-articulation-harm", icon: "icons/editor/artic-E614.png" },
+    { name: "Snap pizzicato", action: "add-articulation-snap", icon: "icons/editor/artic-E631.png" },
+    { name: "Fingernail", action: "add-articulation-fingernail", icon: "icons/editor/artic-E636.png" },
+    { name: "Damp", action: "add-articulation-damp", icon: "icons/editor/artic-E638.png" },
+    { name: "Damp all", action: "add-articulation-dampall", icon: "icons/editor/artic-E639.png" },
+    { name: "Open", action: "add-articulation-open", icon: "icons/editor/artic-E5E7.png" },
+    { name: "Stopped", action: "add-articulation-stop", icon: "icons/editor/artic-E5E5.png" },
+    { name: "Left-hand pizzicato", action: "add-articulation-lhpizz", icon: "icons/editor/artic-E633.png" },
+    { name: "Stroke", action: "add-articulation-stroke", icon: "icons/editor/artic-E4AA.png" },
+]
+
 const controlEventPlace = [
     { name: "Place above", action: "set-place-above", icon: "icons/editor/place-above.png" },
     { name: "Place auto", action: "set-place-auto", icon: "icons/editor/place-auto.png" },
@@ -138,7 +159,49 @@ const insertControlEvent = [
     { name: "Add slur", action: "add-slur", icon: "icons/mei/slur.png", secondary: true },
 ]
 
+const insertDynamics = [
+    { name: "p", action: "add-dynam-p", icon: "icons/editor/dynam-E520.png" },
+    { name: "f", action: "add-dynam-f", icon: "icons/editor/dynam-E522.png" },
+    { name: "mp", action: "add-dynam-mp", icon: "icons/editor/dynam-E52C.png" },
+    { name: "mf", action: "add-dynam-mf", icon: "icons/editor/dynam-E52D.png" },
+    { name: "pp", action: "add-dynam-pp", icon: "icons/editor/dynam-E52B.png" },
+    { name: "ppp", action: "add-dynam-ppp", icon: "icons/editor/dynam-E52A.png" },
+    { name: "pppp", action: "add-dynam-pppp", icon: "icons/editor/dynam-E529.png" },
+    { name: "ppppp", action: "add-dynam-ppppp", icon: "icons/editor/dynam-E528.png" },
+    { name: "pppppp", action: "add-dynam-pppppp", icon: "icons/editor/dynam-E527.png" },
+    { name: "ff", action: "add-dynam-ff", icon: "icons/editor/dynam-E52F.png" },
+    { name: "fff", action: "add-dynam-fff", icon: "icons/editor/dynam-E530.png" },
+    { name: "ffff", action: "add-dynam-ffff", icon: "icons/editor/dynam-E531.png" },
+    { name: "fffff", action: "add-dynam-fffff", icon: "icons/editor/dynam-E532.png" },
+    { name: "ffffff", action: "add-dynam-ffffff", icon: "icons/editor/dynam-E533.png" },
+    { name: "pf", action: "add-dynam-pf", icon: "icons/editor/dynam-E52E.png" },
+    { name: "fp", action: "add-dynam-fp", icon: "icons/editor/dynam-E534.png" },
+    { name: "fz", action: "add-dynam-fz", icon: "icons/editor/dynam-E535.png" },
+    { name: "sf", action: "add-dynam-sf", icon: "icons/editor/dynam-E536.png" },
+    { name: "sfp", action: "add-dynam-sfp", icon: "icons/editor/dynam-E537.png" },
+    { name: "sfz", action: "add-dynam-sfz", icon: "icons/editor/dynam-E539.png" },
+    { name: "sffz", action: "add-dynam-sffz", icon: "icons/editor/dynam-E53B.png" },
+    { name: "rf", action: "add-dynam-rf", icon: "icons/editor/dynam-E53C.png" },
+    { name: "rfz", action: "add-dynam-rfz", icon: "icons/editor/dynam-E53D.png" },
+]
+
+const stemPosition = [
+    { name: "Stem auto", action: "set-stem-auto", icon: "icons/editor/stem-dir-auto.png" },
+    { name: "Stem down", action: "set-stem-down", icon: "icons/editor/stem-dir-down.png" },
+    { name: "Stem up", action: "set-stem-up", icon: "icons/editor/stem-dir-up.png" },
+]
+
 export const contextButtonBars = {
+    chord: [
+        {
+            label: "Stem",
+            actions: stemPosition,
+        },
+        {
+            label: "Articulations",
+            actions: articulations,
+        },
+    ],
     note: [
         {
             label: "Accidentals",
@@ -149,28 +212,12 @@ export const contextButtonBars = {
             ],
         },
         {
+            label: "Stem",
+            actions: stemPosition,
+        },
+        {
             label: "Articulations",
-            actions: [
-                { name: "Accent", action: "add-articulation-acc", icon: "icons/editor/artic-E4A0.png" },
-                { name: "Soft accent", action: "add-articulation-acc-soft", icon: "icons/editor/artic-ED40.png" },
-                { name: "Staccato", action: "add-articulation-stacc", icon: "icons/editor/artic-E4A2.png" },
-                { name: "Tenuto", action: "add-articulation-ten", icon: "icons/editor/artic-E4A4.png" },
-                { name: "Staccatissimo", action: "add-articulation-stacciss", icon: "icons/editor/artic-E4A8.png" },
-                { name: "Marcato", action: "add-articulation-marc", icon: "icons/editor/artic-E4AC.png" },
-                { name: "Spiccato", action: "add-articulation-spicc", icon: "icons/editor/artic-E4A6.png" },
-                { name: "Down bow", action: "add-articulation-dnbow", icon: "icons/editor/artic-E610.png" },
-                { name: "Up bow", action: "add-articulation-upbow", icon: "icons/editor/artic-E612.png" },
-                { name: "Harmonic", action: "add-articulation-harm", icon: "icons/editor/artic-E614.png" },
-                { name: "Snap pizzicato", action: "add-articulation-snap", icon: "icons/editor/artic-E631.png" },
-                { name: "Fingernail", action: "add-articulation-fingernail", icon: "icons/editor/artic-E636.png" },
-                { name: "Damp", action: "add-articulation-damp", icon: "icons/editor/artic-E638.png" },
-                { name: "Damp all", action: "add-articulation-dampall", icon: "icons/editor/artic-E639.png" },
-                { name: "Open", action: "add-articulation-open", icon: "icons/editor/artic-E5E7.png" },
-                { name: "Stopped", action: "add-articulation-stop", icon: "icons/editor/artic-E5E5.png" },
-                { name: "Left-hand pizzicato", action: "add-articulation-lhpizz", icon: "icons/editor/artic-E633.png" },
-                { name: "Dot", action: "add-articulation-dot", icon: "icons/editor/artic-E4A2.png" },
-                { name: "Stroke", action: "add-articulation-stroke", icon: "icons/editor/artic-E4AA.png" },
-            ],
+            actions: articulations,
         },
         {
             label: "Ornaments",
@@ -179,23 +226,16 @@ export const contextButtonBars = {
                 { name: "Add mordent", action: "add-mordent", icon: "icons/mei/mordent.png" },
             ],
         },
+        { label: "Dynamics", actions: insertDynamics },
         {
-            label: "Annotations",
+            label: "Punctual events",
             actions: [
                 { name: "Add fing", action: "add-fing", icon: "icons/mei/fing.png", dialog: "enter-value" },
                 { name: "Add dir", action: "add-dir", icon: "icons/mei/dir.png", dialog: "enter-value" },
                 { name: "Add tempo", action: "add-tempo", icon: "icons/mei/tempo.png", dialog: "enter-value" },
             ],
         },
-        {
-            label: "Stem",
-            actions: [
-                { name: "Stem auto", action: "set-stem-auto", icon: "icons/editor/stem-dir-auto.png" },
-                { name: "Stem down", action: "set-stem-down", icon: "icons/editor/stem-dir-down.png" },
-                { name: "Stem up", action: "set-stem-up", icon: "icons/editor/stem-dir-up.png" },
-            ],
-        },
-        { label: "Control events", actions: insertControlEvent },
+        { label: "Spanning events", actions: insertControlEvent },
     ],
     dir: [
         { label: "Placement", actions: controlEventPlace },
@@ -216,6 +256,7 @@ export const contextButtonBars = {
         { label: "Placement", actions: controlEventPlace },
     ],
     rest: [
+        { label: "Dynamics", actions: insertDynamics },
         {
             label: "Annotations",
             actions: [
@@ -249,6 +290,38 @@ const createAddArticulationAction = (value) => ({
             param: {
                 elementId: "[chained-id]",
                 attribute: "artic",
+                value,
+            },
+        },
+        {
+            action: "commit",
+        },
+    ],
+});
+
+const createAddDynamicAction = (value) => ({
+    action: "chain",
+    param: [
+        {
+            action: "insertControl",
+            param: {
+                elementName: "dynam",
+                startId: "[selection-id]",
+            },
+        },
+        {
+            action: "insert",
+            param: {
+                elementName: "text",
+                elementId: "[chained-id]",
+                insertMode: "appendChild",
+            },
+        },
+        {
+            action: "set",
+            param: {
+                elementId: "[chained-id]",
+                attribute: "text",
                 value,
             },
         },
@@ -478,6 +551,36 @@ export const actionDefinitions = {
     "add-articulation-lhpizz": createAddArticulationAction("lhpizz"),
     "add-articulation-dot": createAddArticulationAction("dot"),
     "add-articulation-stroke": createAddArticulationAction("stroke"),
+    "add-dynam-p": createAddDynamicAction("p"),
+    "add-dynam-m": createAddDynamicAction("m"),
+    "add-dynam-f": createAddDynamicAction("f"),
+    "add-dynam-r": createAddDynamicAction("r"),
+    "add-dynam-s": createAddDynamicAction("s"),
+    "add-dynam-z": createAddDynamicAction("z"),
+    "add-dynam-n": createAddDynamicAction("n"),
+    "add-dynam-pppppp": createAddDynamicAction("pppppp"),
+    "add-dynam-ppppp": createAddDynamicAction("ppppp"),
+    "add-dynam-pppp": createAddDynamicAction("pppp"),
+    "add-dynam-ppp": createAddDynamicAction("ppp"),
+    "add-dynam-pp": createAddDynamicAction("pp"),
+    "add-dynam-mp": createAddDynamicAction("mp"),
+    "add-dynam-mf": createAddDynamicAction("mf"),
+    "add-dynam-pf": createAddDynamicAction("pf"),
+    "add-dynam-ff": createAddDynamicAction("ff"),
+    "add-dynam-fff": createAddDynamicAction("fff"),
+    "add-dynam-ffff": createAddDynamicAction("ffff"),
+    "add-dynam-fffff": createAddDynamicAction("fffff"),
+    "add-dynam-ffffff": createAddDynamicAction("ffffff"),
+    "add-dynam-fp": createAddDynamicAction("fp"),
+    "add-dynam-fz": createAddDynamicAction("fz"),
+    "add-dynam-sf": createAddDynamicAction("sf"),
+    "add-dynam-sfp": createAddDynamicAction("sfp"),
+    "add-dynam-sfpp": createAddDynamicAction("sfpp"),
+    "add-dynam-sfz": createAddDynamicAction("sfz"),
+    "add-dynam-sfzp": createAddDynamicAction("sfzp"),
+    "add-dynam-sffz": createAddDynamicAction("sffz"),
+    "add-dynam-rf": createAddDynamicAction("rf"),
+    "add-dynam-rfz": createAddDynamicAction("rfz"),
     "add-hairpin": {
         action: "chain",
         param: [
