@@ -266,12 +266,38 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             }
 
             .vrv-context-toolbar {
+                display: flex;
+                flex-flow: row wrap;
+                gap: 4px;
                 min-height: $btn-height;
+                overflow: visible;
             }
 
             .vrv-context-toolbar-section {
                 flex-grow: 0;
             }
+
+            .vrv-context-tool-button {
+                @extend .vrv-clickable;
+                @extend .vrv-activable;
+                width: 32px;
+                height: 32px;
+                min-width: 32px;
+                min-height: 32px;
+                border: 1px solid $background-border;
+                background-color: $background-light;
+                background-repeat: no-repeat;
+                background-position: center center;
+                background-size: 24px 24px;
+                padding: 0;
+                cursor: pointer;
+            }
+
+            .vrv-context-tool-button:disabled {
+                opacity: $disabled-opacity;
+                pointer-events: none;
+            }
+
         }
 
         .vrv-v-split {
@@ -500,36 +526,6 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         &.open {
             display: flex;
             flex-direction: column;
-        }
-
-        .vrv-context-button-bars {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            padding: 6px;
-            border-bottom: 1px solid $background-border;
-            background: $background-light;
-        }
-
-        .vrv-context-button-bar {
-            display: flex;
-            gap: 4px;
-        }
-
-        .vrv-context-icon-btn {
-            @extend .vrv-clickable;
-            @extend .vrv-activable;
-            width: 32px;
-            height: 32px;
-            min-width: 32px;
-            min-height: 32px;
-            border: 1px solid $background-border;
-            background-color: $background;
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: 24px 24px;
-            padding: 0;
-            cursor: pointer;
         }
 
         .vrv-context-menu-content {

@@ -36,6 +36,7 @@
     export let onElementDrag: EditActionDragHandler | null = null;
     export let onPianoKeyboardOctaveChange: ((octave: number) => void | Promise<void>) | null = null;
     export let onPianoKeyboardMidiSelect: ((midi: number) => void | Promise<void>) | null = null;
+    export let onContextAction: ((action: Action) => void) | null = null;
     export let onTargetedContextAction: TargetedContextActionHandler | null = null;
     export let editResponseContent: EditResponseContent| null = null;
     export let rngMEIAll: RNGLoader | null = null;
@@ -505,6 +506,11 @@
                 ></Keyboard>
             {/if}
         </div>
-        <ContextPanel />
+        <ContextPanel
+            selectedElementName={editResponseContent?.object?.element ?? null}
+            hasSecondarySelection={Boolean(selection?.secondaryId)}
+            {insertMode}
+            {onContextAction}
+        />
     </div>
 </div>

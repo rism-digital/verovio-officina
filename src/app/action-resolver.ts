@@ -7,6 +7,11 @@ type ResolvedAction = Action & { actionKey: string };
 
 export type ResolvedContextButton = ResolvedAction & { iconUrl: string };
 
+export type ResolvedContextButtonBar = {
+    label: string;
+    actions: ResolvedContextButton[];
+};
+
 export type ResolvedMenuAction = ResolvedAction;
 
 export type ResolvedMenuEntry =
@@ -96,24 +101,27 @@ function resolveMenuEntries(entries: ActionCatalogEntry[]): ResolvedMenuEntry[] 
 export function resolveContextButtonBars(
     name: string | null,
     options: ResolveContextButtonBarsOptions = {},
-): ResolvedContextButton[][] {
+): ResolvedContextButtonBar[] {
     if (!name) return [];
     const bars = contextButtonBars[name] ?? [];
-    const resolvedBars: ResolvedContextButton[][] = [];
+    const resolvedBars: ResolvedContextButtonBar[] = [];
     for (const bar of bars) {
-        const resolvedBar: ResolvedContextButton[] = [];
-        for (const button of bar) {
+        const resolvedActions: ResolvedContextButton[] = [];
+        for (const button of bar.actions) {
             if (!options.includeDialogs && button.dialog) continue;
             if (button.secondary && !options.includeSecondary) continue;
             const resolvedAction = resolveActionEntry(button);
             if (!resolvedAction) continue;
-            resolvedBar.push({
+            resolvedActions.push({
                 ...resolvedAction,
                 iconUrl: withBaseUrl(button.icon),
             });
         }
-        if (resolvedBar.length > 0) {
-            resolvedBars.push(resolvedBar);
+        if (resolvedActions.length > 0) {
+            resolvedBars.push({
+                label: bar.label,
+                actions: resolvedActions,
+            });
         }
     }
     return resolvedBars;

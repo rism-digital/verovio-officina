@@ -1,9 +1,7 @@
 <script lang="ts">
     import type { Action } from "../app/types";
     import {
-        resolveContextButtonBars,
         resolveContextMenuItems,
-        type ResolvedContextButton,
         type ResolvedMenuEntry,
     } from "../app/action-resolver";
 
@@ -15,13 +13,9 @@
     export let onClose: (() => void) | null = null;
 
     let items: ResolvedMenuEntry[] = [];
-    let buttonBars: ResolvedContextButton[][] = [];
 
     $: items = customItems ?? resolveContextMenuItems(elementName);
-    $: buttonBars = customItems === null
-        ? resolveContextButtonBars(elementName)
-        : [];
-    $: if (elementName && items.length === 0 && buttonBars.length === 0) close();
+    $: if (elementName && items.length === 0) close();
 
     function close() {
         onClose?.();
@@ -68,24 +62,6 @@
     on:contextmenu|preventDefault|stopPropagation
     on:keydown={handleKeydown}
 >
-    {#if buttonBars.length > 0}
-        <div class="vrv-context-button-bars">
-            {#each buttonBars as bar}
-                <div class="vrv-context-button-bar">
-                    {#each bar as button}
-                        <button
-                            class="vrv-context-icon-btn"
-                            type="button"
-                            title={button.label}
-                            aria-label={button.label}
-                            style={`background-image: url("${button.iconUrl}");`}
-                            on:click={() => handleAction(button)}
-                        ></button>
-                    {/each}
-                </div>
-            {/each}
-        </div>
-    {/if}
     <div class="vrv-menu-content vrv-context-menu-content">
         {#each items as item}
             {#if item.kind === "action"}

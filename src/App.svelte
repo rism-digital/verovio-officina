@@ -693,7 +693,6 @@
         {xmlMode}
         onValidateXml={validateXmlContent}
         selectedElementName={$editResponseContent?.object?.element ?? null}
-        hasSecondarySelection={Boolean($editStatus.selection?.secondaryId)}
         {canUndo}
         {canRedo}
         {canRefreshLayout}
@@ -706,7 +705,6 @@
         onRefreshLayout={refreshLayout}
         onToggleShowHidden={toggleShowHidden}
         onToggleAutoBeam={toggleAutoBeam}
-        onContextAction={handleToolbarAction}
     />
 
     {#if xmlMode}
@@ -735,6 +733,7 @@
             onAttributeEdit={(param, commit) =>
                 controller.vrvSet(param, commit)}
             onElementDrag={(param) => controller.vrvDrag(param)}
+            onContextAction={handleToolbarAction}
             onTargetedContextAction={handleTargetedContextAction}
             editResponseContent={$editResponseContent}
             {rngMEIAll}

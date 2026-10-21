@@ -1,12 +1,7 @@
 <script lang="ts">
     import { withBaseUrl } from "../app/asset-url";
-    import {
-        resolveContextButtonBars,
-        type ResolvedContextButton,
-    } from "../app/action-resolver";
     import { enableInsertMode } from "../app/editor-rules";
     import type { InputMode } from "../app/state";
-    import type { Action } from "../app/types";
 
     export let insertMode = false;
     export let onToggleMode: () => void;
@@ -17,7 +12,6 @@
     export let xmlMode = false;
     export let onValidateXml: (() => void) | null = null;
     export let selectedElementName: string | null = null;
-    export let hasSecondarySelection = false;
     export let canUndo = false;
     export let canRedo = false;
     export let canRefreshLayout = false;
@@ -30,20 +24,12 @@
     export let onRefreshLayout: (() => void) | null = null;
     export let onToggleShowHidden: (() => void) | null = null;
     export let onToggleAutoBeam: (() => void) | null = null;
-    export let onContextAction: ((action: Action) => void) | null = null;
 
     const undoIconUrl = withBaseUrl("icons/editor/undo.png");
     const redoIconUrl = withBaseUrl("icons/editor/redo.png");
     const refreshLayoutIconUrl = withBaseUrl("icons/editor/update.png");
     const showHiddenIconUrl = withBaseUrl("icons/toolbar/show-hidden.png");
     const autoBeamIconUrl = withBaseUrl("icons/editor/auto-beam.png");
-
-    let contextBars: ResolvedContextButton[][] = [];
-
-    $: contextBars = resolveContextButtonBars(selectedElementName, {
-        includeDialogs: true,
-        includeSecondary: hasSecondarySelection,
-    });
 
     function handleButtonKeydown(event: KeyboardEvent, handler: () => void) {
         if (event.key !== "Enter" && event.key !== " ") return;
@@ -74,11 +60,6 @@
     function handleToggleAutoBeam() {
         if (!canToggleAutoBeam) return;
         onToggleAutoBeam?.();
-    }
-
-    function handleContextAction(action: Action) {
-        if (insertMode) return;
-        onContextAction?.(action);
     }
 
 </script>
@@ -169,22 +150,5 @@
         >
             <span class="vrv-tooltip">Automatically beam inserted notes</span>
         </div>
-        {#if contextBars.length > 0}
-            <div class="vrv-h-separator"></div>
-            {#each contextBars as bar, barIndex}
-                <div class="vrv-btn-group">
-                    {#each bar as button}
-                        <div
-                            class="vrv-btn-icon-large {insertMode ? 'disabled' : ''}"
-                            style={`background-image: url("${button.iconUrl}");`}
-                            on:click={() => handleContextAction(button)}
-                        ></div>
-                    {/each}
-                </div>
-                {#if barIndex < contextBars.length - 1}
-                    <div class="vrv-h-separator"></div>
-                {/if}
-            {/each}
-        {/if}
     {/if}
 </section>

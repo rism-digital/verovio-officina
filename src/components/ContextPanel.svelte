@@ -1,55 +1,71 @@
 <script lang="ts">
-    let closedSections = {
-        ornaments: false,
-        tempo: false,
-    };
+    import {
+        resolveContextButtonBars,
+        type ResolvedContextButtonBar,
+    } from "../app/action-resolver";
+    import type { Action } from "../app/types";
 
-    function toggleSection(section: keyof typeof closedSections) {
+    export let selectedElementName: string | null = null;
+    export let hasSecondarySelection = false;
+    export let insertMode = false;
+    export let onContextAction: ((action: Action) => void) | null = null;
+
+    let contextBars: ResolvedContextButtonBar[] = [];
+    let closedSections: Record<string, boolean> = {};
+
+    $: contextBars = resolveContextButtonBars(selectedElementName, {
+        includeDialogs: true,
+        includeSecondary: hasSecondarySelection,
+    });
+
+    function toggleSection(label: string) {
         closedSections = {
             ...closedSections,
-            [section]: !closedSections[section],
+            [label]: !closedSections[label],
         };
+    }
+
+    function handleContextAction(action: Action) {
+        if (insertMode) return;
+        onContextAction?.(action);
     }
 </script>
 
 <aside class="vrv-context-panel" aria-label="Context tools">
-    <div class="vrv-legend vrv-collapsible" class:close={closedSections.ornaments}>
-        Ornaments
-        <button
-            class="icon"
-            type="button"
-            aria-label="Toggle ornaments toolbar"
-            aria-expanded={!closedSections.ornaments}
-            on:click={() => toggleSection("ornaments")}
-        >▼</button>
-    </div>
-    <div
-        class="vrv-field-set vrv-collapsible vrv-context-toolbar-section"
-        class:close={closedSections.ornaments}
-    >
+    {#each contextBars as bar}
         <div
-            class="vrv-field-set-panel vrv-context-toolbar"
-            aria-label="Ornaments toolbar"
-        ></div>
-    </div>
-
-    <div class="vrv-legend vrv-collapsible" class:close={closedSections.tempo}>
-        Tempo
-        <button
-            class="icon"
-            type="button"
-            aria-label="Toggle tempo toolbar"
-            aria-expanded={!closedSections.tempo}
-            on:click={() => toggleSection("tempo")}
-        >▼</button>
-    </div>
-    <div
-        class="vrv-field-set vrv-collapsible vrv-context-toolbar-section"
-        class:close={closedSections.tempo}
-    >
+            class="vrv-legend vrv-collapsible"
+            class:close={closedSections[bar.label]}
+        >
+            {bar.label}
+            <button
+                class="icon"
+                type="button"
+                aria-label={`Toggle ${bar.label} toolbar`}
+                aria-expanded={!closedSections[bar.label]}
+                on:click={() => toggleSection(bar.label)}
+            >▼</button>
+        </div>
         <div
-            class="vrv-field-set-panel vrv-context-toolbar"
-            aria-label="Tempo toolbar"
-        ></div>
-    </div>
+            class="vrv-field-set vrv-collapsible vrv-context-toolbar-section"
+            class:close={closedSections[bar.label]}
+        >
+            <div
+                class="vrv-field-set-panel vrv-context-toolbar"
+                aria-label={`${bar.label} toolbar`}
+            >
+                {#each bar.actions as action}
+                    <button
+                        class="vrv-context-tool-button"
+                        type="button"
+                        title={action.label}
+                        aria-label={action.label}
+                        style={`background-image: url("${action.iconUrl}");`}
+                        disabled={insertMode}
+                        on:click={() => handleContextAction(action)}
+                    ></button>
+                {/each}
+            </div>
+        </div>
+    {/each}
 </aside>
