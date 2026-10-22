@@ -556,6 +556,7 @@ export type EditActionUpdateScoreDefParam = {
     update:
         | "insertAbove"
         | "insertBelow"
+        | "insertLayer"
         | "deleteStaff"
         | "moveUp"
         | "moveDown"

@@ -78,6 +78,12 @@ export const contextTools = {
                 name: "Edit staff definition",
                 action: "edit-staff-definition",
                 appAction: "open-staff-def",
+            }
+        ],
+        [
+            {
+                name: "Insert layer",
+                action: "insert-layer",
             },
         ],
         [
@@ -171,6 +177,7 @@ const setMordentGlyphs = [
 ]
 
 const measureBarLines = [
+    { name: "None", value: "", icon: "icons/editor/auto.png" },
     { name: "Dashed", value: "dashed", icon: "icons/editor/barline-E036.png" },
     { name: "Dotted", value: "dotted", icon: "icons/editor/barline-E037.png" },
     { name: "Double", value: "dbl", icon: "icons/editor/barline-E031.png" },
@@ -207,6 +214,47 @@ const controlEventPlace = [
 const insertControlEvent = [
     { name: "Add hairpin", action: "add-hairpin", icon: "icons/mei/hairpin.png", secondary: true },
     { name: "Add slur", action: "add-slur", icon: "icons/mei/slur.png", secondary: true },
+]
+
+const insertOrnaments = [
+    { name: "Add trill", action: "add-trill", icon: "icons/mei/trill.png" },
+    { name: "Add mordent", action: "add-mordent", icon: "icons/editor/mordent.png" },
+    { name: "Add turn", action: "add-turn", icon: "icons/editor/turn-E567.png" },
+]
+
+const trillAccidentals = [
+    { name: "None", action: "set-trill-accid-auto", attribute: "accidlower", value: "", icon: "icons/editor/auto.png" },
+    { name: "Lower flat", action: "set-trill-accidlower-flat", attribute: "accidlower", value: "f", icon: "icons/editor/trill-accidlower-flat.png" },
+    { name: "Lower natural", action: "set-trill-accidlower-natural", attribute: "accidlower", value: "n", icon: "icons/editor/trill-accidlower-natural.png" },
+    { name: "Lower sharp", action: "set-trill-accidlower-sharp", attribute: "accidlower", value: "s", icon: "icons/editor/trill-accidlower-sharp.png" },
+    { name: "Upper flat", action: "set-trill-accidupper-flat", attribute: "accidupper", value: "f", icon: "icons/editor/trill-accidupper-flat.png" },
+    { name: "Upper natural", action: "set-trill-accidupper-natural", attribute: "accidupper", value: "n", icon: "icons/editor/trill-accidupper-natural.png" },
+    { name: "Upper sharp", action: "set-trill-accidupper-sharp", attribute: "accidupper", value: "s", icon: "icons/editor/trill-accidupper-sharp.png" },
+]
+
+const turnAccidentals = [
+    { name: "None", action: "set-turn-accid-auto", attribute: "accidlower", value: "", icon: "icons/editor/auto.png" },
+    { name: "Lower flat", action: "set-turn-accidlower-flat", attribute: "accidlower", value: "f", icon: "icons/editor/turn-accidlower-flat.png" },
+    { name: "Lower natural", action: "set-turn-accidlower-natural", attribute: "accidlower", value: "n", icon: "icons/editor/turn-accidlower-natural.png" },
+    { name: "Lower sharp", action: "set-turn-accidlower-sharp", attribute: "accidlower", value: "s", icon: "icons/editor/turn-accidlower-sharp.png" },
+    { name: "Upper flat", action: "set-turn-accidupper-flat", attribute: "accidupper", value: "f", icon: "icons/editor/turn-accidupper-flat.png" },
+    { name: "Upper natural", action: "set-turn-accidupper-natural", attribute: "accidupper", value: "n", icon: "icons/editor/turn-accidupper-natural.png" },
+    { name: "Upper sharp", action: "set-turn-accidupper-sharp", attribute: "accidupper", value: "s", icon: "icons/editor/turn-accidupper-sharp.png" },
+]
+
+const turnForms = [
+    { name: "Upper", action: "set-turn-form-upper", value: "upper", icon: "icons/editor/turn-E567.png" },
+    { name: "Lower", action: "set-turn-form-lower", value: "lower", icon: "icons/editor/turn-E568.png" },
+]
+
+const mordentAccidentals = [
+    { name: "None", action: "set-mordent-accid-auto", attribute: "accidlower", value: "", icon: "icons/editor/auto.png" },
+    { name: "Lower flat", action: "set-mordent-accidlower-flat", attribute: "accidlower", value: "f", icon: "icons/editor/mordent-accidlower-flat.png" },
+    { name: "Lower natural", action: "set-mordent-accidlower-natural", attribute: "accidlower", value: "n", icon: "icons/editor/mordent-accidlower-natural.png" },
+    { name: "Lower sharp", action: "set-mordent-accidlower-sharp", attribute: "accidlower", value: "s", icon: "icons/editor/mordent-accidlower-sharp.png" },
+    { name: "Upper flat", action: "set-mordent-accidupper-flat", attribute: "accidupper", value: "f", icon: "icons/editor/mordent-accidupper-flat.png" },
+    { name: "Upper natural", action: "set-mordent-accidupper-natural", attribute: "accidupper", value: "n", icon: "icons/editor/mordent-accidupper-natural.png" },
+    { name: "Upper sharp", action: "set-mordent-accidupper-sharp", attribute: "accidupper", value: "s", icon: "icons/editor/mordent-accidupper-sharp.png" },
 ]
 
 const insertDynamics = [
@@ -265,6 +313,10 @@ export const contextButtonBars = {
             label: "Articulations",
             actions: insertArticulations,
         },
+        {
+            label: "Ornaments",
+            actions: insertOrnaments,
+        },
     ],
     note: [
         {
@@ -285,14 +337,12 @@ export const contextButtonBars = {
         },
         {
             label: "Ornaments",
-            actions: [
-                { name: "Add trill", action: "add-trill", icon: "icons/mei/trill.png" },
-                { name: "Add mordent", action: "add-mordent", icon: "icons/editor/mordent.png" },
-                { name: "Add turn", action: "add-turn", icon: "icons/editor/turn-E567.png" },
-                { name: "Add inverted turn", action: "add-turn-inverted", icon: "icons/editor/turn-E568.png" },
-            ],
+            actions: insertOrnaments,
         },
-        { label: "Dynamics", actions: insertDynamics },
+        {
+            label: "Dynamics",
+            actions: insertDynamics
+        },
         {
             label: "Punctual events",
             actions: [
@@ -325,6 +375,7 @@ export const contextButtonBars = {
     ],
     mordent: [
         { label: "Placement", actions: controlEventPlace },
+        { label: "Accidental", actions: mordentAccidentals },
         { label: "Glyph", actions: setMordentGlyphs },
     ],
     rest: [
@@ -339,6 +390,12 @@ export const contextButtonBars = {
     ],
     trill: [
         { label: "Placement", actions: controlEventPlace },
+        { label: "Accidental", actions: trillAccidentals },
+    ],
+    turn: [
+        { label: "Placement", actions: controlEventPlace },
+        { label: "Form", actions: turnForms },
+        { label: "Accidental", actions: turnAccidentals },
     ]
 };
 
@@ -429,6 +486,60 @@ const createSetMeasureBarLineAction = (attribute, value) => ({
         },
     ],
 });
+
+const createSetOrnamentAccidentalAction = (attribute, value) => ({
+    action: "chain",
+    param: [
+        {
+            action: "set",
+            param: {
+                elementId: "[selection-id]",
+                attribute: attribute === "accidlower" ? "accidupper" : "accidlower",
+                value: "",
+            },
+        },
+        {
+            action: "set",
+            param: {
+                elementId: "[selection-id]",
+                attribute,
+                value,
+            },
+        },
+        {
+            action: "commit",
+        },
+    ],
+});
+
+const ornamentAccidentalDefinitions = Object.fromEntries(
+    [trillAccidentals, turnAccidentals, mordentAccidentals].flat().map(({ action, attribute, value }) => [
+        action,
+        createSetOrnamentAccidentalAction(attribute, value),
+    ]),
+);
+
+const turnFormDefinitions = Object.fromEntries(
+    turnForms.map(({ action, value }) => [
+        action,
+        {
+            action: "chain",
+            param: [
+                {
+                    action: "set",
+                    param: {
+                        elementId: "[selection-id]",
+                        attribute: "form",
+                        value,
+                    },
+                },
+                {
+                    action: "commit",
+                },
+            ],
+        },
+    ]),
+);
 
 const measureBarLineDefinitions = Object.fromEntries(
     ["right", "left"].flatMap((attribute) => measureBarLines.map(({ value }) => [
@@ -563,6 +674,21 @@ export const actionDefinitions = {
                 action: "updateScoreDef",
                 param: {
                     update: "insertBelow",
+                    elementId: "[selection-id]",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "insert-layer": {
+        action: "chain",
+        param: [
+            {
+                action: "updateScoreDef",
+                param: {
+                    update: "insertLayer",
                     elementId: "[selection-id]",
                 },
             },
@@ -785,6 +911,8 @@ export const actionDefinitions = {
     "set-glyph-E5C6": createSetGlyphAction("ornamentPrecompMordentUpperPrefix"),
     "set-glyph-E5C7": createSetGlyphAction("ornamentPrecompInvertedMordentUpperPrefix"),
     "set-glyph-E5C8": createSetGlyphAction("ornamentPrecompTrillLowerSuffix"),
+    ...ornamentAccidentalDefinitions,
+    ...turnFormDefinitions,
     ...measureBarLineDefinitions,
     "add-dynam-p": createAddDynamicAction("p"),
     "add-dynam-m": createAddDynamicAction("m"),
