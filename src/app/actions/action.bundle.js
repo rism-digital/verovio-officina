@@ -9,7 +9,7 @@ export const actionCatalog = {
             action: "add-articulation",
         },
         {
-            name: "Add dir",
+            name: "Add directive",
             action: "add-dir",
             dialog: "enter-value",
         },
@@ -115,6 +115,12 @@ export const contextTools = {
             },
         ]
     ],
+    layer: [[
+        {
+            name: "Delete layer",
+            action: "delete-layer",
+        },
+    ]],
 };
 
 const insertArticulations = [
@@ -212,14 +218,26 @@ const controlEventPlace = [
 ]
 
 const insertControlEvent = [
-    { name: "Add hairpin", action: "add-hairpin", icon: "icons/mei/hairpin.png", secondary: true },
-    { name: "Add slur", action: "add-slur", icon: "icons/mei/slur.png", secondary: true },
+    { name: "Add hairpin", action: "add-hairpin", icon: "icons/editor/hairpin.png", secondary: true },
+    { name: "Add slur", action: "add-slur", icon: "icons/editor/slur.png", secondary: true },
 ]
 
-const insertOrnaments = [
-    { name: "Add trill", action: "add-trill", icon: "icons/mei/trill.png" },
-    { name: "Add mordent", action: "add-mordent", icon: "icons/editor/mordent.png" },
+const insertPitchedPunctualEvents = [
+    { name: "Add trill", action: "add-trill", icon: "icons/editor/trill.png" },
+    { name: "Add fingering", action: "add-fing", icon: "icons/editor/fing.png", dialog: "enter-value" },
     { name: "Add turn", action: "add-turn", icon: "icons/editor/turn-E567.png" },
+    { name: "Add mordent", action: "add-mordent", icon: "icons/editor/mordent.png" },
+]
+
+const insertRestPunctualEvents = [
+    { name: "Add directive", action: "add-dir", icon: "icons/editor/dir.png", dialog: "enter-value" },
+    { name: "Add tempo", action: "add-tempo", icon: "icons/editor/tempo.png", dialog: "enter-value" },
+    { name: "Add fermata", action: "add-fermata", icon: "icons/editor/fermata.png" },
+]
+
+const insertPunctualEvents = [
+    ...insertRestPunctualEvents,
+    ...insertPitchedPunctualEvents,
 ]
 
 const trillAccidentals = [
@@ -245,6 +263,11 @@ const turnAccidentals = [
 const turnForms = [
     { name: "Upper", action: "set-turn-form-upper", value: "upper", icon: "icons/editor/turn-E567.png" },
     { name: "Lower", action: "set-turn-form-lower", value: "lower", icon: "icons/editor/turn-E568.png" },
+]
+
+const hairpinForms = [
+    { name: "Crescendo", action: "set-hairpin-form-cres", value: "cres", icon: "icons/editor/hairpin.png" },
+    { name: "Diminuendo", action: "set-hairpin-form-dim", value: "dim", icon: "icons/editor/hairpin-dim.png" },
 ]
 
 const mordentAccidentals = [
@@ -314,8 +337,8 @@ export const contextButtonBars = {
             actions: insertArticulations,
         },
         {
-            label: "Ornaments",
-            actions: insertOrnaments,
+            label: "Punctual events",
+            actions: insertPunctualEvents,
         },
     ],
     note: [
@@ -336,20 +359,12 @@ export const contextButtonBars = {
             actions: insertArticulations,
         },
         {
-            label: "Ornaments",
-            actions: insertOrnaments,
+            label: "Punctual events",
+            actions: insertPunctualEvents,
         },
         {
             label: "Dynamics",
             actions: insertDynamics
-        },
-        {
-            label: "Punctual events",
-            actions: [
-                { name: "Add fing", action: "add-fing", icon: "icons/mei/fing.png", dialog: "enter-value" },
-                { name: "Add dir", action: "add-dir", icon: "icons/mei/dir.png", dialog: "enter-value" },
-                { name: "Add tempo", action: "add-tempo", icon: "icons/mei/tempo.png", dialog: "enter-value" },
-            ],
         },
         { label: "Spanning events", actions: insertControlEvent },
     ],
@@ -364,6 +379,9 @@ export const contextButtonBars = {
         { label: "Placement", actions: controlEventPlace },
         { label: "Dynamics", actions: setDynamics },
     ],
+    fermata: [
+        { label: "Placement", actions: controlEventPlace },
+    ],
     fing: [
         { label: "Placement", actions: controlEventPlace },
     ],
@@ -372,6 +390,7 @@ export const contextButtonBars = {
     ],
     hairpin: [
         { label: "Placement", actions: controlEventPlace },
+        { label: "Form", actions: hairpinForms },
     ],
     mordent: [
         { label: "Placement", actions: controlEventPlace },
@@ -381,11 +400,8 @@ export const contextButtonBars = {
     rest: [
         { label: "Dynamics", actions: insertDynamics },
         {
-            label: "Annotations",
-            actions: [
-                { name: "Add dir", action: "add-dir", icon: "icons/mei/dir.png", dialog: "enter-value" },
-                { name: "Add tempo", action: "add-tempo", icon: "icons/mei/tempo.png", dialog: "enter-value" },
-            ],
+            label: "Punctual events",
+            actions: insertRestPunctualEvents,
         },
     ],
     trill: [
@@ -519,8 +535,8 @@ const ornamentAccidentalDefinitions = Object.fromEntries(
     ]),
 );
 
-const turnFormDefinitions = Object.fromEntries(
-    turnForms.map(({ action, value }) => [
+const formDefinitions = Object.fromEntries(
+    [turnForms, hairpinForms].flat().map(({ action, value }) => [
         action,
         {
             action: "chain",
@@ -689,6 +705,21 @@ export const actionDefinitions = {
                 action: "updateScoreDef",
                 param: {
                     update: "insertLayer",
+                    elementId: "[selection-id]",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+    "delete-layer": {
+        action: "chain",
+        param: [
+            {
+                action: "updateScoreDef",
+                param: {
+                    update: "deleteLayer",
                     elementId: "[selection-id]",
                 },
             },
@@ -912,7 +943,7 @@ export const actionDefinitions = {
     "set-glyph-E5C7": createSetGlyphAction("ornamentPrecompInvertedMordentUpperPrefix"),
     "set-glyph-E5C8": createSetGlyphAction("ornamentPrecompTrillLowerSuffix"),
     ...ornamentAccidentalDefinitions,
-    ...turnFormDefinitions,
+    ...formDefinitions,
     ...measureBarLineDefinitions,
     "add-dynam-p": createAddDynamicAction("p"),
     "add-dynam-m": createAddDynamicAction("m"),
@@ -961,7 +992,22 @@ export const actionDefinitions = {
                 param: {
                     elementId: "[chained-id]",
                     attribute: "form",
-                    value: "dim",
+                    value: "cres",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
+     "add-fermata": {
+        action: "chain",
+        param: [
+            {
+                action: "insertControl",
+                param: {
+                    elementName: "fermata",
+                    startId: "[selection-id]",
                 },
             },
             {
