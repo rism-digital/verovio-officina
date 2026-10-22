@@ -43,7 +43,9 @@ export const contextTools = {
         {
             name: "Insert one measure after",
             action: "add-measure-after",
-        },
+        }
+    ],
+    [
         {
             name: "Insert score definition before",
             action: "add-score-definition-before",
@@ -73,43 +75,39 @@ export const contextTools = {
     staff: [
         [
             {
-                name: "Add staff above",
-                action: "add-staff-above",
-            },
-            {
-                name: "Add staff below",
-                action: "add-staff-below",
-            },
-            {
-                name: "Delete staff",
-                action: "delete-staff",
-            },
-        ],
-        [
-            {
-                name: "Move staff up",
-                action: "move-staff-up",
-            },
-            {
-                name: "Move staff down",
-                action: "move-staff-down",
-            },
-        ],
-        [
-            {
-                name: "Add staff group",
-                action: "add-staff-group-disabled",
-            },
-            {
-                name: "Remove staff group",
-                action: "remove-staff-group-diabled",
-            },
-            {
                 name: "Edit staff definition",
                 action: "edit-staff-definition",
                 appAction: "open-staff-def",
             },
         ],
+        [
+            [
+                {
+                    name: "Add staff above",
+                    action: "add-staff-above",
+                },
+                {
+                    name: "Add staff below",
+                    action: "add-staff-below",
+                },
+            ],
+            [
+                {
+                    name: "Move staff up",
+                    action: "move-staff-up",
+                },
+                {
+                    name: "Move staff down",
+                    action: "move-staff-down",
+                }
+            ]
+        ],
+        [
+            {
+                name: "Delete staff",
+                action: "delete-staff",
+            },
+        ]
     ],
 };
 
@@ -172,6 +170,34 @@ const setMordentGlyphs = [
     { name: "Trill lower suffix", action: "set-glyph-E5C8", icon: "icons/editor/mordent-E5C8.png" },
 ]
 
+const measureBarLines = [
+    { name: "Dashed", value: "dashed", icon: "icons/editor/barline-E036.png" },
+    { name: "Dotted", value: "dotted", icon: "icons/editor/barline-E037.png" },
+    { name: "Double", value: "dbl", icon: "icons/editor/barline-E031.png" },
+    { name: "Double dashed", value: "dbldashed", icon: "icons/editor/barline-dbldashed.png" },
+    { name: "Double dotted", value: "dbldotted", icon: "icons/editor/barline-dbldotted.png" },
+    { name: "Double heavy", value: "dblheavy", icon: "icons/editor/barline-E035.png" },
+    { name: "Double segno", value: "dblsegno", icon: "icons/editor/barline-E04B.png" },
+    { name: "End", value: "end", icon: "icons/editor/barline-E032.png" },
+    { name: "Heavy", value: "heavy", icon: "icons/editor/barline-E034.png" },
+    { name: "Invisible", value: "invis", icon: "icons/editor/barline-invis.png" },
+    { name: "Repeat start", value: "rptstart", icon: "icons/editor/barline-E040.png" },
+    { name: "Repeat both", value: "rptboth", icon: "icons/editor/barline-E042.png" },
+    { name: "Repeat end", value: "rptend", icon: "icons/editor/barline-E041.png" },
+    { name: "Single", value: "single", icon: "icons/editor/barline-E030.png" },
+]
+
+const createMeasureBarLineButtons = (attribute) => measureBarLines.map(
+    ({ name, value, icon }) => ({
+        name,
+        action: `set-measure-${attribute}-${value}`,
+        icon,
+    }),
+);
+
+const setMeasureRightBarLines = createMeasureBarLineButtons("right");
+const setMeasureLeftBarLines = createMeasureBarLineButtons("left");
+
 const controlEventPlace = [
     { name: "Place above", action: "set-place-above", icon: "icons/editor/place-above.png" },
     { name: "Place auto", action: "set-place-auto", icon: "icons/editor/place-auto.png" },
@@ -226,6 +252,10 @@ const stemPosition = [
 ]
 
 export const contextButtonBars = {
+    measure: [
+        { label: "Right bar line", actions: setMeasureRightBarLines },
+        { label: "Left bar line", actions: setMeasureLeftBarLines },
+    ],
     chord: [
         {
             label: "Stem",
@@ -382,6 +412,30 @@ const createSetGlyphAction = (glyphName) => ({
         },
     ],
 });
+
+const createSetMeasureBarLineAction = (attribute, value) => ({
+    action: "chain",
+    param: [
+        {
+            action: "set",
+            param: {
+                elementId: "[selection-id]",
+                attribute,
+                value,
+            },
+        },
+        {
+            action: "commit",
+        },
+    ],
+});
+
+const measureBarLineDefinitions = Object.fromEntries(
+    ["right", "left"].flatMap((attribute) => measureBarLines.map(({ value }) => [
+        `set-measure-${attribute}-${value}`,
+        createSetMeasureBarLineAction(attribute, value),
+    ])),
+);
 
 const createAddDynamicAction = (value) => ({
     action: "chain",
@@ -731,6 +785,7 @@ export const actionDefinitions = {
     "set-glyph-E5C6": createSetGlyphAction("ornamentPrecompMordentUpperPrefix"),
     "set-glyph-E5C7": createSetGlyphAction("ornamentPrecompInvertedMordentUpperPrefix"),
     "set-glyph-E5C8": createSetGlyphAction("ornamentPrecompTrillLowerSuffix"),
+    ...measureBarLineDefinitions,
     "add-dynam-p": createAddDynamicAction("p"),
     "add-dynam-m": createAddDynamicAction("m"),
     "add-dynam-f": createAddDynamicAction("f"),
@@ -954,7 +1009,7 @@ export const actionDefinitions = {
             {
                 action: "commit",
             },
-        ], 
+        ],
     },
     "delete-backspace": {
         action: "chain",
@@ -969,7 +1024,7 @@ export const actionDefinitions = {
             {
                 action: "commit",
             },
-        ], 
+        ],
     },
     "set-stem-auto": {
         action: "chain",

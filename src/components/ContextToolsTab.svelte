@@ -54,14 +54,18 @@
     <div class="vrv-context-actions" aria-label="Context actions">
         {#each contextToolGroups as group}
             <div class="vrv-context-action-group">
-                {#each group as action}
-                    <button
-                        class="vrv-context-action-button"
-                        type="button"
-                        title={action.label}
-                        disabled={insertMode}
-                        on:click={() => handleContextAction(action)}
-                    >{action.label}</button>
+                {#each group as row}
+                    <div class="vrv-context-action-row">
+                        {#each row as action}
+                            <button
+                                class="vrv-context-action-button"
+                                type="button"
+                                title={action.label}
+                                disabled={insertMode}
+                                on:click={() => handleContextAction(action)}
+                            >{action.label}</button>
+                        {/each}
+                    </div>
                 {/each}
             </div>
         {/each}

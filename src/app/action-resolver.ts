@@ -11,7 +11,9 @@ import type { Action } from "./types";
 
 export type ResolvedAction = Action & { actionKey: string };
 
-export type ResolvedContextToolGroup = ResolvedAction[];
+export type ResolvedContextToolRow = ResolvedAction[];
+
+export type ResolvedContextToolGroup = ResolvedContextToolRow[];
 
 export type ResolvedContextButton = ResolvedAction & { iconUrl: string };
 
@@ -77,8 +79,13 @@ export function resolveContextTools(
     const groups = contextTools[name] ?? [];
     return groups
         .map((group) => group
-            .map((entry) => resolveActionEntry(entry))
-            .filter((action): action is ResolvedAction => Boolean(action)))
+            .map((item) => {
+                const row = Array.isArray(item) ? item : [item];
+                return row
+                    .map((entry) => resolveActionEntry(entry))
+                    .filter((action): action is ResolvedAction => Boolean(action));
+            })
+            .filter((row) => row.length > 0))
         .filter((group) => group.length > 0);
 }
 

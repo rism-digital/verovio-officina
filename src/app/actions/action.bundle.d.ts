@@ -5,6 +5,8 @@ export type ActionEntry = ActionMetadata & {
     action: string;
 };
 
+export type ContextToolItem = ActionEntry | ActionEntry[];
+
 export type ActionCatalogSubmenuEntry = {
     name: string;
     submenu: ActionCatalogEntry[];
@@ -30,7 +32,7 @@ export type ContextButtonBar = {
 };
 
 export const actionCatalog: Record<string, ActionCatalogEntry[]>;
-export const contextTools: Record<string, ActionEntry[][]>;
+export const contextTools: Record<string, ContextToolItem[][]>;
 export const contextButtonBars: Record<string, ContextButtonBar[]>;
 export const menuActions: ActionEntry[];
 export const actionDefinitions: Record<string, EditAction>;
