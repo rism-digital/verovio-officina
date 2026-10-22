@@ -2,14 +2,12 @@
     import ContentTab from "./ContentTab.svelte";
     import ScoreTab from "./ScoreTab.svelte";
     import type {
-        EditActionSetHandler,
         EditResponseContent,
         HoverElementHandler,
         SelectElementHandler,
         Tab,
         TargetedContextActionHandler,
     } from "../app/types";
-    import type { RNGLoader } from "../app/rng-loader";
 
     export const items: Tab[] = [
         { label: "Score", value: 1, component: ScoreTab },
@@ -18,11 +16,8 @@
 
     export let activeTabValue = 2;
     export let editResponseContent: EditResponseContent | null = null;
-    export let rngMEIAll: RNGLoader | null = null;
-    export let rngMEIBasic: RNGLoader | null = null;
     export let onSelectElement: SelectElementHandler | null = null;
     export let onHoverElement: HoverElementHandler | null = null;
-    export let onEditAttribute: EditActionSetHandler | null = null;
     export let onTargetedContextAction: TargetedContextActionHandler | null = null;
 
     const handleClick = (tabValue: number) => () => {
@@ -52,11 +47,8 @@
                             this={item.component}
                             {onSelectElement}
                             {onHoverElement}
-                            {onEditAttribute}
                             {onTargetedContextAction}
                             {editResponseContent}
-                            {rngMEIAll}
-                            {rngMEIBasic}
                         />
                     </div>
                 {/if}

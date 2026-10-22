@@ -466,11 +466,8 @@
         <SidePanel
             onSelectElement={handleSelect}
             onHoverElement={handleHover}
-            onEditAttribute={handleEditAttribute}
             {onTargetedContextAction}
             {editResponseContent}
-            {rngMEIAll}
-            {rngMEIBasic}
         />
         <div class="vrv-v-split">
             <div
@@ -511,6 +508,10 @@
             hasSecondarySelection={Boolean(selection?.secondaryId)}
             {insertMode}
             {onContextAction}
+            {editResponseContent}
+            {rngMEIAll}
+            {rngMEIBasic}
+            onEditAttribute={handleEditAttribute}
         />
     </div>
 </div>
