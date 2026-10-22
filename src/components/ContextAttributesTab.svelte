@@ -12,9 +12,11 @@
     export let onEditAttribute: EditActionSetHandler | null = null;
 </script>
 
-<AttributeList
-    {editResponseContent}
-    {rngMEIAll}
-    {rngMEIBasic}
-    onEditSet={onEditAttribute}
-/>
+{#if editResponseContent?.object?.element !== "text"}
+    <AttributeList
+        {editResponseContent}
+        {rngMEIAll}
+        {rngMEIBasic}
+        onEditSet={onEditAttribute}
+    />
+{/if}

@@ -129,7 +129,6 @@ export const actionCatalog = {
 
 const insertArticulations = [
     { name: "Accent", action: "add-articulation-acc", icon: "icons/editor/artic-E4A0.png" },
-    { name: "Soft accent", action: "add-articulation-acc-soft", icon: "icons/editor/artic-ED40.png" },
     { name: "Staccato", action: "add-articulation-stacc", icon: "icons/editor/artic-E4A2.png" },
     { name: "Tenuto", action: "add-articulation-ten", icon: "icons/editor/artic-E4A4.png" },
     { name: "Staccatissimo", action: "add-articulation-stacciss", icon: "icons/editor/artic-E4A8.png" },
@@ -205,7 +204,6 @@ const insertDynamics = [
     { name: "mf", action: "add-dynam-mf", icon: "icons/editor/dynam-E52D.png" },
     { name: "pp", action: "add-dynam-pp", icon: "icons/editor/dynam-E52B.png" },
     { name: "ff", action: "add-dynam-ff", icon: "icons/editor/dynam-E52F.png" },
-    { name: "pf", action: "add-dynam-pf", icon: "icons/editor/dynam-E52E.png" },
     { name: "sfz", action: "add-dynam-sfz", icon: "icons/editor/dynam-E539.png" }
 ]
 

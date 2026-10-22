@@ -1049,7 +1049,7 @@ export class EditorController {
         }
     }
 
-    async vrvSelectCustom(id: string | null, custom: "note" | "textParent"): Promise<void> {
+    async vrvSelectCustom(id: string | null, custom: "note" | "staff" | "textParent"): Promise<void> {
         if (!id) return;
         try {
             const editActionSelect: EditAction = {

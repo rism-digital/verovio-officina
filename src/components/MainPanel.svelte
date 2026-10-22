@@ -31,6 +31,7 @@
     export let onElementSelect: SelectElementHandler | null = null;
     export let onElementSecondarySelect: SelectElementHandler | null = null;
     export let onNoteDoubleClick: SelectElementHandler | null = null;
+    export let onStaffDoubleClick: SelectElementHandler | null = null;
     export let onTextParentDoubleClick: SelectElementHandler | null = null;
     export let onAttributeEdit: EditActionSetHandler | null = null;
     export let onElementDrag: EditActionDragHandler | null = null;
@@ -397,6 +398,9 @@
 
         const node = getClosestMEIElement(<SVGElement>event.target, "note");
         if (node?.id) await onNoteDoubleClick?.(node.id);
+
+        const nodeStaff = getClosestMEIElement(<SVGElement>event.target, "staff");
+        if (nodeStaff?.id) await onStaffDoubleClick?.(nodeStaff.id);
 
         const nodeDir = getClosestMEIElement(<SVGElement>event.target, ["dir", "dynam", "fing", "syl"]);
         if (nodeDir?.id) await onTextParentDoubleClick?.(nodeDir.id);

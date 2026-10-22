@@ -53,6 +53,8 @@
                         {hasSecondarySelection}
                         {insertMode}
                         {onContextAction}
+                        {editResponseContent}
+                        {onEditAttribute}
                     />
                 {:else}
                     <ContextAttributesTab

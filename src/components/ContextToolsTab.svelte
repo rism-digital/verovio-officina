@@ -1,14 +1,21 @@
 <script lang="ts">
+    import AttributeList from "./AttributeList.svelte";
     import {
         resolveContextButtonBars,
         type ResolvedContextButtonBar,
     } from "../app/action-resolver";
-    import type { Action } from "../app/types";
+    import type {
+        Action,
+        EditActionSetHandler,
+        EditResponseContent,
+    } from "../app/types";
 
     export let selectedElementName: string | null = null;
     export let hasSecondarySelection = false;
     export let insertMode = false;
     export let onContextAction: ((action: Action) => void) | null = null;
+    export let editResponseContent: EditResponseContent | null = null;
+    export let onEditAttribute: EditActionSetHandler | null = null;
 
     let contextBars: ResolvedContextButtonBar[] = [];
     let closedSections: Record<string, boolean> = {};
@@ -30,6 +37,15 @@
         onContextAction?.(action);
     }
 </script>
+
+{#if editResponseContent?.object?.element === "text"}
+    <AttributeList
+        {editResponseContent}
+        onEditSet={onEditAttribute}
+    />
+{/if}
+
+<!-- Add context menu as buttons -->
 
 {#each contextBars as bar}
     <div

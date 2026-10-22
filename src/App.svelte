@@ -729,6 +729,7 @@
             onElementSelect={(id) => controller.vrvSelect(id)}
             onElementSecondarySelect={(id) => controller.vrvSelectSecondary(id)}
             onNoteDoubleClick={(id) => controller.vrvSelectCustom(id, "note")}
+            onStaffDoubleClick={(id) => controller.vrvSelectCustom(id, "staff")}
             onTextParentDoubleClick={(id) => controller.vrvSelectCustom(id, "textParent")}
             onAttributeEdit={(param, commit) =>
                 controller.vrvSet(param, commit)}

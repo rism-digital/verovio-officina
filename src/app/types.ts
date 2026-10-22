@@ -513,7 +513,7 @@ export type EditActionSetScoreDefStaffDefParam = {
 export type EditActionSelectParam = {
     elementId: string;
     secondary?: boolean;
-    custom?: "note" | "textParent";
+    custom?: "note" | "staff" | "textParent";
 };
 
 export type EditActionSetParam = {
