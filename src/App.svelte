@@ -66,7 +66,7 @@
     };
     const appActionHandlers: Record<
         AppActionKey,
-        (action: TargetedContextAction) => void | Promise<void>
+        (action: Action) => void | Promise<void>
     > = {
         "open-staff-def": () => openStaffDefDialog(),
         "open-staff-groups": () => openStaffGroupsDialog(true),
@@ -523,6 +523,11 @@
     }
 
     async function handleToolbarAction(action: Action) {
+        if (action.appAction) {
+            await appActionHandlers[action.appAction](action);
+            return;
+        }
+
         const next = beginToolbarAction(action);
         if (next.kind === "prompt") {
             enterValueDialogState = next.dialogState;

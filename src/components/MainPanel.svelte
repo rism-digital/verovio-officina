@@ -397,7 +397,10 @@
         }
 
         const node = getClosestMEIElement(<SVGElement>event.target, "note");
-        if (node?.id) await onNoteDoubleClick?.(node.id);
+        if (node?.id) {
+            await onNoteDoubleClick?.(node.id);
+            return;
+        }
 
         const nodeStaff = getClosestMEIElement(<SVGElement>event.target, "staff");
         if (nodeStaff?.id) await onStaffDoubleClick?.(nodeStaff.id);

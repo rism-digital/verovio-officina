@@ -1,22 +1,4 @@
 export const actionCatalog = {
-    measure: [
-        {
-            name: "Insert one measure before",
-            action: "add-measure-before",
-        },
-        {
-            name: "Insert one measure after",
-            action: "add-measure-after",
-        },
-        {
-            name: "Insert score definition before",
-            action: "add-score-definition-before",
-        },
-        {
-            name: "Insert score definition after",
-            action: "add-score-definition-after",
-        },
-    ],
     note: [
         {
             name: "Add accidental",
@@ -50,23 +32,28 @@ export const actionCatalog = {
             ],
         },
     ],
-    rest: [
+};
+
+export const contextTools = {
+    measure: [[
         {
-            name: "Add dir",
-            action: "add-dir",
-            dialog: "enter-value",
+            name: "Insert one measure before",
+            action: "add-measure-before",
         },
         {
-            name: "Add tempo",
-            action: "add-tempo",
-            dialog: "enter-value",
+            name: "Insert one measure after",
+            action: "add-measure-after",
         },
         {
-            name: "Delete",
-            action: "delete",
+            name: "Insert score definition before",
+            action: "add-score-definition-before",
         },
-    ],
-    scoreDef: [
+        {
+            name: "Insert score definition after",
+            action: "add-score-definition-after",
+        },
+    ]],
+    scoreDef: [[
         {
             name: "Staff group properties",
             action: "open-staff-groups",
@@ -82,48 +69,47 @@ export const actionCatalog = {
             action: "open-meter-signature",
             appAction: "open-meter-signature",
         },
-    ],
+    ]],
     staff: [
-        
-        {
-            name: "Add staff above",
-            action: "add-staff-above",
-        },
-        {
-            name: "Add staff below",
-            action: "add-staff-below",
-        },
-        {
-            name: "Delete staff",
-            action: "delete-staff",
-        },
-        {
-            separator: true,
-        },
-        {
-            name: "Move staff up",
-            action: "move-staff-up",
-        },
-        {
-            name: "Move staff down",
-            action: "move-staff-down",
-        },
-        {
-            separator: true,
-        },
-        {
-            name: "Add staff group",
-            action: "add-staff-group-disabled",
-        },
-        {
-            name: "Remove staff group",
-            action: "remove-staff-group-diabled",
-        },
-        {
-            name: "Edit staff definition",
-            action: "edit-staff-definition",
-            appAction: "open-staff-def",
-        },
+        [
+            {
+                name: "Add staff above",
+                action: "add-staff-above",
+            },
+            {
+                name: "Add staff below",
+                action: "add-staff-below",
+            },
+            {
+                name: "Delete staff",
+                action: "delete-staff",
+            },
+        ],
+        [
+            {
+                name: "Move staff up",
+                action: "move-staff-up",
+            },
+            {
+                name: "Move staff down",
+                action: "move-staff-down",
+            },
+        ],
+        [
+            {
+                name: "Add staff group",
+                action: "add-staff-group-disabled",
+            },
+            {
+                name: "Remove staff group",
+                action: "remove-staff-group-diabled",
+            },
+            {
+                name: "Edit staff definition",
+                action: "edit-staff-definition",
+                appAction: "open-staff-def",
+            },
+        ],
     ],
 };
 

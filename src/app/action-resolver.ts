@@ -1,9 +1,17 @@
 import { withBaseUrl } from "./asset-url";
-import { actionCatalog, actionDefinitions, contextButtonBars, menuActions } from "./actions/action.bundle";
+import {
+    actionCatalog,
+    actionDefinitions,
+    contextButtonBars,
+    contextTools,
+    menuActions,
+} from "./actions/action.bundle";
 import type { ActionCatalogEntry, ActionEntry, ContextButtonEntry } from "./actions/action.bundle";
 import type { Action } from "./types";
 
-type ResolvedAction = Action & { actionKey: string };
+export type ResolvedAction = Action & { actionKey: string };
+
+export type ResolvedContextToolGroup = ResolvedAction[];
 
 export type ResolvedContextButton = ResolvedAction & { iconUrl: string };
 
@@ -60,6 +68,18 @@ export function resolveMenuActions(): ResolvedMenuAction[] {
         if (resolvedAction) resolvedActions.push(resolvedAction);
     }
     return resolvedActions;
+}
+
+export function resolveContextTools(
+    name: string | null,
+): ResolvedContextToolGroup[] {
+    if (!name) return [];
+    const groups = contextTools[name] ?? [];
+    return groups
+        .map((group) => group
+            .map((entry) => resolveActionEntry(entry))
+            .filter((action): action is ResolvedAction => Boolean(action)))
+        .filter((group) => group.length > 0);
 }
 
 function resolveMenuEntries(entries: ActionCatalogEntry[]): ResolvedMenuEntry[] {

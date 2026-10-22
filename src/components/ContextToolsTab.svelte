@@ -2,7 +2,9 @@
     import AttributeList from "./AttributeList.svelte";
     import {
         resolveContextButtonBars,
+        resolveContextTools,
         type ResolvedContextButtonBar,
+        type ResolvedContextToolGroup,
     } from "../app/action-resolver";
     import type {
         Action,
@@ -18,7 +20,10 @@
     export let onEditAttribute: EditActionSetHandler | null = null;
 
     let contextBars: ResolvedContextButtonBar[] = [];
+    let contextToolGroups: ResolvedContextToolGroup[] = [];
     let closedSections: Record<string, boolean> = {};
+
+    $: contextToolGroups = resolveContextTools(selectedElementName);
 
     $: contextBars = resolveContextButtonBars(selectedElementName, {
         includeDialogs: true,
@@ -45,7 +50,23 @@
     />
 {/if}
 
-<!-- Add context menu as buttons -->
+{#if contextToolGroups.length > 0}
+    <div class="vrv-context-actions" aria-label="Context actions">
+        {#each contextToolGroups as group}
+            <div class="vrv-context-action-group">
+                {#each group as action}
+                    <button
+                        class="vrv-context-action-button"
+                        type="button"
+                        title={action.label}
+                        disabled={insertMode}
+                        on:click={() => handleContextAction(action)}
+                    >{action.label}</button>
+                {/each}
+            </div>
+        {/each}
+    </div>
+{/if}
 
 {#each contextBars as bar}
     <div

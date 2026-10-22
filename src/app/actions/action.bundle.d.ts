@@ -30,6 +30,7 @@ export type ContextButtonBar = {
 };
 
 export const actionCatalog: Record<string, ActionCatalogEntry[]>;
+export const contextTools: Record<string, ActionEntry[][]>;
 export const contextButtonBars: Record<string, ContextButtonBar[]>;
 export const menuActions: ActionEntry[];
 export const actionDefinitions: Record<string, EditAction>;
