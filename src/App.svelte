@@ -301,6 +301,20 @@
         }));
     }
 
+    function toggleSidePanel() {
+        userPreferences.update((preferences) => ({
+            ...preferences,
+            sidePanelVisible: !preferences.sidePanelVisible,
+        }));
+    }
+
+    function toggleContextPanel() {
+        userPreferences.update((preferences) => ({
+            ...preferences,
+            contextPanelVisible: !preferences.contextPanelVisible,
+        }));
+    }
+
     function setInputMode(inputMode: InputMode) {
         userPreferences.update((preferences) => ({
             ...preferences,
@@ -693,6 +707,10 @@
         onToggleMode={toggleMode}
         pianoKeyboardEnabled={$userPreferences.pianoKeyboardEnabled}
         onTogglePianoKeyboard={togglePianoKeyboard}
+        sidePanelVisible={$userPreferences.sidePanelVisible}
+        contextPanelVisible={$userPreferences.contextPanelVisible}
+        onToggleSidePanel={toggleSidePanel}
+        onToggleContextPanel={toggleContextPanel}
         inputMode={$userPreferences.inputMode}
         onInputModeChange={setInputMode}
         {xmlMode}
@@ -727,6 +745,8 @@
             selection={$editStatus.selection}
             insertMode={$editStatus.insertMode}
             pianoKeyboardEnabled={$userPreferences.pianoKeyboardEnabled}
+            sidePanelVisible={$userPreferences.sidePanelVisible}
+            contextPanelVisible={$userPreferences.contextPanelVisible}
             pianoKeyboardOctave={$pianoKeyboardOctave}
             onPianoKeyboardOctaveChange={handlePianoKeyboardOctaveChange}
             onPianoKeyboardMidiSelect={handlePianoKeyboardMidiSelect}

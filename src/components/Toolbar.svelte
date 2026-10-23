@@ -7,6 +7,10 @@
     export let onToggleMode: () => void;
     export let pianoKeyboardEnabled = false;
     export let onTogglePianoKeyboard: () => void;
+    export let sidePanelVisible = true;
+    export let contextPanelVisible = true;
+    export let onToggleSidePanel: (() => void) | null = null;
+    export let onToggleContextPanel: (() => void) | null = null;
     export let inputMode: InputMode = "durationFirst";
     export let onInputModeChange: (inputMode: InputMode) => void;
     export let xmlMode = false;
@@ -30,6 +34,8 @@
     const refreshLayoutIconUrl = withBaseUrl("icons/editor/update.png");
     const showHiddenIconUrl = withBaseUrl("icons/toolbar/show-hidden.png");
     const autoBeamIconUrl = withBaseUrl("icons/editor/auto-beam.png");
+    const leftPanelIconUrl = withBaseUrl("icons/toolbar/left-panel.png");
+    const rightPanelIconUrl = withBaseUrl("icons/toolbar/right-panel.png");
 
     function handleButtonKeydown(event: KeyboardEvent, handler: () => void) {
         if (event.key !== "Enter" && event.key !== " ") return;
@@ -149,6 +155,31 @@
             on:keydown={(event) => handleButtonKeydown(event, handleToggleAutoBeam)}
         >
             <span class="vrv-tooltip">Automatically beam inserted notes</span>
+        </div>
+        <div class="vrv-h-separator"></div>
+        <div
+            class="vrv-btn-icon-large vrv-toggleable {sidePanelVisible ? 'toggled' : ''}"
+            style={`background-image: url('${leftPanelIconUrl}');`}
+            role="button"
+            tabindex="0"
+            aria-label="Show or hide left panel"
+            aria-pressed={sidePanelVisible}
+            on:click={() => onToggleSidePanel?.()}
+            on:keydown={(event) => handleButtonKeydown(event, () => onToggleSidePanel?.())}
+        >
+            <span class="vrv-tooltip">Show or hide left panel</span>
+        </div>
+        <div
+            class="vrv-btn-icon-large vrv-toggleable {contextPanelVisible ? 'toggled' : ''}"
+            style={`background-image: url('${rightPanelIconUrl}');`}
+            role="button"
+            tabindex="0"
+            aria-label="Show or hide right panel"
+            aria-pressed={contextPanelVisible}
+            on:click={() => onToggleContextPanel?.()}
+            on:keydown={(event) => handleButtonKeydown(event, () => onToggleContextPanel?.())}
+        >
+            <span class="vrv-tooltip">Show or hide right panel</span>
         </div>
     {/if}
 </section>

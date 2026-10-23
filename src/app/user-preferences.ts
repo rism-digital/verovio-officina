@@ -34,6 +34,14 @@ export function loadUserPreferencesFromStorage(): UserPreferences {
                 typeof parsed.pianoKeyboardEnabled === "boolean"
                     ? parsed.pianoKeyboardEnabled
                     : DEFAULT_USER_PREFERENCES.pianoKeyboardEnabled,
+            sidePanelVisible:
+                typeof parsed.sidePanelVisible === "boolean"
+                    ? parsed.sidePanelVisible
+                    : DEFAULT_USER_PREFERENCES.sidePanelVisible,
+            contextPanelVisible:
+                typeof parsed.contextPanelVisible === "boolean"
+                    ? parsed.contextPanelVisible
+                    : DEFAULT_USER_PREFERENCES.contextPanelVisible,
             inputMode: isInputMode(parsed.inputMode)
                 ? parsed.inputMode
                 : DEFAULT_USER_PREFERENCES.inputMode,

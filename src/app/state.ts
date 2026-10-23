@@ -7,6 +7,8 @@ export type PianoKeyboardMode = 'flat' | 'auto' | 'sharp';
 
 export type UserPreferences = {
     pianoKeyboardEnabled: boolean;
+    sidePanelVisible: boolean;
+    contextPanelVisible: boolean;
     inputMode: InputMode;
     autoBeam: boolean;
     viewMode: ViewMode;
@@ -15,6 +17,8 @@ export type UserPreferences = {
 
 export const DEFAULT_USER_PREFERENCES: UserPreferences = {
     pianoKeyboardEnabled: false,
+    sidePanelVisible: true,
+    contextPanelVisible: true,
     inputMode: 'durationFirst',
     autoBeam: true,
     viewMode: 'page',

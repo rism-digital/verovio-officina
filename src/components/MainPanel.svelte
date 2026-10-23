@@ -26,6 +26,8 @@
     export let selection: EditStatus["selection"] = null;
     export let insertMode = false;
     export let pianoKeyboardEnabled = false;
+    export let sidePanelVisible = true;
+    export let contextPanelVisible = true;
     export let pianoKeyboardOctave = 4;
     export let onResize: (size: { width: number; height: number }) => void;
     export let onElementSelect: SelectElementHandler | null = null;
@@ -470,12 +472,14 @@
         <div class="vrv-filter" aria-hidden="true">{@html filterMarkup}</div>
     {/if}
     <div class="vrv-h-split">
-        <SidePanel
-            onSelectElement={handleSelect}
-            onHoverElement={handleHover}
-            {onTargetedContextAction}
-            {editResponseContent}
-        />
+        {#if sidePanelVisible}
+            <SidePanel
+                onSelectElement={handleSelect}
+                onHoverElement={handleHover}
+                {onTargetedContextAction}
+                {editResponseContent}
+            />
+        {/if}
         <div class="vrv-v-split">
             <div
                 class:page={viewMode === "page"}
@@ -510,15 +514,17 @@
                 ></Keyboard>
             {/if}
         </div>
-        <ContextPanel
-            selectedElementName={editResponseContent?.object?.element ?? null}
-            hasSecondarySelection={Boolean(selection?.secondaryId)}
-            {insertMode}
-            {onContextAction}
-            {editResponseContent}
-            {rngMEIAll}
-            {rngMEIBasic}
-            onEditAttribute={handleEditAttribute}
-        />
+        {#if contextPanelVisible}
+            <ContextPanel
+                selectedElementName={editResponseContent?.object?.element ?? null}
+                hasSecondarySelection={Boolean(selection?.secondaryId)}
+                {insertMode}
+                {onContextAction}
+                {editResponseContent}
+                {rngMEIAll}
+                {rngMEIBasic}
+                onEditAttribute={handleEditAttribute}
+            />
+        {/if}
     </div>
 </div>
