@@ -85,8 +85,9 @@ export class EditorController {
         xmlIdSeed: 1,
     };
 
-    constructor(workerUrl: string | URL, stores: ControllerStores) {
-        this.worker = new Worker(workerUrl, { type: "classic" });
+    constructor(stores: ControllerStores) {
+        // Written out here so that Vite serves the worker as a classic script in dev too.
+        this.worker = new Worker(new URL("./worker/worker.ts", import.meta.url), { type: "classic" });
         this.bridge = createWorkerBridge(this.worker);
         this.stores = stores;
     }

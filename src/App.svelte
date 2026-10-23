@@ -13,7 +13,6 @@
     import Menu from "./components/Menu.svelte";
     import Toolbar from "./components/Toolbar.svelte";
     import StatusBar from "./components/StatusBar.svelte";
-    import workerUrl from "./app/worker/worker.ts?worker&url";
     import { withBaseUrl } from "./app/asset-url";
     import { initMEIAutosave, type AutosaveHandle } from "./app/autosave";
     import { EditorController } from "./app/editor-controller";
@@ -133,7 +132,6 @@
     }
 
     const controller = new EditorController(
-        workerUrl,
         {
             verovioState,
             viewModel,
