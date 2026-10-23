@@ -75,7 +75,7 @@ export const contextTools = {
     staff: [
         [
             {
-                name: "Edit staff definition",
+                name: "Edit global staff definition",
                 action: "edit-staff-definition",
                 appAction: "open-staff-def",
             }
