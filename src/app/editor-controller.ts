@@ -408,7 +408,7 @@ export class EditorController {
         const inputMode = get(this.stores.userPreferences).inputMode;
         if (editStatus.insertMode) {
             if (chordMode) return;
-            if (editStatus.insertion?.chordMode && inputMode === "durationFirst") {
+            if (editStatus.insertion?.chordMode) {
                 return await this.vrvResetCursor(true);
             }
             const ok = await this.vrvEdit({
