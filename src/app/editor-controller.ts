@@ -253,27 +253,27 @@ export class EditorController {
             case "scoreDef":
                 return { 
                     action: "getScoreDef",
-                    param: { elementId },
+                    param: { scoreDefId: elementId },
                 };
             case "staffGrp":
                 return {
                     action: "getScoreDefStaffGrp",
-                    param: { elementId },
+                    param: { scoreDefId: elementId },
                 };
             case "keySig":
                 return {
                     action: "getScoreDefKeySig",
-                    param: { elementId },
+                    param: { scoreDefId: elementId },
                 };
             case "meterSig":
                 return {
                     action: "getScoreDefMeterSig",
-                    param: { elementId },
+                    param: { scoreDefId: elementId },
                 };
             case "staffDef":
                 return {
                     action: "getScoreDefStaffDef",
-                    param: {},
+                    param: { staffId: elementId },
                 };
         }
     }
@@ -287,14 +287,14 @@ export class EditorController {
             case "scoreDef":
                 return {
                     action: "setScoreDef",
-                    param: { subTree, elementId },
+                    param: { subTree, scoreDefId: elementId },
                 };
             case "staffGrp":
                 return {
                     action: "setScoreDefStaffGrp",
                     param: {
                         subTree,
-                        elementId,
+                        scoreDefId: elementId,
                     },
                 };
             case "keySig":
@@ -302,7 +302,7 @@ export class EditorController {
                     action: "setScoreDefKeySig",
                     param: {
                         subTree,
-                        elementId,
+                        scoreDefId: elementId,
                     },
                 };
             case "meterSig":
@@ -310,13 +310,16 @@ export class EditorController {
                     action: "setScoreDefMeterSig",
                     param: {
                         subTree,
-                        elementId,
+                        scoreDefId: elementId,
                     },
                 };
             case "staffDef":
                 return {
                     action: "setScoreDefStaffDef",
-                    param: { subTree },
+                    param: { 
+                        subTree,
+                        staffId: elementId,
+                    },
                 };
         }
     }

@@ -125,13 +125,14 @@ export type EditActionParam =
     | EditActionResetCursorParam
     | EditActionResetCursorContainerParam
     | EditActionGetScoreDefParam
+    | EditActionSetScoreDefParam
     | EditActionGetScoreDefKeySigParam
     | EditActionSetScoreDefKeySigParam
     | EditActionGetScoreDefMeterSigParam
     | EditActionSetScoreDefMeterSigParam
     | EditActionGetScoreDefStaffGrpParam
     | EditActionSetScoreDefStaffGrpParam
-    | EditActionSetScoreDefParam
+    | EditActionGetScoreDefStaffDefParam
     | EditActionSetScoreDefStaffDefParam
     | EditActionSelectParam
     | EditActionSetParam
@@ -326,7 +327,7 @@ export type EditActionSetScoreDefStaffGrp = {
 
 export type EditActionGetScoreDefStaffDef = {
     action: "getScoreDefStaffDef";
-    param: {}
+    param: EditActionGetScoreDefStaffDefParam
 };
 
 export type EditActionSetScoreDefStaffDef = {
@@ -479,43 +480,48 @@ export type EditActionResetCursorContainerParam = {
 };
 
 export type EditActionGetScoreDefParam = {
-    elementId: string;
-};
-
-export type EditActionGetScoreDefKeySigParam = {
-    elementId: string;
-};
-
-export type EditActionSetScoreDefKeySigParam = {
-    subTree: TreeNodeData;
-    elementId: string;
-};
-
-export type EditActionGetScoreDefMeterSigParam = {
-    elementId: string;
-};
-
-export type EditActionSetScoreDefMeterSigParam = {
-    subTree: TreeNodeData;
-    elementId: string;
-};
-
-export type EditActionGetScoreDefStaffGrpParam = {
-    elementId: string;
-};
-
-export type EditActionSetScoreDefStaffGrpParam = {
-    subTree: TreeNodeData;
-    elementId: string;
+    scoreDefId: string;
 };
 
 export type EditActionSetScoreDefParam = {
     subTree: TreeNodeData;
-    elementId: string;
+    scoreDefId: string;
 };
+
+export type EditActionGetScoreDefKeySigParam = {
+    scoreDefId: string;
+};
+
+export type EditActionSetScoreDefKeySigParam = {
+    subTree: TreeNodeData;
+    scoreDefId: string;
+};
+
+export type EditActionGetScoreDefMeterSigParam = {
+    scoreDefId: string;
+};
+
+export type EditActionSetScoreDefMeterSigParam = {
+    subTree: TreeNodeData;
+    scoreDefId: string;
+};
+
+export type EditActionGetScoreDefStaffGrpParam = {
+    scoreDefId: string;
+};
+
+export type EditActionSetScoreDefStaffGrpParam = {
+    subTree: TreeNodeData;
+    scoreDefId: string;
+};
+
+export type EditActionGetScoreDefStaffDefParam = {
+    staffId: string;
+}
 
 export type EditActionSetScoreDefStaffDefParam = {
     subTree: TreeNodeData;
+    staffId: string;
 };
 
 export type EditActionSelectParam = {
