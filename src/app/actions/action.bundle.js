@@ -165,6 +165,7 @@ const setArticulations = [
 ]
 
 const setMordentGlyphs = [
+    { name: "Automatic", action: "reset-glyph", icon: "icons/editor/auto.png" },
     { name: "Slide", action: "set-glyph-E5B0", icon: "icons/editor/mordent-E5B0.png" },
     { name: "Descending slide", action: "set-glyph-E5B1", icon: "icons/editor/mordent-E5B1.png" },
     { name: "Appoggiatura trill", action: "set-glyph-E5B2", icon: "icons/editor/mordent-E5B2.png" },
@@ -227,6 +228,12 @@ const controlEventPlace = [
     { name: "Place below", action: "set-place-below", icon: "icons/editor/place-below.png" },
 ]
 
+const ornamentEnclosures = [
+    { name: "Auto", action: "set-enclose-auto", value: "", icon: "icons/editor/auto.png" },
+    { name: "Brackets", action: "set-enclose-brack", value: "brack", icon: "icons/editor/enclose-brack.png" },
+    { name: "Parentheses", action: "set-enclose-paren", value: "paren", icon: "icons/editor/enclose-paren.png" },
+]
+
 const insertControlEvent = [
     { name: "Add hairpin", action: "add-hairpin", icon: "icons/editor/hairpin.png", secondary: true },
     { name: "Add slur", action: "add-slur", icon: "icons/editor/slur.png", secondary: true },
@@ -278,6 +285,31 @@ const turnForms = [
 const hairpinForms = [
     { name: "Crescendo", action: "set-hairpin-form-cres", value: "cres", icon: "icons/editor/hairpin.png" },
     { name: "Diminuendo", action: "set-hairpin-form-dim", value: "dim", icon: "icons/editor/hairpin-dim.png" },
+]
+
+const fermataShapes = [
+    { name: "Auto", action: "set-fermata-shape-auto", value: "", icon: "icons/editor/auto.png" },
+    { name: "Angular", action: "set-fermata-shape-angular", value: "angular", icon: "icons/editor/fermata-E4C4.png" },
+    { name: "Curved", action: "set-fermata-shape-curved", value: "curved", icon: "icons/editor/fermata-E4C0.png" },
+    { name: "Square", action: "set-fermata-shape-square", value: "square", icon: "icons/editor/fermata-E4C6.png" },
+]
+
+const setFermataGlyphs = [
+    { name: "Automatic", action: "reset-glyph", icon: "icons/editor/auto.png" },
+    { name: "Fermata above", action: "set-glyph-E4C0", icon: "icons/editor/fermata-E4C0.png" },
+    { name: "Fermata below", action: "set-glyph-E4C1", icon: "icons/editor/fermata-E4C1.png" },
+    { name: "Very short above", action: "set-glyph-E4C2", icon: "icons/editor/fermata-E4C2.png" },
+    { name: "Very short below", action: "set-glyph-E4C3", icon: "icons/editor/fermata-E4C3.png" },
+    { name: "Short above", action: "set-glyph-E4C4", icon: "icons/editor/fermata-E4C4.png" },
+    { name: "Short below", action: "set-glyph-E4C5", icon: "icons/editor/fermata-E4C5.png" },
+    { name: "Long above", action: "set-glyph-E4C6", icon: "icons/editor/fermata-E4C6.png" },
+    { name: "Long below", action: "set-glyph-E4C7", icon: "icons/editor/fermata-E4C7.png" },
+    { name: "Very long above", action: "set-glyph-E4C8", icon: "icons/editor/fermata-E4C8.png" },
+    { name: "Very long below", action: "set-glyph-E4C9", icon: "icons/editor/fermata-E4C9.png" },
+    { name: "Long Henze above", action: "set-glyph-E4CA", icon: "icons/editor/fermata-E4CA.png" },
+    { name: "Long Henze below", action: "set-glyph-E4CB", icon: "icons/editor/fermata-E4CB.png" },
+    { name: "Short Henze above", action: "set-glyph-E4CC", icon: "icons/editor/fermata-E4CC.png" },
+    { name: "Short Henze below", action: "set-glyph-E4CD", icon: "icons/editor/fermata-E4CD.png" },
 ]
 
 const mordentAccidentals = [
@@ -391,6 +423,8 @@ export const contextButtonBars = {
     ],
     fermata: [
         { label: "Placement", actions: controlEventPlace },
+        { label: "Shape", actions: fermataShapes },
+        { label: "Glyph", actions: setFermataGlyphs },
     ],
     fing: [
         { label: "Placement", actions: controlEventPlace },
@@ -405,6 +439,7 @@ export const contextButtonBars = {
     mordent: [
         { label: "Placement", actions: controlEventPlace },
         { label: "Accidental", actions: mordentAccidentals },
+        { label: "Enclose", actions: ornamentEnclosures },
         { label: "Glyph", actions: setMordentGlyphs },
     ],
     rest: [
@@ -417,11 +452,13 @@ export const contextButtonBars = {
     trill: [
         { label: "Placement", actions: controlEventPlace },
         { label: "Accidental", actions: trillAccidentals },
+        { label: "Enclose", actions: ornamentEnclosures },
     ],
     turn: [
         { label: "Placement", actions: controlEventPlace },
         { label: "Form", actions: turnForms },
         { label: "Accidental", actions: turnAccidentals },
+        { label: "Enclose", actions: ornamentEnclosures },
     ]
 };
 
@@ -567,6 +604,50 @@ const formDefinitions = Object.fromEntries(
     ]),
 );
 
+const fermataShapeDefinitions = Object.fromEntries(
+    fermataShapes.map(({ action, value }) => [
+        action,
+        {
+            action: "chain",
+            param: [
+                {
+                    action: "set",
+                    param: {
+                        elementId: "[selection-id]",
+                        attribute: "shape",
+                        value,
+                    },
+                },
+                {
+                    action: "commit",
+                },
+            ],
+        },
+    ]),
+);
+
+const ornamentEnclosureDefinitions = Object.fromEntries(
+    ornamentEnclosures.map(({ action, value }) => [
+        action,
+        {
+            action: "chain",
+            param: [
+                {
+                    action: "set",
+                    param: {
+                        elementId: "[selection-id]",
+                        attribute: "enclose",
+                        value,
+                    },
+                },
+                {
+                    action: "commit",
+                },
+            ],
+        },
+    ]),
+);
+
 const measureBarLineDefinitions = Object.fromEntries(
     ["right", "left"].flatMap((attribute) => measureBarLines.map(({ value }) => [
         `set-measure-${attribute}-${value}`,
@@ -660,6 +741,30 @@ const createAddTurnAction = (form) => ({
 });
 
 export const actionDefinitions = {
+    "reset-glyph": {
+        action: "chain",
+        param: [
+            {
+                action: "set",
+                param: {
+                    elementId: "[selection-id]",
+                    attribute: "glyph.name",
+                    value: "",
+                },
+            },
+            {
+                action: "set",
+                param: {
+                    elementId: "[selection-id]",
+                    attribute: "glyph.auth",
+                    value: "",
+                },
+            },
+            {
+                action: "commit",
+            },
+        ],
+    },
     "open-header-footer": {
         action: "getScoreDef",
         param: {
@@ -933,6 +1038,20 @@ export const actionDefinitions = {
     "set-articulation-stop": createSetArticulationAction("stop"),
     "set-articulation-lhpizz": createSetArticulationAction("lhpizz"),
     "set-articulation-stroke": createSetArticulationAction("stroke"),
+    "set-glyph-E4C0": createSetGlyphAction("fermataAbove"),
+    "set-glyph-E4C1": createSetGlyphAction("fermataBelow"),
+    "set-glyph-E4C2": createSetGlyphAction("fermataVeryShortAbove"),
+    "set-glyph-E4C3": createSetGlyphAction("fermataVeryShortBelow"),
+    "set-glyph-E4C4": createSetGlyphAction("fermataShortAbove"),
+    "set-glyph-E4C5": createSetGlyphAction("fermataShortBelow"),
+    "set-glyph-E4C6": createSetGlyphAction("fermataLongAbove"),
+    "set-glyph-E4C7": createSetGlyphAction("fermataLongBelow"),
+    "set-glyph-E4C8": createSetGlyphAction("fermataVeryLongAbove"),
+    "set-glyph-E4C9": createSetGlyphAction("fermataVeryLongBelow"),
+    "set-glyph-E4CA": createSetGlyphAction("fermataLongHenzeAbove"),
+    "set-glyph-E4CB": createSetGlyphAction("fermataLongHenzeBelow"),
+    "set-glyph-E4CC": createSetGlyphAction("fermataShortHenzeAbove"),
+    "set-glyph-E4CD": createSetGlyphAction("fermataShortHenzeBelow"),
     "set-glyph-E5B0": createSetGlyphAction("ornamentPrecompSlide"),
     "set-glyph-E5B1": createSetGlyphAction("ornamentPrecompDescendingSlide"),
     "set-glyph-E5B2": createSetGlyphAction("ornamentPrecompAppoggTrill"),
@@ -960,6 +1079,8 @@ export const actionDefinitions = {
     "set-glyph-E5C8": createSetGlyphAction("ornamentPrecompTrillLowerSuffix"),
     ...ornamentAccidentalDefinitions,
     ...formDefinitions,
+    ...fermataShapeDefinitions,
+    ...ornamentEnclosureDefinitions,
     ...measureBarLineDefinitions,
     "add-dynam-p": createAddDynamicAction("p"),
     "add-dynam-m": createAddDynamicAction("m"),
