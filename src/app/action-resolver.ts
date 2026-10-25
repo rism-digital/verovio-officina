@@ -55,6 +55,7 @@ function resolveActionEntry(entry: ActionEntry): ResolvedAction | null {
         dialog: entry.dialog,
         valueType: entry.valueType,
         redoLayout: entry.redoLayout,
+        requiredSelectionId: entry.requiredSelectionId,
     };
 }
 

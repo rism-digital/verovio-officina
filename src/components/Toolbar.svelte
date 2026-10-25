@@ -11,6 +11,7 @@
     export let contextPanelVisible = true;
     export let onToggleSidePanel: (() => void) | null = null;
     export let onToggleContextPanel: (() => void) | null = null;
+    export let onSelectMainScoreDef: (() => void) | null = null;
     export let inputMode: InputMode = "durationFirst";
     export let onInputModeChange: (inputMode: InputMode) => void;
     export let xmlMode = false;
@@ -36,6 +37,7 @@
     const autoBeamIconUrl = withBaseUrl("icons/editor/auto-beam.png");
     const leftPanelIconUrl = withBaseUrl("icons/toolbar/left-panel.png");
     const rightPanelIconUrl = withBaseUrl("icons/toolbar/right-panel.png");
+    const scoreDefIconUrl = withBaseUrl("icons/mei/scoreDef.png");
 
     function handleButtonKeydown(event: KeyboardEvent, handler: () => void) {
         if (event.key !== "Enter" && event.key !== " ") return;
@@ -116,6 +118,18 @@
             on:keydown={(event) => handleButtonKeydown(event, () => onToggleContextPanel?.())}
         >
             <span class="vrv-tooltip">Show or hide right panel</span>
+        </div>
+        <div
+            class="vrv-btn-icon-large"
+            style={`background-image: url('${scoreDefIconUrl}');`}
+            role="button"
+            tabindex="0"
+            aria-label="Select main score definition"
+            on:click={() => onSelectMainScoreDef?.()}
+            on:keydown={(event) =>
+                handleButtonKeydown(event, () => onSelectMainScoreDef?.())}
+        >
+            <span class="vrv-tooltip">Select main score definition</span>
         </div>
         <div class="vrv-h-separator"></div>
         <div

@@ -13,6 +13,7 @@
     } from "../app/types";
 
     export let selectedElementName: string | null = null;
+    export let selectedElementId: string | null = null;
     export let hasSecondarySelection = false;
     export let insertMode = false;
     export let onContextAction: ((action: Action) => void) | null = null;
@@ -38,8 +39,16 @@
     }
 
     function handleContextAction(action: Action) {
-        if (insertMode) return;
+        if (isActionDisabled(action)) return;
         onContextAction?.(action);
+    }
+
+    function isActionDisabled(action: Action): boolean {
+        return insertMode
+            || Boolean(
+                action.requiredSelectionId
+                && action.requiredSelectionId !== selectedElementId,
+            );
     }
 </script>
 
@@ -61,7 +70,7 @@
                                 class="vrv-context-action-button"
                                 type="button"
                                 title={action.label}
-                                disabled={insertMode}
+                                disabled={isActionDisabled(action)}
                                 on:click={() => handleContextAction(action)}
                             >{action.label}</button>
                         {/each}

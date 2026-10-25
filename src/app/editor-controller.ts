@@ -157,9 +157,9 @@ export class EditorController {
     async applyScoreDefFromDialog(
         subTree: TreeNodeData,
         update: ScoreDefinitionUpdate,
-        selected = false,
+        elementId: string,
     ): Promise<boolean> {
-        const editAction = this.getSetScoreDefAction(subTree, update, selected);
+        const editAction = this.getSetScoreDefAction(subTree, update, elementId);
         const ok = await this.vrvEdit(editAction, "Failed to apply scoreDef");
         if (!ok) {
             return false;
@@ -230,11 +230,10 @@ export class EditorController {
 
     async getSubTreeForPropDialog(
         level: ScoreDefinitionUpdate,
-        selected = false,
+        elementId: string,
     ): Promise<TreeNodeData | null> {
         try {
-            const editAction = this.getScoreDefAction(level, selected);
-            console.log(editAction);
+            const editAction = this.getScoreDefAction(level, elementId);
             const scoreDefOk = await this.vrvEdit(editAction, "Failed to load scoreDef");
             if (!scoreDefOk) {
                 return null;
@@ -249,27 +248,27 @@ export class EditorController {
         }
     }
 
-    private getScoreDefAction(level: ScoreDefinitionUpdate, selected: boolean): EditAction {
+    private getScoreDefAction(level: ScoreDefinitionUpdate, elementId: string): EditAction {
         switch (level) {
             case "scoreDef":
                 return { 
                     action: "getScoreDef",
-                    param: {},
+                    param: { elementId },
                 };
             case "staffGrp":
                 return {
                     action: "getScoreDefStaffGrp",
-                    param: { selected },
+                    param: { elementId },
                 };
             case "keySig":
                 return {
                     action: "getScoreDefKeySig",
-                    param: { selected },
+                    param: { elementId },
                 };
             case "meterSig":
                 return {
                     action: "getScoreDefMeterSig",
-                    param: { selected },
+                    param: { elementId },
                 };
             case "staffDef":
                 return {
@@ -282,28 +281,37 @@ export class EditorController {
     private getSetScoreDefAction(
         subTree: TreeNodeData,
         update: ScoreDefinitionUpdate,
-        selected: boolean,
+        elementId: string,
     ): EditAction {
         switch (update) {
             case "scoreDef":
                 return {
                     action: "setScoreDef",
-                    param: { subTree },
+                    param: { subTree, elementId },
                 };
             case "staffGrp":
                 return {
                     action: "setScoreDefStaffGrp",
-                    param: { subTree, selected },
+                    param: {
+                        subTree,
+                        elementId,
+                    },
                 };
             case "keySig":
                 return {
                     action: "setScoreDefKeySig",
-                    param: { subTree, selected },
+                    param: {
+                        subTree,
+                        elementId,
+                    },
                 };
             case "meterSig":
                 return {
                     action: "setScoreDefMeterSig",
-                    param: { subTree, selected },
+                    param: {
+                        subTree,
+                        elementId,
+                    },
                 };
             case "staffDef":
                 return {
@@ -1008,9 +1016,12 @@ export class EditorController {
             this.stores.editResponseContent.set(null);
             return;
         }
-        const page = await this.bridge.verovio.getPageWithElement(id);
-        if (page && page > 0 && page !== get(this.stores.verovioState).currentPage) {
-            await this.setCurrentPage(page);
+        const isSpecialSelector = id.startsWith("[") && id.endsWith("]");
+        if (!isSpecialSelector) {
+            const page = await this.bridge.verovio.getPageWithElement(id);
+            if (page && page > 0 && page !== get(this.stores.verovioState).currentPage) {
+                await this.setCurrentPage(page);
+            }
         }
         try {
             const editActionSelect: EditAction = {
@@ -1018,10 +1029,13 @@ export class EditorController {
                 param: { elementId: id },
             }
             const selectOk = await this.bridge.verovio.edit(editActionSelect);
-            const contextOk = selectOk && await this.vrvRefreshContextForElement(id);
-            if (selectOk && contextOk) {
-                await this.vrvRefreshStatus();
-            } else {
+            if (!selectOk) {
+                this.stores.editResponseContent.set(null);
+                return;
+            }
+            const editStatus = await this.vrvRefreshStatus();
+            const selectedId = editStatus.selection?.id;
+            if (!selectedId || !await this.vrvRefreshContextForElement(selectedId)) {
                 this.stores.editResponseContent.set(null);
             }
         } catch (error) {

@@ -68,10 +68,15 @@
         AppActionKey,
         (action: Action) => void | Promise<void>
     > = {
-        "open-staff-def": () => openStaffDefDialog(),
-        "open-staff-groups": () => openStaffGroupsDialog(true),
-        "open-key-signature": () => openKeySigDialog(true),
-        "open-meter-signature": () => openMeterSigDialog(true),
+        "open-staff-def": () =>
+            openStaffDefDialog(get(editStatus).selection?.id),
+        "open-staff-groups": () =>
+            openStaffGroupsDialog(get(editStatus).selection?.id),
+        "open-key-signature": () =>
+            openKeySigDialog(get(editStatus).selection?.id),
+        "open-meter-signature": () =>
+            openMeterSigDialog(get(editStatus).selection?.id),
+        "open-header-footer": () => openHeaderFooterDialog(),
     };
 
     let fileInput: HTMLInputElement | null = null;
@@ -91,7 +96,7 @@
     let settingsOpen = false;
     let showHidden = false;
     let dialogSubTree: TreeNodeData | null = null;
-    let dialogSelected = false;
+    let dialogElementId: string | null = null;
     let xmlReloadDialogOpen = false;
     let enterValueDialogState: EnterValueDialogState | null = null;
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
@@ -259,7 +264,6 @@
     $: canMenuGoPrev = canNavigateView && $verovioState.currentPage > 1;
     $: canMenuGoNext =
         canNavigateView && $verovioState.currentPage < $verovioState.pageCount;
-    $: canHeaderFooter = $editStatus.selection?.element !== "scoreDef";
     $: canUndo = menuInteractionEnabled && $editStatus.canUndo;
     $: canRedo = menuInteractionEnabled && $editStatus.canRedo;
     $: canRefreshLayout = menuInteractionEnabled;
@@ -575,58 +579,64 @@
         localStorage.setItem(HELP_SEEN_STORAGE_KEY, "true");
     }
 
-    async function openStaffDefDialog() {
-        const subTree = await controller.getSubTreeForPropDialog("staffDef");
+    async function openStaffDefDialog(elementId?: string) {
+        if (!elementId) return;
+        const subTree = await controller.getSubTreeForPropDialog("staffDef", elementId);
         if (!subTree) {
             statusLine.set("Failed to load score properties.");
             return;
         }
         dialogSubTree = subTree;
-        dialogSelected = false;
+        dialogElementId = elementId;
         scorePropStaffDefOpen = true;
     }
 
-    async function openStaffGroupsDialog(selected = false) {
-        const subTree = await controller.getSubTreeForPropDialog("staffGrp", selected);
+    async function openStaffGroupsDialog(elementId?: string) {
+        if (!elementId) return;
+        const subTree = await controller.getSubTreeForPropDialog("staffGrp", elementId);
         if (!subTree) {
             statusLine.set("Failed to load score properties.");
             return;
         }
         dialogSubTree = subTree;
-        dialogSelected = selected;
+        dialogElementId = elementId;
         scorePropStaffGrpOpen = true;
     }
 
-    async function openMeterSigDialog(selected = false) {
-        const subTree = await controller.getSubTreeForPropDialog("meterSig", selected);
+    async function openMeterSigDialog(elementId?: string) {
+        if (!elementId) return;
+        const subTree = await controller.getSubTreeForPropDialog("meterSig", elementId);
         if (!subTree) {
             statusLine.set("Failed to load score properties.");
             return;
         }
         dialogSubTree = subTree;
-        dialogSelected = selected;
+        dialogElementId = elementId;
         scorePropMeterSigOpen = true;
     }
 
-    async function openKeySigDialog(selected = false) {
-        const subTree = await controller.getSubTreeForPropDialog("keySig", selected);
+    async function openKeySigDialog(elementId?: string) {
+        if (!elementId) return;
+        const subTree = await controller.getSubTreeForPropDialog("keySig", elementId);
         if (!subTree) {
             statusLine.set("Failed to load score properties.");
             return;
         }
         dialogSubTree = subTree;
-        dialogSelected = selected;
+        dialogElementId = elementId;
         scorePropKeySigOpen = true;
     }
 
     async function openHeaderFooterDialog() {
-        const subTree = await controller.getSubTreeForPropDialog("scoreDef");
+        const elementId = get(editStatus).selection?.id;
+        if (!elementId) return;
+        const subTree = await controller.getSubTreeForPropDialog("scoreDef", elementId);
         if (!subTree) {
             statusLine.set("Failed to load header / footer properties.");
             return;
         }
         dialogSubTree = subTree;
-        dialogSelected = false;
+        dialogElementId = elementId;
         scorePropHeaderFooterOpen = true;
     }
 
@@ -637,7 +647,7 @@
         scorePropMeterSigOpen = false;
         scorePropHeaderFooterOpen = false;
         dialogSubTree = null;
-        dialogSelected = false;
+        dialogElementId = null;
     }
 
     async function confirmPropertiesDialog(
@@ -645,11 +655,11 @@
         edited: boolean,
         update: ScoreDefinitionUpdate,
     ) {
-        if (edited && subTree) {
+        if (edited && subTree && dialogElementId) {
             const ok = await controller.applyScoreDefFromDialog(
                 subTree,
                 update,
-                dialogSelected,
+                dialogElementId,
             );
             if (!ok) {
                 statusLine.set("Failed to apply score properties.");
@@ -682,11 +692,6 @@
         onNextPage={() =>
             controller.setCurrentPage(get(verovioState).currentPage + 1)}
         onToggleXml={toggleXmlMode}
-        onStaffGroups={openStaffGroupsDialog}
-        onKeySig={openKeySigDialog}
-        onMeterSig={openMeterSigDialog}
-        onHeaderFooter={openHeaderFooterDialog}
-        canScoreDef={canHeaderFooter}
         viewMode={$userPreferences.viewMode}
         onViewModeChange={setViewMode}
         onContextAction={handleToolbarAction}
@@ -711,6 +716,7 @@
         contextPanelVisible={$userPreferences.contextPanelVisible}
         onToggleSidePanel={toggleSidePanel}
         onToggleContextPanel={toggleContextPanel}
+        onSelectMainScoreDef={() => controller.vrvSelect("[main-scoredef]")}
         inputMode={$userPreferences.inputMode}
         onInputModeChange={setInputMode}
         {xmlMode}

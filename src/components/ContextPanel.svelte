@@ -9,6 +9,7 @@
     import type { RNGLoader } from "../app/rng-loader";
 
     export let selectedElementName: string | null = null;
+    export let selectedElementId: string | null = null;
     export let hasSecondarySelection = false;
     export let insertMode = false;
     export let onContextAction: ((action: Action) => void) | null = null;
@@ -50,6 +51,7 @@
                 {#if activeTab === "tools"}
                     <ContextToolsTab
                         {selectedElementName}
+                        {selectedElementId}
                         {hasSecondarySelection}
                         {insertMode}
                         {onContextAction}

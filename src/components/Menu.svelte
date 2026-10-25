@@ -11,7 +11,6 @@
     export let canZoomOut = true;
     export let canGoPrev = false;
     export let canGoNext = false;
-    export let canScoreDef = true;
     export let xmlMode = false;
     export let viewMode: ViewMode = "page";
 
@@ -23,10 +22,6 @@
     export let onPrevPage: ActionHandler | null = null;
     export let onNextPage: ActionHandler | null = null;
     export let onToggleXml: ActionHandler | null = null;
-    export let onStaffGroups: ActionHandler | null = null;
-    export let onMeterSig: ActionHandler | null = null;
-    export let onKeySig: ActionHandler | null = null;
-    export let onHeaderFooter: ActionHandler | null = null;
     export let onViewModeChange:
         | ((viewMode: ViewMode) => void | Promise<void>)
         | null = null;
@@ -84,48 +79,6 @@
                 class="vrv-menu-text"
                 data-before="Export as SVG"
                 on:click={() => onExport?.()}
-            ></div>
-        </div>
-    </div>
-    <div class="vrv-menu">
-        <div class="vrv-btn-text" data-before="Edit"></div>
-        <div class="vrv-menu-content">
-            <div class="vrv-v-separator"></div>
-            <div
-                class="vrv-menu-text {canScoreDef ? '' : 'disabled'}"
-                data-before="Staff group properties"
-                role="menuitem"
-                tabindex="0"
-                on:click={() => onStaffGroups?.()}
-                on:keydown={(event) =>
-                    handleMenuItemKeydown(event, onStaffGroups)}
-            ></div>
-            <div
-                class="vrv-menu-text {canScoreDef ? '' : 'disabled'}"
-                data-before="Key signature"
-                role="menuitem"
-                tabindex="0"
-                on:click={() => onKeySig?.()}
-                on:keydown={(event) =>
-                    handleMenuItemKeydown(event, onKeySig)}
-            ></div>
-            <div
-                class="vrv-menu-text  {canScoreDef ? '' : 'disabled'}"
-                data-before="Meter signature"
-                role="menuitem"
-                tabindex="0"
-                on:click={() => onMeterSig?.()}
-                on:keydown={(event) =>
-                    handleMenuItemKeydown(event, onMeterSig)}
-            ></div>
-            <div
-                class="vrv-menu-text"
-                data-before="Header / footer"
-                role="menuitem"
-                tabindex="0"
-                on:click={() => onHeaderFooter?.()}
-                on:keydown={(event) =>
-                    handleMenuItemKeydown(event, onHeaderFooter)}
             ></div>
         </div>
     </div>

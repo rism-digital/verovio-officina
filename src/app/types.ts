@@ -11,7 +11,8 @@ export type AppActionKey =
     | "open-staff-def"
     | "open-staff-groups"
     | "open-key-signature"
-    | "open-meter-signature";
+    | "open-meter-signature"
+    | "open-header-footer";
 export type ScoreDefinitionUpdate = "scoreDef" | "staffGrp" | "staffDef" | "keySig" | "meterSig";
 
 export type ActionMetadata = {
@@ -20,6 +21,7 @@ export type ActionMetadata = {
     dialogValue?: string | number;
     valueType?: ActionValueType;
     redoLayout?: boolean;
+    requiredSelectionId?: string;
 };
 
 export type Action = ActionMetadata & EditAction & {
@@ -122,6 +124,7 @@ export type EditActionParam =
     | EditActionPropertiesParam
     | EditActionResetCursorParam
     | EditActionResetCursorContainerParam
+    | EditActionGetScoreDefParam
     | EditActionGetScoreDefKeySigParam
     | EditActionSetScoreDefKeySigParam
     | EditActionGetScoreDefMeterSigParam
@@ -283,7 +286,7 @@ export type EditActionResetCursorContainer = {
 
 export type EditActionGetScoreDef = {
     action: "getScoreDef";
-    param: {}
+    param: EditActionGetScoreDefParam;
 };
 
 export type EditActionSetScoreDef = {
@@ -475,35 +478,40 @@ export type EditActionResetCursorContainerParam = {
     container: "tuplet" | "beam" | "graceGrp";
 };
 
+export type EditActionGetScoreDefParam = {
+    elementId: string;
+};
+
 export type EditActionGetScoreDefKeySigParam = {
-    selected?: boolean;
+    elementId: string;
 };
 
 export type EditActionSetScoreDefKeySigParam = {
     subTree: TreeNodeData;
-    selected?: boolean;
+    elementId: string;
 };
 
 export type EditActionGetScoreDefMeterSigParam = {
-    selected?: boolean;
+    elementId: string;
 };
 
 export type EditActionSetScoreDefMeterSigParam = {
     subTree: TreeNodeData;
-    selected?: boolean;
+    elementId: string;
 };
 
 export type EditActionGetScoreDefStaffGrpParam = {
-    selected?: boolean;
+    elementId: string;
 };
 
 export type EditActionSetScoreDefStaffGrpParam = {
     subTree: TreeNodeData;
-    selected?: boolean;
+    elementId: string;
 };
 
 export type EditActionSetScoreDefParam = {
     subTree: TreeNodeData;
+    elementId: string;
 };
 
 export type EditActionSetScoreDefStaffDefParam = {
@@ -557,7 +565,6 @@ export type EditActionUpdateScoreDefParam = {
         | "insertAbove"
         | "insertBelow"
         | "insertLayer"
-        | "deleteLayer"
         | "deleteStaff"
         | "moveUp"
         | "moveDown"

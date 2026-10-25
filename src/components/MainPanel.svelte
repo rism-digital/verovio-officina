@@ -189,6 +189,7 @@
 
     function clearSelected(id: string | null) {
         if (!svgWrapper || !id) return;
+        if (id.startsWith('[')) return;
         let element = <SVGElement>svgWrapper.querySelector("#" + id);
         if (element) {
             highlightWithColor(element, "");
@@ -197,6 +198,7 @@
 
     function highlightSelected(id: string | null, color: string) {
         if (!svgWrapper || !id) return;
+        if (id.startsWith('[')) return;
         let element = <SVGElement>svgWrapper.querySelector("#" + id);
         if (element) {
             highlightWithColor(element, color);
@@ -516,7 +518,10 @@
         </div>
         {#if contextPanelVisible}
             <ContextPanel
-                selectedElementName={editResponseContent?.object?.element ?? null}
+                selectedElementName={selection?.element
+                    ?? editResponseContent?.object?.element
+                    ?? null}
+                selectedElementId={selection?.id ?? null}
                 hasSecondarySelection={Boolean(selection?.secondaryId)}
                 {insertMode}
                 {onContextAction}

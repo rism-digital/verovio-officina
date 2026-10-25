@@ -57,11 +57,6 @@ export const contextTools = {
     ]],
     scoreDef: [[
         {
-            name: "Staff group properties",
-            action: "open-staff-groups",
-            appAction: "open-staff-groups",
-        },
-        {
             name: "Key signature",
             action: "open-key-signature",
             appAction: "open-key-signature",
@@ -71,6 +66,21 @@ export const contextTools = {
             action: "open-meter-signature",
             appAction: "open-meter-signature",
         },
+    ],
+    [
+        {
+            name: "Staff group properties",
+            action: "open-staff-groups",
+            appAction: "open-staff-groups",
+        }
+    ],
+    [
+        {
+            name: "Header / footer",
+            action: "open-header-footer",
+            appAction: "open-header-footer",
+            requiredSelectionId: "[main-scoredef]",
+        }
     ]],
     staff: [
         [
@@ -650,22 +660,28 @@ const createAddTurnAction = (form) => ({
 });
 
 export const actionDefinitions = {
+    "open-header-footer": {
+        action: "getScoreDef",
+        param: {
+            elementId: "[selection-id]",
+        },
+    },
     "open-staff-groups": {
         action: "getScoreDefStaffGrp",
         param: {
-            selected: true,
+            elementId: "[selection-id]",
         },
     },
     "open-key-signature": {
         action: "getScoreDefKeySig",
         param: {
-            selected: true,
+            elementId: "[selection-id]",
         },
     },
     "open-meter-signature": {
         action: "getScoreDefMeterSig",
         param: {
-            selected: true,
+            elementId: "[selection-id]",
         },
     },
     "add-staff-above": {
@@ -1000,7 +1016,7 @@ export const actionDefinitions = {
             },
         ],
     },
-     "add-fermata": {
+    "add-fermata": {
         action: "chain",
         param: [
             {
