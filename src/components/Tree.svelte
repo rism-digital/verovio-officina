@@ -19,6 +19,7 @@
     export let showBreadcrumbs = true;
     export let selectOnContextMenu = false;
     export let disabledElements: string[] = [];
+    export let hideChildrenOfElements: string[] = [];
     export let selectedId: string | null = null;
     export let onSelectElement: SelectElementHandler | null = null;
     export let onHoverElement: HoverElementHandler | null = null;
@@ -119,6 +120,7 @@
             {showRootNode}
             {selectOnContextMenu}
             {disabledElements}
+            {hideChildrenOfElements}
             {selectedId}
             onSelect={onSelectElement}
             onHover={onHoverElement}

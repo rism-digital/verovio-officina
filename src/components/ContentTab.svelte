@@ -41,6 +41,7 @@
             ancestors={editResponseContent?.ancestors ?? null}
             context={editResponseContent?.context ?? null}
             selectedId={$editStatus.selection?.id ?? null}
+            hideChildrenOfElements={["scoreDef"]}
             {onSelectElement}
             {onHoverElement}
             onContextAction={onTargetedContextAction}

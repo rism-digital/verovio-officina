@@ -7,6 +7,7 @@
     export let showRootNode = false;
     export let selectOnContextMenu = false;
     export let disabledElements: string[] = [];
+    export let hideChildrenOfElements: string[] = [];
     export let selectedId: string | null = null;
     export let onSelect: SelectElementHandler | null = null;
     export let onHover: HoverElementHandler | null = null;
@@ -18,9 +19,10 @@
 
     let htmlTreeNode: HTMLDivElement | null = null;
     $: disabled = disabledElements.includes(node.element);
+    $: childrenHidden = hideChildrenOfElements.includes(node.element);
 
     function handleOpenClose() {
-        if (disabled || !htmlTreeNode) return;
+        if (disabled || childrenHidden || !htmlTreeNode) return;
         if (htmlTreeNode.classList.contains("open")) {
             htmlTreeNode.classList.remove("open");
         } else {
@@ -61,7 +63,7 @@
 <div
     class={isRoot
         ? `vrv-tree-root${disabled ? " node-disabled" : " open"}`
-        : `vrv-tree-node${node.isLeaf ? " leaf" : ""}${disabled ? " node-disabled" : ""}${!disabled && node.children?.length ? " open" : ""}`}
+        : `vrv-tree-node${node.isLeaf || childrenHidden ? " leaf" : ""}${disabled ? " node-disabled" : ""}${!disabled && !childrenHidden && node.children?.length ? " open" : ""}`}
     data-id={node.id}
     data-element={node.element}
     on:click|stopPropagation={handleOpenClose}
@@ -80,12 +82,13 @@
         {node.element} {node.attributes?.["n"] ? `${node.attributes["n"]}` : ""}
      </div>
     <div class="vrv-node-children">
-        {#if node.children?.length}
+        {#if !childrenHidden && node.children?.length}
             {#each node.children as child}
                 <svelte:self
                     node={child}
                     {selectOnContextMenu}
                     {disabledElements}
+                    {hideChildrenOfElements}
                     {selectedId}
                     {onSelect}
                     {onHover}
