@@ -7,7 +7,10 @@
     import DialogEnterValue from "./components/dialogs/DialogEnterValue.svelte";
     import DialogExport from "./components/dialogs/DialogExport.svelte";
     import DialogHelp from "./components/dialogs/DialogHelp.svelte";
+    import DialogKeySigProperties from "./components/dialogs/DialogKeySigProperties.svelte";
+    import DialogMeterSigProperties from "./components/dialogs/DialogMeterSigProperties.svelte";
     import DialogScoreProperties from "./components/dialogs/DialogScoreProperties.svelte";
+    import DialogStaffDefProperties from "./components/dialogs/DialogStaffDefProperties.svelte";
     import DialogUserPreferences from "./components/dialogs/DialogUserPreferences.svelte";
     import DialogXmlReload from "./components/dialogs/DialogXmlReload.svelte";
     import Menu from "./components/Menu.svelte";
@@ -840,34 +843,25 @@
         disabledElements={["pgHead", "staffDef"]}
     />
 
-    <DialogScoreProperties
+    <DialogStaffDefProperties
         open={scorePropStaffDefOpen}
-        title="Staff definition"
         subTree={dialogSubTree}
-        update="staffDef"
         onConfirm={confirmPropertiesDialog}
         onCancel={closePropertiesDialog}
-        disabledElements={[]}
     />
 
-    <DialogScoreProperties
+    <DialogMeterSigProperties
         open={scorePropMeterSigOpen}
-        title="Meter or meter group signature"
         subTree={dialogSubTree}
-        update="meterSig"
         onConfirm={confirmPropertiesDialog}
         onCancel={closePropertiesDialog}
-        disabledElements={[]}
     />
 
-    <DialogScoreProperties
+    <DialogKeySigProperties
         open={scorePropKeySigOpen}
-        title="Key signature"
         subTree={dialogSubTree}
-        update="keySig"
         onConfirm={confirmPropertiesDialog}
         onCancel={closePropertiesDialog}
-        disabledElements={[]}
     />
 
     <DialogScoreProperties

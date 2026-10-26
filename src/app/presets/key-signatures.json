@@ -1,0 +1,26 @@
+[
+    {
+        "icon": "keysig-0",
+        "name": "C major / A minor",
+        "preset": {
+            "attributes": { "sig": "0" },
+            "element": "keySig"
+        }
+    },
+    {
+        "icon": "keysig-1s",
+        "name": "G major / D minor",
+        "preset": {
+            "attributes": { "sig": "1s" },
+            "element": "keySig"
+        }
+    },
+    {
+        "icon": "keysig-2s",
+        "name": "D major / B minor",
+        "preset": {
+            "attributes": { "sig": "2s" },
+            "element": "keySig"
+        }
+    }
+]

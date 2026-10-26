@@ -111,6 +111,27 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     background-color: $background;
 }
 
+.vrv-context-action-button {
+    @extend .vrv-clickable;
+    @extend .vrv-activable;
+    appearance: none;
+    box-sizing: border-box;
+    min-height: 28px;
+    border: 1px solid $background-border;
+    background: $background-light;
+    color: $text-color;
+    flex: 1 1 0;
+    font: inherit;
+    min-width: 0;
+    padding: 1px 8px;
+    text-align: left;
+}
+
+.vrv-context-action-button:disabled {
+    opacity: $disabled-opacity;
+    pointer-events: none;
+}
+
 // Disable text selection
 .vrv-text-no-select {
     -webkit-touch-callout: none;
@@ -294,62 +315,6 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 display: flex;
                 gap: 2px;
                 width: 100%;
-            }
-
-            .vrv-context-action-button {
-                @extend .vrv-clickable;
-                @extend .vrv-activable;
-                appearance: none;
-                box-sizing: border-box;
-                min-height: 28px;
-                border: 1px solid $background-border;
-                background: $background-light;
-                color: $text-color;
-                flex: 1 1 0;
-                font: inherit;
-                min-width: 0;
-                padding: 1px 8px;
-                text-align: left;
-            }
-
-            .vrv-context-action-button:disabled {
-                opacity: $disabled-opacity;
-                pointer-events: none;
-            }
-
-            .vrv-context-toolbar {
-                display: flex;
-                flex-flow: row wrap;
-                gap: 4px;
-                min-height: $btn-height;
-                overflow: visible;
-            }
-
-            .vrv-context-toolbar-section {
-                flex: 0 0 auto;
-                min-height: 0;
-                overflow: visible;
-            }
-
-            .vrv-context-tool-button {
-                @extend .vrv-clickable;
-                @extend .vrv-activable;
-                width: 32px;
-                height: 32px;
-                min-width: 32px;
-                min-height: 32px;
-                border: 1px solid $background-border;
-                background-color: $background-light;
-                background-repeat: no-repeat;
-                background-position: center center;
-                background-size: 24px 24px;
-                padding: 0;
-                cursor: pointer;
-            }
-
-            .vrv-context-tool-button:disabled {
-                opacity: $disabled-opacity;
-                pointer-events: none;
             }
 
         }
@@ -1230,6 +1195,35 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 overflow-x: auto;
             }
         }
+
+        &-tabs {
+            width: 100%;
+            min-width: 0;
+        }
+    }
+
+    .vrv-instrument-presets {
+        display: grid;
+        grid-template-columns: minmax(140px, 0.7fr) minmax(180px, 1.3fr);
+        gap: 12px;
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+
+    .vrv-instrument-preset-column {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+        overflow-y: auto;
+
+        > .vrv-context-action-button {
+            flex: 0 0 auto;
+        }
+
+        > .vrv-context-action-button.selected {
+            background-color: $background-toggled;
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -1449,6 +1443,41 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
 
     .vrv-field-set.vrv-collapsible {
         display: flex;
+    }
+
+    .vrv-field-set-panel.vrv-context-toolbar {
+        display: flex;
+        flex-flow: row wrap;
+        gap: 4px;
+        min-height: $btn-height;
+        overflow: visible;
+    }
+
+    .vrv-context-toolbar-section {
+        flex: 0 0 auto;
+        min-height: 0;
+        overflow: visible;
+    }
+
+    .vrv-context-tool-button {
+        @extend .vrv-clickable;
+        @extend .vrv-activable;
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        border: 1px solid $background-border;
+        background-color: $background-light;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 24px 24px;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    .vrv-context-tool-button:disabled {
+        opacity: $disabled-opacity;
+        pointer-events: none;
     }
 
     ////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,26 @@
+[
+    {
+        "icon": "metersig-common",
+        "name": "Common time",
+        "preset": {
+            "attributes": { "sym": "common" },
+            "element": "meterSig"
+        }
+    },
+    {
+        "icon": "metersig-cut",
+        "name": "Cut time",
+        "preset": {
+            "attributes": { "sym": "cut" },
+            "element": "meterSig"
+        }
+    },
+    {
+        "icon": "metersig-3-4",
+        "name": "3/4",
+        "preset": {
+            "attributes": { "unit": "4", "count": "3" },
+            "element": "meterSig"
+        }
+    }
+]
