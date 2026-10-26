@@ -3,6 +3,7 @@ import {
     actionCatalog,
     actionDefinitions,
     contextButtonBars,
+    contextToolComponents,
     contextTools,
     menuActions,
 } from "./actions/action.bundle";
@@ -88,6 +89,13 @@ export function resolveContextTools(
             })
             .filter((row) => row.length > 0))
         .filter((group) => group.length > 0);
+}
+
+export function resolveContextToolComponent(
+    name: string | null,
+): string | null {
+    if (!name) return null;
+    return contextToolComponents[name] ?? null;
 }
 
 function resolveMenuEntries(entries: ActionCatalogEntry[]): ResolvedMenuEntry[] {

@@ -3,6 +3,7 @@
     import ContextToolsTab from "./ContextToolsTab.svelte";
     import type {
         Action,
+        ContextToolsApi,
         EditActionSetHandler,
         EditResponseContent,
     } from "../app/types";
@@ -17,6 +18,7 @@
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
     export let onEditAttribute: EditActionSetHandler | null = null;
+    export let contextToolsApi: ContextToolsApi | null = null;
 
     type ContextTab = "tools" | "attributes";
     let activeTab: ContextTab = "tools";
@@ -57,6 +59,7 @@
                         {onContextAction}
                         {editResponseContent}
                         {onEditAttribute}
+                        {contextToolsApi}
                     />
                 {:else}
                     <ContextAttributesTab

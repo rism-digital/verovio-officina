@@ -133,6 +133,10 @@ export const contextTools = {
     ]],
 };
 
+export const contextToolComponents = {
+    scoreDef: "ScoreDefContextTools",
+};
+
 const insertArticulations = [
     { name: "Accent", action: "add-articulation-acc", icon: "icons/editor/artic-E4A0.png" },
     { name: "Staccato", action: "add-articulation-stacc", icon: "icons/editor/artic-E4A2.png" },

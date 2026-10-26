@@ -29,6 +29,7 @@
     import type {
         Action,
         AppActionKey,
+        ContextToolsApi,
         MEIExportOptions,
         ScoreDefinitionUpdate,
         TargetedContextAction,
@@ -153,6 +154,11 @@
             userPreferences,
         },
     );
+
+    const contextToolsApi: ContextToolsApi = {
+        loadSubTree: (level, elementId) =>
+            controller.getSubTreeForPropDialog(level, elementId),
+    };
 
     const shortcuts = createKeyShortcuts(controller, {
         togglePianoKeyboard,
@@ -767,6 +773,7 @@
             onElementDrag={(param) => controller.vrvDrag(param)}
             onContextAction={handleToolbarAction}
             onTargetedContextAction={handleTargetedContextAction}
+            {contextToolsApi}
             editResponseContent={$editResponseContent}
             {rngMEIAll}
             {rngMEIBasic}

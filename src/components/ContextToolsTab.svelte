@@ -1,13 +1,16 @@
 <script lang="ts">
+    import type { Component } from "svelte";
     import AttributeList from "./AttributeList.svelte";
     import {
         resolveContextButtonBars,
+        resolveContextToolComponent,
         resolveContextTools,
         type ResolvedContextButtonBar,
         type ResolvedContextToolGroup,
     } from "../app/action-resolver";
     import type {
         Action,
+        ContextToolsApi,
         EditActionSetHandler,
         EditResponseContent,
     } from "../app/types";
@@ -19,10 +22,35 @@
     export let onContextAction: ((action: Action) => void) | null = null;
     export let editResponseContent: EditResponseContent | null = null;
     export let onEditAttribute: EditActionSetHandler | null = null;
+    export let contextToolsApi: ContextToolsApi | null = null;
+
+    type ContextToolComponentModule = {
+        default: Component<Record<string, unknown>>;
+    };
+
+    const contextToolComponentModules = import.meta.glob<ContextToolComponentModule>(
+        "./*ContextTools.svelte",
+        { eager: true },
+    );
+
+    function getContextToolComponent(
+        componentName: string | null,
+    ): Component<Record<string, unknown>> | null {
+        if (!componentName) return null;
+        return contextToolComponentModules[`./${componentName}.svelte`]?.default
+            ?? null;
+    }
 
     let contextBars: ResolvedContextButtonBar[] = [];
     let contextToolGroups: ResolvedContextToolGroup[] = [];
     let closedSections: Record<string, boolean> = {};
+    let customToolComponent: Component<Record<string, unknown>> | null = null;
+    $: customToolComponent = selectedElementName
+        && editResponseContent?.object?.id === selectedElementId
+        ? getContextToolComponent(
+            resolveContextToolComponent(selectedElementName),
+        )
+        : null;
 
     $: contextToolGroups = resolveContextTools(selectedElementName);
 
@@ -51,6 +79,14 @@
             );
     }
 </script>
+
+{#if customToolComponent}
+    <svelte:component
+        this={customToolComponent}
+        elementId={selectedElementId}
+        {contextToolsApi}
+    />
+{/if}
 
 {#if editResponseContent?.object?.element === "text"}
     <AttributeList

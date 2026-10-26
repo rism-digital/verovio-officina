@@ -6,6 +6,7 @@
     import { withBaseUrl } from "../app/asset-url";
     import type {
         Action,
+        ContextToolsApi,
         EditActionDragHandler,
         EditActionDragMoveParam,
         EditActionSetParam,
@@ -44,6 +45,7 @@
     export let editResponseContent: EditResponseContent| null = null;
     export let rngMEIAll: RNGLoader | null = null;
     export let rngMEIBasic: RNGLoader | null = null;
+    export let contextToolsApi: ContextToolsApi | null = null;
 
     async function handleSelect(id: string | null) {
         if (id) await onElementSelect?.(id);
@@ -528,6 +530,7 @@
                 {editResponseContent}
                 {rngMEIAll}
                 {rngMEIBasic}
+                {contextToolsApi}
                 onEditAttribute={handleEditAttribute}
             />
         {/if}

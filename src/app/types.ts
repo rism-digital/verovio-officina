@@ -60,6 +60,13 @@ export interface TreeNodeData {
     attributes?: Record<string, unknown>;
 };
 
+export interface ContextToolsApi {
+    loadSubTree: (
+        level: ScoreDefinitionUpdate,
+        elementId: string,
+    ) => Promise<TreeNodeData | null>;
+}
+
 export interface Tab {
     label: string;
     value: number;
