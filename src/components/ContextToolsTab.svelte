@@ -80,13 +80,6 @@
     }
 </script>
 
-{#if customToolComponent}
-    <svelte:component
-        this={customToolComponent}
-        elementId={selectedElementId}
-        {contextToolsApi}
-    />
-{/if}
 
 {#if editResponseContent?.object?.element === "text"}
     <AttributeList
@@ -115,6 +108,14 @@
             </div>
         {/each}
     </div>
+{/if}
+
+{#if customToolComponent}
+    <svelte:component
+        this={customToolComponent}
+        elementId={selectedElementId}
+        {contextToolsApi}
+    />
 {/if}
 
 {#each contextBars as bar}

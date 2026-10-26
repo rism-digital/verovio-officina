@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { ContextToolsApi, TreeNodeData } from "../app/types";
 
-    export let scoreDefId: string | null = null;
+    export let elementId: string | null = null;
     export let contextToolsApi: ContextToolsApi | null = null;
 
     let staffDefs: TreeNodeData[] = [];
@@ -30,8 +30,8 @@
 
     function editStaffDef(staffDef: TreeNodeData) {
         const staffN = staffNumber(staffDef);
-        if (!scoreDefId || !contextToolsApi || staffN === null) return;
-        void contextToolsApi.openStaffDefProperties(scoreDefId, staffN);
+        if (!elementId || !contextToolsApi || staffN === null) return;
+        void contextToolsApi.openStaffDefProperties(elementId, staffN);
     }
 
     async function refresh(
@@ -51,7 +51,7 @@
         loading = false;
     }
 
-    $: void refresh(scoreDefId, contextToolsApi);
+    $: void refresh(elementId, contextToolsApi);
 </script>
 
 {#if loading}
