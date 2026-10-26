@@ -69,8 +69,7 @@
         AppActionKey,
         (action: Action) => void | Promise<void>
     > = {
-        "open-staff-def": () =>
-            openStaffDefDialog(get(editStatus).selection?.id),
+        "open-staff-def": () => openGlobalStaffDefDialog(),
         "open-staff-groups": () =>
             openStaffGroupsDialog(get(editStatus).selection?.id),
         "open-key-signature": () =>
@@ -97,7 +96,8 @@
     let settingsOpen = false;
     let showHidden = false;
     let dialogSubTree: TreeNodeData | null = null;
-    let dialogElementId: string | null = null;
+    let dialogScoreDefId: string | null = null;
+    let dialogStaffN: number | null = null;
     let xmlReloadDialogOpen = false;
     let enterValueDialogState: EnterValueDialogState | null = null;
     let meiExportOptions: MEIExportOptions = DEFAULT_MEI_EXPORT_OPTIONS;
@@ -156,8 +156,10 @@
     );
 
     const contextToolsApi: ContextToolsApi = {
-        loadSubTree: (level, elementId) =>
-            controller.getSubTreeForPropDialog(level, elementId),
+        loadSubTree: (level, scoreDefId, staffN) =>
+            controller.getSubTreeForPropDialog(level, scoreDefId, staffN),
+        openStaffDefProperties: (scoreDefId, staffN) =>
+            openStaffDefDialog(scoreDefId, staffN),
     };
 
     const shortcuts = createKeyShortcuts(controller, {
@@ -585,64 +587,79 @@
         localStorage.setItem(HELP_SEEN_STORAGE_KEY, "true");
     }
 
-    async function openStaffDefDialog(elementId?: string) {
-        if (!elementId) return;
-        const subTree = await controller.getSubTreeForPropDialog("staffDef", elementId);
+    async function openStaffDefDialog(scoreDefId?: string, staffN?: number) {
+        if (!scoreDefId || staffN === undefined) return;
+        const subTree = await controller.getSubTreeForPropDialog(
+            "staffDef",
+            scoreDefId,
+            staffN,
+        );
         if (!subTree) {
             statusLine.set("Failed to load score properties.");
             return;
         }
         dialogSubTree = subTree;
-        dialogElementId = elementId;
+        dialogScoreDefId = scoreDefId;
+        dialogStaffN = staffN;
         scorePropStaffDefOpen = true;
     }
 
-    async function openStaffGroupsDialog(elementId?: string) {
-        if (!elementId) return;
-        const subTree = await controller.getSubTreeForPropDialog("staffGrp", elementId);
+    async function openGlobalStaffDefDialog() {
+        const value = get(editResponseContent)?.object?.attributes?.["n"];
+        const staffN = Number(value);
+        if (!Number.isInteger(staffN) || staffN <= 0) {
+            statusLine.set("Failed to determine the selected staff number.");
+            return;
+        }
+        await openStaffDefDialog("[main-scoredef]", staffN);
+    }
+
+    async function openStaffGroupsDialog(scoreDefId?: string) {
+        if (!scoreDefId) return;
+        const subTree = await controller.getSubTreeForPropDialog("staffGrp", scoreDefId);
         if (!subTree) {
             statusLine.set("Failed to load score properties.");
             return;
         }
         dialogSubTree = subTree;
-        dialogElementId = elementId;
+        dialogScoreDefId = scoreDefId;
         scorePropStaffGrpOpen = true;
     }
 
-    async function openMeterSigDialog(elementId?: string) {
-        if (!elementId) return;
-        const subTree = await controller.getSubTreeForPropDialog("meterSig", elementId);
+    async function openMeterSigDialog(scoreDefId?: string) {
+        if (!scoreDefId) return;
+        const subTree = await controller.getSubTreeForPropDialog("meterSig", scoreDefId);
         if (!subTree) {
             statusLine.set("Failed to load score properties.");
             return;
         }
         dialogSubTree = subTree;
-        dialogElementId = elementId;
+        dialogScoreDefId = scoreDefId;
         scorePropMeterSigOpen = true;
     }
 
-    async function openKeySigDialog(elementId?: string) {
-        if (!elementId) return;
-        const subTree = await controller.getSubTreeForPropDialog("keySig", elementId);
+    async function openKeySigDialog(scoreDefId?: string) {
+        if (!scoreDefId) return;
+        const subTree = await controller.getSubTreeForPropDialog("keySig", scoreDefId);
         if (!subTree) {
             statusLine.set("Failed to load score properties.");
             return;
         }
         dialogSubTree = subTree;
-        dialogElementId = elementId;
+        dialogScoreDefId = scoreDefId;
         scorePropKeySigOpen = true;
     }
 
     async function openHeaderFooterDialog() {
-        const elementId = get(editStatus).selection?.id;
-        if (!elementId) return;
-        const subTree = await controller.getSubTreeForPropDialog("scoreDef", elementId);
+        const scoreDefId = get(editStatus).selection?.id;
+        if (!scoreDefId) return;
+        const subTree = await controller.getSubTreeForPropDialog("scoreDef", scoreDefId);
         if (!subTree) {
             statusLine.set("Failed to load header / footer properties.");
             return;
         }
         dialogSubTree = subTree;
-        dialogElementId = elementId;
+        dialogScoreDefId = scoreDefId;
         scorePropHeaderFooterOpen = true;
     }
 
@@ -653,7 +670,8 @@
         scorePropMeterSigOpen = false;
         scorePropHeaderFooterOpen = false;
         dialogSubTree = null;
-        dialogElementId = null;
+        dialogScoreDefId = null;
+        dialogStaffN = null;
     }
 
     async function confirmPropertiesDialog(
@@ -661,11 +679,12 @@
         edited: boolean,
         update: ScoreDefinitionUpdate,
     ) {
-        if (edited && subTree && dialogElementId) {
+        if (edited && subTree && dialogScoreDefId) {
             const ok = await controller.applyScoreDefFromDialog(
                 subTree,
                 update,
-                dialogElementId,
+                dialogScoreDefId,
+                update === "staffDef" ? dialogStaffN ?? undefined : undefined,
             );
             if (!ok) {
                 statusLine.set("Failed to apply score properties.");

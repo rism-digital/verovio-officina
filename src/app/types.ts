@@ -63,8 +63,13 @@ export interface TreeNodeData {
 export interface ContextToolsApi {
     loadSubTree: (
         level: ScoreDefinitionUpdate,
-        elementId: string,
+        scoreDefId: string,
+        staffN?: number,
     ) => Promise<TreeNodeData | null>;
+    openStaffDefProperties: (
+        scoreDefId: string,
+        staffN: number,
+    ) => void | Promise<void>;
 }
 
 export interface Tab {
@@ -523,12 +528,14 @@ export type EditActionSetScoreDefStaffGrpParam = {
 };
 
 export type EditActionGetScoreDefStaffDefParam = {
-    staffId: string;
+    scoreDefId: string;
+    staffN: number;
 }
 
 export type EditActionSetScoreDefStaffDefParam = {
     subTree: TreeNodeData;
-    staffId: string;
+    scoreDefId: string;
+    staffN: number;
 };
 
 export type EditActionSelectParam = {

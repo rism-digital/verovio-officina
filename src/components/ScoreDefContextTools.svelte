@@ -1,11 +1,8 @@
 <script lang="ts">
     import type { ContextToolsApi, TreeNodeData } from "../app/types";
 
-    export let elementId: string | null = null;
+    export let scoreDefId: string | null = null;
     export let contextToolsApi: ContextToolsApi | null = null;
-    export let onEditStaffDef:
-        | ((staffDef: TreeNodeData) => void | Promise<void>)
-        | null = null;
 
     let staffDefs: TreeNodeData[] = [];
     let loading = false;
@@ -26,24 +23,35 @@
             : `Staff ${String(number)}`;
     }
 
+    function staffNumber(staffDef: TreeNodeData): number | null {
+        const number = Number(staffDef.attributes?.["n"]);
+        return Number.isInteger(number) && number > 0 ? number : null;
+    }
+
+    function editStaffDef(staffDef: TreeNodeData) {
+        const staffN = staffNumber(staffDef);
+        if (!scoreDefId || !contextToolsApi || staffN === null) return;
+        void contextToolsApi.openStaffDefProperties(scoreDefId, staffN);
+    }
+
     async function refresh(
-        currentElementId: string | null,
+        currentScoreDefId: string | null,
         api: ContextToolsApi | null,
     ) {
         const currentRequestId = ++requestId;
         staffDefs = [];
         loading = false;
-        if (!currentElementId || !api) return;
+        if (!currentScoreDefId || !api) return;
 
         loading = true;
-        const scoreDef = await api.loadSubTree("scoreDef", currentElementId);
+        const scoreDef = await api.loadSubTree("scoreDef", currentScoreDefId);
         if (currentRequestId !== requestId) return;
 
         staffDefs = scoreDef ? collectStaffDefs(scoreDef) : [];
         loading = false;
     }
 
-    $: void refresh(elementId, contextToolsApi);
+    $: void refresh(scoreDefId, contextToolsApi);
 </script>
 
 {#if loading}
@@ -57,7 +65,8 @@
                     type="button"
                     data-id={staffDef.id}
                     title={`Edit ${buttonLabel(staffDef, index)}`}
-                    on:click={() => onEditStaffDef?.(staffDef)}
+                    disabled={staffNumber(staffDef) === null}
+                    on:click={() => editStaffDef(staffDef)}
                 >{buttonLabel(staffDef, index)}</button>
             {/each}
         </div>

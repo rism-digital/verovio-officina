@@ -157,9 +157,15 @@ export class EditorController {
     async applyScoreDefFromDialog(
         subTree: TreeNodeData,
         update: ScoreDefinitionUpdate,
-        elementId: string,
+        scoreDefId: string,
+        staffN?: number,
     ): Promise<boolean> {
-        const editAction = this.getSetScoreDefAction(subTree, update, elementId);
+        const editAction = this.getSetScoreDefAction(
+            subTree,
+            update,
+            scoreDefId,
+            staffN,
+        );
         const ok = await this.vrvEdit(editAction, "Failed to apply scoreDef");
         if (!ok) {
             return false;
@@ -230,10 +236,11 @@ export class EditorController {
 
     async getSubTreeForPropDialog(
         level: ScoreDefinitionUpdate,
-        elementId: string,
+        scoreDefId: string,
+        staffN?: number,
     ): Promise<TreeNodeData | null> {
         try {
-            const editAction = this.getScoreDefAction(level, elementId);
+            const editAction = this.getScoreDefAction(level, scoreDefId, staffN);
             const scoreDefOk = await this.vrvEdit(editAction, "Failed to load scoreDef");
             if (!scoreDefOk) {
                 return null;
@@ -248,32 +255,39 @@ export class EditorController {
         }
     }
 
-    private getScoreDefAction(level: ScoreDefinitionUpdate, elementId: string): EditAction {
+    private getScoreDefAction(
+        level: ScoreDefinitionUpdate,
+        scoreDefId: string,
+        staffN?: number,
+    ): EditAction {
         switch (level) {
             case "scoreDef":
                 return { 
                     action: "getScoreDef",
-                    param: { scoreDefId: elementId },
+                    param: { scoreDefId },
                 };
             case "staffGrp":
                 return {
                     action: "getScoreDefStaffGrp",
-                    param: { scoreDefId: elementId },
+                    param: { scoreDefId },
                 };
             case "keySig":
                 return {
                     action: "getScoreDefKeySig",
-                    param: { scoreDefId: elementId },
+                    param: { scoreDefId },
                 };
             case "meterSig":
                 return {
                     action: "getScoreDefMeterSig",
-                    param: { scoreDefId: elementId },
+                    param: { scoreDefId },
                 };
             case "staffDef":
+                if (staffN === undefined) {
+                    throw new Error("staffN is required to load a staff definition");
+                }
                 return {
                     action: "getScoreDefStaffDef",
-                    param: { staffId: elementId },
+                    param: { scoreDefId, staffN },
                 };
         }
     }
@@ -281,20 +295,21 @@ export class EditorController {
     private getSetScoreDefAction(
         subTree: TreeNodeData,
         update: ScoreDefinitionUpdate,
-        elementId: string,
+        scoreDefId: string,
+        staffN?: number,
     ): EditAction {
         switch (update) {
             case "scoreDef":
                 return {
                     action: "setScoreDef",
-                    param: { subTree, scoreDefId: elementId },
+                    param: { subTree, scoreDefId },
                 };
             case "staffGrp":
                 return {
                     action: "setScoreDefStaffGrp",
                     param: {
                         subTree,
-                        scoreDefId: elementId,
+                        scoreDefId,
                     },
                 };
             case "keySig":
@@ -302,7 +317,7 @@ export class EditorController {
                     action: "setScoreDefKeySig",
                     param: {
                         subTree,
-                        scoreDefId: elementId,
+                        scoreDefId,
                     },
                 };
             case "meterSig":
@@ -310,15 +325,19 @@ export class EditorController {
                     action: "setScoreDefMeterSig",
                     param: {
                         subTree,
-                        scoreDefId: elementId,
+                        scoreDefId,
                     },
                 };
             case "staffDef":
+                if (staffN === undefined) {
+                    throw new Error("staffN is required to set a staff definition");
+                }
                 return {
                     action: "setScoreDefStaffDef",
                     param: { 
                         subTree,
-                        staffId: elementId,
+                        scoreDefId,
+                        staffN,
                     },
                 };
         }

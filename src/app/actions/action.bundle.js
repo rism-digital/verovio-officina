@@ -772,25 +772,25 @@ export const actionDefinitions = {
     "open-header-footer": {
         action: "getScoreDef",
         param: {
-            elementId: "[selection-id]",
+            scoreDefId: "[selection-id]",
         },
     },
     "open-staff-groups": {
         action: "getScoreDefStaffGrp",
         param: {
-            elementId: "[selection-id]",
+            scoreDefId: "[selection-id]",
         },
     },
     "open-key-signature": {
         action: "getScoreDefKeySig",
         param: {
-            elementId: "[selection-id]",
+            scoreDefId: "[selection-id]",
         },
     },
     "open-meter-signature": {
         action: "getScoreDefMeterSig",
         param: {
-            elementId: "[selection-id]",
+            scoreDefId: "[selection-id]",
         },
     },
     "add-staff-above": {
