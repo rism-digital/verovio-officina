@@ -16,6 +16,7 @@
     export let update: ScoreDefinitionUpdate = "scoreDef";
     export let disabledElements: string[] = [];
     export let preventDelete: string[] = ["staffGrp", "staffDef"];
+    export let preventDeleteIfContains: Record<string, string[]> = {};
     export let moveTargets: Record<string, string[]> = {};
     export let reorderableElements: string[] = [];
     export let onConfirm: ((
@@ -51,6 +52,7 @@
         bind:value={localScoreDef}
         {disabledElements}
         {preventDelete}
+        {preventDeleteIfContains}
         {moveTargets}
         {reorderableElements}
     />

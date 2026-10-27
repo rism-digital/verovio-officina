@@ -8,12 +8,14 @@
         TreeDropPosition,
         TreeNodeData,
     } from "../app/types";
+    import { treeNodeKey } from "../app/tree-node-key";
     import ScorePropertiesAttributeList from "./ScorePropertiesAttributeList.svelte";
     import Tree from "./Tree.svelte";
 
     export let value: TreeNodeData | null = null;
     export let disabledElements: string[] = [];
     export let preventDelete: string[] = ["staffGrp", "staffDef"];
+    export let preventDeleteIfContains: Record<string, string[]> = {};
     export let moveTargets: Record<string, string[]> = {};
     export let reorderableElements: string[] = [];
 
@@ -21,58 +23,60 @@
     const ancestors: TreeNodeData[] = [];
     const elementDefinitions = propertiesSchema as Record<string, ElementDef>;
 
-    function findNodeById(
+    function findNodeByKey(
         node: TreeNodeData | null,
-        id: string | null,
+        key: string | null,
     ): TreeNodeData | null {
-        if (!node || !id) return null;
-        if (node.id === id) return node;
+        if (!node || !key) return null;
+        if (treeNodeKey(node) === key) return node;
         for (const child of node.children ?? []) {
-            const found = findNodeById(child, id);
+            const found = findNodeByKey(child, key);
             if (found) return found;
         }
         return null;
     }
 
-    function findParentByChildId(
+    function findParentByChildKey(
         node: TreeNodeData | null,
-        childId: string,
+        childKey: string,
     ): TreeNodeData | null {
         if (!node?.children?.length) return null;
-        if (node.children.some((child) => child.id === childId)) return node;
+        if (node.children.some((child) => treeNodeKey(child) === childKey)) {
+            return node;
+        }
         for (const child of node.children) {
-            const parent = findParentByChildId(child, childId);
+            const parent = findParentByChildKey(child, childKey);
             if (parent) return parent;
         }
         return null;
     }
 
-    function removeNodeById(
+    function removeNodeByKey(
         node: TreeNodeData | null,
-        id: string,
+        key: string,
     ): TreeNodeData | null {
-        if (!node || node.id === id) return null;
+        if (!node || treeNodeKey(node) === key) return null;
         if (!node.children?.length) return node;
         return {
             ...node,
             children: node.children
-                .map((child) => removeNodeById(child, id))
+                .map((child) => removeNodeByKey(child, key))
                 .filter((child): child is TreeNodeData => child !== null),
         };
     }
 
-    function replaceNodeById(
+    function replaceNodeByKey(
         node: TreeNodeData | null,
-        id: string | null,
+        key: string | null,
         updater: (node: TreeNodeData) => TreeNodeData,
     ): TreeNodeData | null {
-        if (!node || !id) return node;
-        if (node.id === id) return updater(node);
+        if (!node || !key) return node;
+        if (treeNodeKey(node) === key) return updater(node);
         if (!node.children?.length) return node;
         return {
             ...node,
             children: node.children.map((child) =>
-                replaceNodeById(child, id, updater) as TreeNodeData,
+                replaceNodeByKey(child, key, updater) as TreeNodeData,
             ),
         };
     }
@@ -81,8 +85,29 @@
         return Boolean(node && disabledElements.includes(node.element));
     }
 
+    function hasDescendantElement(
+        node: TreeNodeData,
+        elementNames: Set<string>,
+    ): boolean {
+        for (const child of node.children ?? []) {
+            if (
+                elementNames.has(child.element)
+                || hasDescendantElement(child, elementNames)
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function canDeleteNode(node: TreeNodeData): boolean {
+        if (node === value || preventDelete.includes(node.element)) return false;
+        const protectedDescendants = preventDeleteIfContains[node.element] ?? [];
+        return !hasDescendantElement(node, new Set(protectedDescendants));
+    }
+
     function handleTreeSelect(id: string) {
-        if (!isNodeDisabled(findNodeById(value, id))) selectedNodeId = id;
+        if (!isNodeDisabled(findNodeByKey(value, id))) selectedNodeId = id;
     }
 
     function canAddChild(node: TreeNodeData, elementName: string): boolean {
@@ -113,7 +138,7 @@
                 action: "insert",
                 param: {
                     elementName,
-                    elementId: node.id,
+                    elementId: treeNodeKey(node),
                     insertMode: "appendChild",
                 },
             }));
@@ -126,7 +151,7 @@
                 action: "insert",
                 param: {
                     elementName: "text",
-                    elementId: node.id,
+                    elementId: treeNodeKey(node),
                     insertMode: "appendChild",
                 },
             });
@@ -136,13 +161,13 @@
         if (addItems.length) {
             items.push({ kind: "submenu", label: "Add", items: addItems });
         }
-        if (node.id !== value?.id && !preventDelete.includes(node.element)) {
+        if (canDeleteNode(node)) {
             items.push({
                 kind: "action",
                 label: "Delete",
                 actionKey: "score-properties-delete",
                 action: "delete",
-                param: { elementId: node.id },
+                param: { elementId: treeNodeKey(node) },
             });
         }
         return items;
@@ -151,7 +176,6 @@
     function createChildNode(elementName: string): TreeNodeData {
         const definition = elementDefinitions[elementName];
         return {
-            id: `score-properties-${crypto.randomUUID()}`,
             element: elementName,
             attributes: {},
             isLeaf: (definition?.children.length ?? 0) === 0,
@@ -160,15 +184,16 @@
     }
 
     function handleTreeContextAction(action: TargetedContextAction) {
-        const targetNode = findNodeById(value, action.targetId);
+        const targetNode = findNodeByKey(value, action.targetId);
         if (!targetNode || isNodeDisabled(targetNode)) return;
 
         if (action.action === "delete") {
-            if (preventDelete.includes(targetNode.element)) return;
-            const parent = findParentByChildId(value, targetNode.id);
+            if (!canDeleteNode(targetNode)) return;
+            const targetKey = treeNodeKey(targetNode);
+            const parent = findParentByChildKey(value, targetKey);
             if (!parent) return;
-            value = removeNodeById(value, targetNode.id);
-            selectedNodeId = isNodeDisabled(parent) ? null : parent.id;
+            value = removeNodeByKey(value, targetKey);
+            selectedNodeId = isNodeDisabled(parent) ? null : treeNodeKey(parent);
             return;
         }
 
@@ -176,12 +201,12 @@
             return;
         }
         const child = createChildNode(action.param.elementName);
-        value = replaceNodeById(value, action.targetId, (node) => ({
+        value = replaceNodeByKey(value, action.targetId, (node) => ({
             ...node,
             children: [...(node.children ?? []), child],
             isLeaf: false,
         }));
-        selectedNodeId = child.id;
+        selectedNodeId = treeNodeKey(child);
     }
 
     function handleTreeMove(
@@ -189,28 +214,29 @@
         targetId: string,
         position: TreeDropPosition,
     ) {
-        const source = findNodeById(value, sourceId);
-        const target = findNodeById(value, targetId);
-        if (!source || !target || source.id === target.id || source.id === value?.id) {
+        const source = findNodeByKey(value, sourceId);
+        const target = findNodeByKey(value, targetId);
+        if (!source || !target || sourceId === targetId || source === value) {
             return;
         }
 
-        const sourceParent = findParentByChildId(value, source.id);
+        const sourceParent = findParentByChildKey(value, sourceId);
         if (!sourceParent) return;
 
         if (position !== "inside") {
-            const targetParent = findParentByChildId(value, target.id);
+            const targetParent = findParentByChildKey(value, targetId);
             if (
                 !reorderableElements.includes(source.element)
                 || !reorderableElements.includes(target.element)
                 || !targetParent
                 || !moveTargets[source.element]?.includes(targetParent.element)
-                || findNodeById(source, target.id)
+                || findNodeByKey(source, targetId)
             ) {
                 return;
             }
-            const withoutSource = removeNodeById(value, source.id);
-            const destination = findNodeById(withoutSource, targetParent.id);
+            const withoutSource = removeNodeByKey(value, sourceId);
+            const destinationKey = treeNodeKey(targetParent);
+            const destination = findNodeByKey(withoutSource, destinationKey);
             if (
                 !destination
                 || isNodeDisabled(destination)
@@ -218,12 +244,12 @@
             ) {
                 return;
             }
-            value = replaceNodeById(withoutSource, destination.id, (parent) => {
+            value = replaceNodeByKey(withoutSource, destinationKey, (parent) => {
                 const children = (parent.children ?? []).filter(
-                    (child) => child.id !== source.id,
+                    (child) => treeNodeKey(child) !== sourceId,
                 );
                 const targetIndex = children.findIndex(
-                    (child) => child.id === target.id,
+                    (child) => treeNodeKey(child) === targetId,
                 );
                 if (targetIndex < 0) return parent;
                 children.splice(
@@ -238,12 +264,12 @@
 
         if (!moveTargets[source.element]?.includes(target.element)) return;
         if (isNodeDisabled(target)) return;
-        if (findNodeById(source, target.id)) return;
-        if (sourceParent.id === target.id) return;
+        if (findNodeByKey(source, targetId)) return;
+        if (treeNodeKey(sourceParent) === targetId) return;
         if (!canAddChild(target, source.element)) return;
 
-        const withoutSource = removeNodeById(value, source.id);
-        value = replaceNodeById(withoutSource, target.id, (node) => ({
+        const withoutSource = removeNodeByKey(value, sourceId);
+        value = replaceNodeByKey(withoutSource, targetId, (node) => ({
             ...node,
             children: [...(node.children ?? []), source],
             isLeaf: false,
@@ -252,7 +278,7 @@
 
     function updateSelectedAttribute(name: string, attributeValue: string) {
         if (name === "xml:id" || isNodeDisabled(selectedNode)) return;
-        value = replaceNodeById(value, selectedNodeId, (node) => ({
+        value = replaceNodeByKey(value, selectedNodeId, (node) => ({
             ...node,
             attributes: { ...(node.attributes ?? {}), [name]: attributeValue },
         }));
@@ -260,24 +286,24 @@
 
     function updateSelectedText(text: string) {
         if (isNodeDisabled(selectedNode)) return;
-        value = replaceNodeById(value, selectedNodeId, (node) => ({
+        value = replaceNodeByKey(value, selectedNodeId, (node) => ({
             ...node,
             text,
         }));
     }
 
     function handleAttributeEdit(param: EditActionSetParam, _commit: boolean) {
-        if (!selectedNode || param.elementId !== selectedNode.id) return;
+        if (!selectedNode || param.elementId !== treeNodeKey(selectedNode)) return;
         updateSelectedAttribute(param.attribute, param.value);
     }
 
-    $: selectedNode = findNodeById(value, selectedNodeId) ?? value;
+    $: selectedNode = findNodeByKey(value, selectedNodeId) ?? value;
     $: selectedNodeDisabled = isNodeDisabled(selectedNode);
     $: selectedText = selectedNode?.text == null ? "" : String(selectedNode.text);
     $: if (!value) {
         selectedNodeId = null;
-    } else if (!findNodeById(value, selectedNodeId)) {
-        selectedNodeId = value.id;
+    } else if (!findNodeByKey(value, selectedNodeId)) {
+        selectedNodeId = treeNodeKey(value);
     }
 </script>
 

@@ -34,9 +34,7 @@ export function instantiateTreePreset(
     function instantiate(node: TreeNodePreset, isRoot: boolean): TreeNodeData {
         const children = node.children?.map((child) => instantiate(child, false));
         return {
-            id: isRoot && options.rootId
-                ? options.rootId
-                : `score-properties-${crypto.randomUUID()}`,
+            ...(isRoot && options.rootId ? { id: options.rootId } : {}),
             element: node.element,
             attributes: {
                 ...(node.attributes ?? {}),

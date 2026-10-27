@@ -72,6 +72,7 @@ export const contextTools = {
             name: "Staff group properties",
             action: "open-staff-groups",
             appAction: "open-staff-groups",
+            requiredSelectionId: "[main-scoredef]",
         }
     ],
     [

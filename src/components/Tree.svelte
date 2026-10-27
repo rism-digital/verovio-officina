@@ -13,6 +13,7 @@
         TreeNodeMoveHandler,
         TreeNodeData,
     } from "../app/types";
+    import { treeNodeKey } from "../app/tree-node-key";
 
     export let ancestors: TreeNodeData[] | null = null;
     export let context: TreeNodeData | null = null;
@@ -85,7 +86,7 @@
         contextMenu = null;
     }
 
-    $: if (contextMenu && selectedId !== contextMenu.node.id) {
+    $: if (contextMenu && selectedId !== treeNodeKey(contextMenu.node)) {
         closeContextMenu();
     }
 
@@ -94,7 +95,7 @@
         if (!currentContextMenu) return;
         onContextAction?.({
             ...action,
-            targetId: currentContextMenu.node.id,
+            targetId: treeNodeKey(currentContextMenu.node),
             targetElement: currentContextMenu.node.element,
         });
         closeContextMenu();
@@ -117,7 +118,7 @@
             {#if ancestors}
                 {#each [...ancestors].reverse() as ancestor}
                     <TreeCrumb
-                        id={ancestor.id}
+                        id={treeNodeKey(ancestor)}
                         label={ancestor.element}
                         onSelect={onSelectElement}
                         onHover={onHoverElement}

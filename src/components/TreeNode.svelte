@@ -7,6 +7,7 @@
         TreeNodeMoveHandler,
     } from "../app/types";
     import { iconFor } from "../app/icons";
+    import { treeNodeKey } from "../app/tree-node-key";
 
     export let node: TreeNodeData;
     export let isRoot = false;
@@ -30,6 +31,7 @@
     let htmlTreeNode: HTMLDivElement | null = null;
     let dragging = false;
     let dropPosition: TreeDropPosition | null = null;
+    $: nodeKey = treeNodeKey(node);
     $: disabled = disabledElements.includes(node.element);
     $: childrenHidden = hideChildrenOfElements.includes(node.element);
     $: draggable = !isRoot && draggableElements.includes(node.element);
@@ -50,11 +52,11 @@
 
     function handleSelect() {
         if (disabled) return;
-        onSelect?.(node.id);
+        onSelect?.(nodeKey);
     }
 
     function handleMouseEnter() {
-        onHover?.(node.id);
+        onHover?.(nodeKey);
     }
 
     function handleMouseLeave() {
@@ -68,7 +70,7 @@
             return;
         }
         event.preventDefault();
-        if (node.id !== selectedId) {
+        if (nodeKey !== selectedId) {
             if (!selectOnContextMenu) return;
             handleSelect();
         }
@@ -83,7 +85,7 @@
         }
         dragging = true;
         event.dataTransfer.effectAllowed = "move";
-        event.dataTransfer.setData("text/plain", node.id);
+        event.dataTransfer.setData("text/plain", nodeKey);
         event.stopPropagation();
     }
 
@@ -124,7 +126,7 @@
         const sourceId = event.dataTransfer.getData("text/plain");
         const position = dropPosition ?? resolveDropPosition(event);
         dropPosition = null;
-        if (sourceId) onMoveNode?.(sourceId, node.id, position);
+        if (sourceId) onMoveNode?.(sourceId, nodeKey, position);
     }
 </script>
 
@@ -132,14 +134,14 @@
     class={isRoot
         ? `vrv-tree-root${disabled ? " node-disabled" : " open"}`
         : `vrv-tree-node${node.isLeaf || childrenHidden ? " leaf" : ""}${disabled ? " node-disabled" : ""}${!disabled && !childrenHidden && node.children?.length ? " open" : ""}`}
-    data-id={node.id}
+    data-id={nodeKey}
     data-element={node.element}
     on:click|stopPropagation={handleOpenClose}
     bind:this={htmlTreeNode}
 >
     <div
-        class="vrv-mei-element vrv-node-label {disabled ? 'node-disabled' : ''} {draggable ? 'node-draggable' : ''} {dragging ? 'node-dragging' : ''} {dropPosition === 'inside' ? 'node-drop-target' : ''} {dropPosition === 'before' ? 'node-drop-before' : ''} {dropPosition === 'after' ? 'node-drop-after' : ''} {node.id === selectedId ? 'target checked' : ''}"
-        data-id={node.id}
+        class="vrv-mei-element vrv-node-label {disabled ? 'node-disabled' : ''} {draggable ? 'node-draggable' : ''} {dragging ? 'node-dragging' : ''} {dropPosition === 'inside' ? 'node-drop-target' : ''} {dropPosition === 'before' ? 'node-drop-before' : ''} {dropPosition === 'after' ? 'node-drop-after' : ''} {nodeKey === selectedId ? 'target checked' : ''}"
+        data-id={nodeKey}
         data-element={node.element}
         draggable={draggable}
         style={`background-image: url("${iconFor(node.element)}");${isRoot && !showRootNode ? " display: none;" : ""}`}
@@ -157,7 +159,7 @@
      </div>
     <div class="vrv-node-children">
         {#if !childrenHidden && node.children?.length}
-            {#each node.children as child (child.id)}
+            {#each node.children as child (treeNodeKey(child))}
                 <svelte:self
                     node={child}
                     {selectOnContextMenu}

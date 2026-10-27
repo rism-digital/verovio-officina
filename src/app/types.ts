@@ -58,7 +58,7 @@ export interface ViewModel {
 };
 
 export interface TreeNodeData {
-    id: string;
+    id?: string;
     element: string;
     children?: TreeNodeData[];
     isLeaf?: boolean;
@@ -109,6 +109,7 @@ export interface EditStatus {
 }
 
 export interface ReferenceObject extends TreeNodeData {
+    id: string;
     referenceAttribute: string;
 }
 

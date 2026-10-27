@@ -841,6 +841,8 @@
         onConfirm={confirmPropertiesDialog}
         onCancel={closePropertiesDialog}
         disabledElements={["pgHead", "staffDef"]}
+        preventDelete={["staffDef"]}
+        preventDeleteIfContains={{ staffGrp: ["staffDef"] }}
         moveTargets={{
             staffDef: ["staffGrp"],
             staffGrp: ["staffGrp"],

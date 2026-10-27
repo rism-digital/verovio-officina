@@ -3,6 +3,7 @@
     import propertiesSchema from "../app/properties.json";
     import type { TreeNodeData, EditActionSetHandler } from "../app/types";
     import type { ElementDef } from "../app/rng-loader";
+    import { treeNodeKey } from "../app/tree-node-key";
 
     export let node: TreeNodeData | null = null;
     export let readOnly = false;
@@ -64,7 +65,7 @@
             <tbody>
                 {#each attributeNames as name}
                     <AttributeRow
-                        elementId={node?.id ?? null}
+                        elementId={node ? treeNodeKey(node) : null}
                         {name}
                         value={attributes[name] ?? ""}
                         optionsAll={schemaAttrs[name] ?? null}

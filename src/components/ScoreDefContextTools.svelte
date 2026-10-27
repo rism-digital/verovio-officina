@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { ContextToolsApi, TreeNodeData } from "../app/types";
+    import { treeNodeKey } from "../app/tree-node-key";
 
     export let elementId: string | null = null;
     export let contextToolsApi: ContextToolsApi | null = null;
@@ -59,11 +60,11 @@
 {:else if staffDefs.length > 0}
     <div class="vrv-context-actions" aria-label="Staff definitions">
         <div class="vrv-context-action-group">
-            {#each staffDefs as staffDef, index (staffDef.id)}
+            {#each staffDefs as staffDef, index (treeNodeKey(staffDef))}
                 <button
                     class="vrv-context-action-button"
                     type="button"
-                    data-id={staffDef.id}
+                    data-id={treeNodeKey(staffDef)}
                     title={`Edit ${buttonLabel(staffDef, index)}`}
                     disabled={staffNumber(staffDef) === null}
                     on:click={() => editStaffDef(staffDef)}
