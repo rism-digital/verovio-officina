@@ -105,7 +105,7 @@
             on:click={() => onToggleSidePanel?.()}
             on:keydown={(event) => handleButtonKeydown(event, () => onToggleSidePanel?.())}
         >
-            <span class="vrv-tooltip">Show or hide left panel</span>
+            <span class="vrv-tooltip">Show or hide navigation panel</span>
         </div>
         <div
             class="vrv-btn-icon-large vrv-toggleable {contextPanelVisible ? 'toggled' : ''}"
@@ -117,7 +117,7 @@
             on:click={() => onToggleContextPanel?.()}
             on:keydown={(event) => handleButtonKeydown(event, () => onToggleContextPanel?.())}
         >
-            <span class="vrv-tooltip">Show or hide right panel</span>
+            <span class="vrv-tooltip">Show or hide tool panel</span>
         </div>
         <div
             class="vrv-btn-icon-large"
@@ -129,7 +129,7 @@
             on:keydown={(event) =>
                 handleButtonKeydown(event, () => onSelectMainScoreDef?.())}
         >
-            <span class="vrv-tooltip">Select main score definition</span>
+            <span class="vrv-tooltip">Main score definition</span>
         </div>
         <div class="vrv-h-separator"></div>
         <div

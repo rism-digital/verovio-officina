@@ -87,7 +87,7 @@
                 role="tab"
                 aria-selected={activeTab === "custom"}
                 on:click={() => activeTab = "custom"}
-            >Custom</button>
+            >Tree editor</button>
         </div>
         <div class="vrv-tab-content">
             <div class="vrv-tab-content-panel" role="tabpanel">
