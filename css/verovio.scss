@@ -1544,6 +1544,29 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
             opacity: $disabled-opacity;
         }
 
+        .vrv-node-label.node-draggable {
+            cursor: grab;
+        }
+
+        .vrv-node-label.node-dragging {
+            cursor: grabbing;
+            opacity: $disabled-opacity;
+        }
+
+        .vrv-node-label.node-drop-target {
+            background-color: $background-toggled;
+            outline: 2px solid $primary;
+            outline-offset: -2px;
+        }
+
+        .vrv-node-label.node-drop-before {
+            box-shadow: inset 0 2px 0 $primary;
+        }
+
+        .vrv-node-label.node-drop-after {
+            box-shadow: inset 0 -2px 0 $primary;
+        }
+
         .vrv-tree-node:not(.leaf)::before {
             cursor: pointer;
             position: absolute;

@@ -16,6 +16,8 @@
     export let update: ScoreDefinitionUpdate = "scoreDef";
     export let disabledElements: string[] = [];
     export let preventDelete: string[] = ["staffGrp", "staffDef"];
+    export let moveTargets: Record<string, string[]> = {};
+    export let reorderableElements: string[] = [];
     export let onConfirm: ((
         scoreDef: TreeNodeData | null,
         edited: boolean,
@@ -49,5 +51,7 @@
         bind:value={localScoreDef}
         {disabledElements}
         {preventDelete}
+        {moveTargets}
+        {reorderableElements}
     />
 </Dialog>

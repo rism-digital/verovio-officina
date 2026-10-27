@@ -9,6 +9,8 @@
         HoverElementHandler,
         SelectElementHandler,
         TargetedContextActionHandler,
+        TreeDropPosition,
+        TreeNodeMoveHandler,
         TreeNodeData,
     } from "../app/types";
 
@@ -20,10 +22,14 @@
     export let selectOnContextMenu = false;
     export let disabledElements: string[] = [];
     export let hideChildrenOfElements: string[] = [];
+    export let draggableElements: string[] = [];
+    export let dropTargetElements: string[] = [];
+    export let reorderableElements: string[] = [];
     export let selectedId: string | null = null;
     export let onSelectElement: SelectElementHandler | null = null;
     export let onHoverElement: HoverElementHandler | null = null;
     export let onContextAction: TargetedContextActionHandler | null = null;
+    export let onMoveNode: TreeNodeMoveHandler | null = null;
     export let resolveContextMenuItems:
         | ((node: TreeNodeData) => ResolvedMenuEntry[] | null)
         | null = null;
@@ -93,6 +99,15 @@
         });
         closeContextMenu();
     }
+
+    function handleMoveNode(
+        sourceId: string,
+        targetId: string,
+        position: TreeDropPosition,
+    ) {
+        closeContextMenu();
+        onMoveNode?.(sourceId, targetId, position);
+    }
 </script>
 
 {#if showBreadcrumbs}
@@ -121,10 +136,14 @@
             {selectOnContextMenu}
             {disabledElements}
             {hideChildrenOfElements}
+            {draggableElements}
+            {dropTargetElements}
+            {reorderableElements}
             {selectedId}
             onSelect={onSelectElement}
             onHover={onHoverElement}
             onContextMenu={openContextMenu}
+            onMoveNode={handleMoveNode}
         />
     {/if}
 </div>

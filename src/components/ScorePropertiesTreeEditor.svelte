@@ -5,6 +5,7 @@
     import type {
         EditActionSetParam,
         TargetedContextAction,
+        TreeDropPosition,
         TreeNodeData,
     } from "../app/types";
     import ScorePropertiesAttributeList from "./ScorePropertiesAttributeList.svelte";
@@ -13,6 +14,8 @@
     export let value: TreeNodeData | null = null;
     export let disabledElements: string[] = [];
     export let preventDelete: string[] = ["staffGrp", "staffDef"];
+    export let moveTargets: Record<string, string[]> = {};
+    export let reorderableElements: string[] = [];
 
     let selectedNodeId: string | null = null;
     const ancestors: TreeNodeData[] = [];
@@ -181,6 +184,72 @@
         selectedNodeId = child.id;
     }
 
+    function handleTreeMove(
+        sourceId: string,
+        targetId: string,
+        position: TreeDropPosition,
+    ) {
+        const source = findNodeById(value, sourceId);
+        const target = findNodeById(value, targetId);
+        if (!source || !target || source.id === target.id || source.id === value?.id) {
+            return;
+        }
+
+        const sourceParent = findParentByChildId(value, source.id);
+        if (!sourceParent) return;
+
+        if (position !== "inside") {
+            const targetParent = findParentByChildId(value, target.id);
+            if (
+                !reorderableElements.includes(source.element)
+                || !reorderableElements.includes(target.element)
+                || !targetParent
+                || !moveTargets[source.element]?.includes(targetParent.element)
+                || findNodeById(source, target.id)
+            ) {
+                return;
+            }
+            const withoutSource = removeNodeById(value, source.id);
+            const destination = findNodeById(withoutSource, targetParent.id);
+            if (
+                !destination
+                || isNodeDisabled(destination)
+                || !canAddChild(destination, source.element)
+            ) {
+                return;
+            }
+            value = replaceNodeById(withoutSource, destination.id, (parent) => {
+                const children = (parent.children ?? []).filter(
+                    (child) => child.id !== source.id,
+                );
+                const targetIndex = children.findIndex(
+                    (child) => child.id === target.id,
+                );
+                if (targetIndex < 0) return parent;
+                children.splice(
+                    targetIndex + (position === "after" ? 1 : 0),
+                    0,
+                    source,
+                );
+                return { ...parent, children };
+            });
+            return;
+        }
+
+        if (!moveTargets[source.element]?.includes(target.element)) return;
+        if (isNodeDisabled(target)) return;
+        if (findNodeById(source, target.id)) return;
+        if (sourceParent.id === target.id) return;
+        if (!canAddChild(target, source.element)) return;
+
+        const withoutSource = removeNodeById(value, source.id);
+        value = replaceNodeById(withoutSource, target.id, (node) => ({
+            ...node,
+            children: [...(node.children ?? []), source],
+            isLeaf: false,
+        }));
+    }
+
     function updateSelectedAttribute(name: string, attributeValue: string) {
         if (name === "xml:id" || isNodeDisabled(selectedNode)) return;
         value = replaceNodeById(value, selectedNodeId, (node) => ({
@@ -224,9 +293,15 @@
                     showBreadcrumbs={false}
                     selectOnContextMenu
                     {disabledElements}
+                    draggableElements={Object.keys(moveTargets)}
+                    dropTargetElements={[
+                        ...new Set(Object.values(moveTargets).flat()),
+                    ]}
+                    {reorderableElements}
                     selectedId={selectedNodeId}
                     onSelectElement={handleTreeSelect}
                     onContextAction={handleTreeContextAction}
+                    onMoveNode={handleTreeMove}
                     resolveContextMenuItems={resolveContextMenuItems}
                 />
             {:else}

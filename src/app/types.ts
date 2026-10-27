@@ -1,5 +1,11 @@
 export type SelectElementHandler = (id: string) => void | Promise<void>;
 export type HoverElementHandler = (id: string | null) => void;
+export type TreeDropPosition = "inside" | "before" | "after";
+export type TreeNodeMoveHandler = (
+    sourceId: string,
+    targetId: string,
+    position: TreeDropPosition,
+) => void;
 export type EditActionSetHandler = (param: EditActionSetParam, commit: boolean) => void;
 export type EditActionDragHandler = (
     param: EditActionDragParam,
