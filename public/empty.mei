@@ -11,7 +11,7 @@
             </respStmt>
          </titleStmt>
          <pubStmt>
-            <date isodate="2026-06-29T16:36:42"/>
+            <date isodate="2026-06-29T16:36:42" />
          </pubStmt>
       </fileDesc>
    </meiHead>
@@ -29,24 +29,36 @@
                      </rend>
                   </pgHead>
                   <staffGrp>
-                     <staffGrp bar.thru="true" symbol="bracket">
-                        <staffDef n="1" lines="5" meter.count="4" meter.unit="4">
-                           <label>Violin</label>
-                           <labelAbbr>Vln.</labelAbbr>
-                           <clef shape="G" line="2"/>
-                           <keySig sig="3f"></keySig>
-                        </staffDef>
-                        <staffDef n="2" lines="5" meter.count="4" meter.unit="4">
+                     <staffGrp bar.thru="true">
+                        <grpSym symbol="bracket" />
+                        <staffDef n="1" lines="5">
                            <label>Viola</label>
                            <labelAbbr>Vla.</labelAbbr>
-                           <clef shape="C" line="3"/>
-                           <keySig sig="3f"></keySig>
+                           <meterSig count="4" unit="4" />
+                           <clef shape="C" line="3" />
+                           <keySig sig="3f" />
                         </staffDef>
-                        <staffDef n="3" lines="5" meter.count="4" meter.unit="4">
-                           <label>Violoncello</label>
-                           <labelAbbr>Vc.</labelAbbr>
-                           <clef shape="F" line="4"/>
-                           <keySig sig="3f"></keySig>
+                        <staffDef n="2" lines="5" trans.diat="-1" trans.semi="-2">
+                           <label>Clarinet</label>
+                           <labelAbbr>Cl.</labelAbbr>
+                           <meterSig count="4" unit="4" />
+                           <clef shape="G" line="2" />
+                           <keySig sig="1f" />
+                        </staffDef>
+                     </staffGrp>
+                     <staffGrp>
+                        <grpSym symbol="brace" />
+                        <label>Piano</label>
+                        <labelAbbr>Pno.</labelAbbr>
+                        <staffDef n="3" lines="5">
+                           <meterSig count="4" unit="4" />
+                           <clef shape="G" line="2" />
+                           <keySig sig="3f" />
+                        </staffDef>
+                        <staffDef n="4" lines="5">
+                           <meterSig corresp="#k1d0qcvg" count="4" unit="4" />
+                           <clef corresp="#pk6xyvl" shape="F" line="4" />
+                           <keySig corresp="#xtqb96j" sig="3f" />
                         </staffDef>
                      </staffGrp>
                   </staffGrp>
@@ -54,79 +66,100 @@
                <section>
                   <measure n="1">
                      <staff n="1">
-                        <layer n="1"/>
+                        <layer n="1" />
                      </staff>
                      <staff n="2">
-                        <layer n="1"/>
+                        <layer n="1" />
                      </staff>
                      <staff n="3">
-                        <layer n="1"/>
+                        <layer n="1" />
+                     </staff>
+                     <staff n="4">
+                        <layer n="1" />
                      </staff>
                   </measure>
                   <measure n="2">
                      <staff n="1">
-                        <layer n="1"/>
+                        <layer n="1" />
                      </staff>
                      <staff n="2">
-                        <layer n="1"/>
+                        <layer n="1" />
                      </staff>
                      <staff n="3">
-                        <layer n="1"/>
+                        <layer n="1" />
+                     </staff>
+                     <staff n="4">
+                        <layer n="1" />
                      </staff>
                   </measure>
                   <measure n="3">
                      <staff n="1">
-                        <layer n="1"/>
+                        <layer n="1" />
                      </staff>
                      <staff n="2">
-                        <layer n="1"/>
+                        <layer n="1" />
                      </staff>
                      <staff n="3">
-                        <layer n="1"/>
+                        <layer n="1" />
+                     </staff>
+                     <staff n="4">
+                        <layer n="1" />
                      </staff>
                   </measure>
                   <measure n="4">
                      <staff n="1">
-                        <layer n="1"/>
+                        <layer n="1" />
                      </staff>
                      <staff n="2">
-                        <layer n="1"/>
+                        <layer n="1" />
                      </staff>
                      <staff n="3">
-                        <layer n="1"/>
+                        <layer n="1" />
+                     </staff>
+                     <staff n="4">
+                        <layer n="1" />
                      </staff>
                   </measure>
                   <measure n="5">
                      <staff n="1">
-                        <layer n="1"/>
+                        <layer n="1" />
                      </staff>
                      <staff n="2">
-                        <layer n="1"/>
+                        <layer n="1" />
                      </staff>
                      <staff n="3">
-                        <layer n="1"/>
+                        <layer n="1" />
+                     </staff>
+                     <staff n="4">
+                        <layer n="1" />
                      </staff>
                   </measure>
                   <measure n="6">
                      <staff n="1">
-                        <layer n="1"/>
+                        <layer n="1" />
                      </staff>
                      <staff n="2">
-                        <layer n="1"/>
+                        <layer n="1" />
                      </staff>
                      <staff n="3">
-                        <layer n="1"/>
+                        <layer n="1" />
+                     </staff>
+                     <staff n="4">
+                        <layer n="1" />
                      </staff>
                   </measure>
                   <measure right="end" n="7">
                      <staff n="1">
-                        <layer n="1"/>
+                        <layer n="1" />
                      </staff>
                      <staff n="2">
-                        <layer n="1"/>
+                        <layer n="1" />
                      </staff>
                      <staff n="3">
-                        <layer n="1"/>
+                        <layer n="1" />
+                     </staff>
+                     <staff n="4">
+                        <layer n="1" />
                      </staff>
                   </measure>
                </section>

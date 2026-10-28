@@ -1,13 +1,5 @@
 [
     {
-        "icon": "keysig-0",
-        "name": "C major / A minor",
-        "preset": {
-            "attributes": { "sig": "0" },
-            "element": "keySig"
-        }
-    },
-    {
         "icon": "keysig-1s",
         "name": "G major / D minor",
         "preset": {
@@ -60,6 +52,14 @@
         "name": "C# major / A# minor",
         "preset": {
             "attributes": { "sig": "7s" },
+            "element": "keySig"
+        }
+    },
+    {
+        "icon": "keysig-0",
+        "name": "C major / A minor",
+        "preset": {
+            "attributes": { "sig": "0" },
             "element": "keySig"
         }
     },
