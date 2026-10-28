@@ -87,7 +87,7 @@
                         class="vrv-field-set vrv-context-toolbar-section"
                     >
                         <div
-                            class="vrv-field-set-panel vrv-context-toolbar"
+                            class="vrv-field-set-panel vrv-context-toolbar vrv-score-preset-toolbar"
                             role="toolbar"
                             aria-label={`${presetTabLabel} toolbar`}
                         >

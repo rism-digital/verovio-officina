@@ -3,7 +3,9 @@
         "icon": "metersig-common",
         "name": "Common time",
         "preset": {
-            "attributes": { "sym": "common" },
+            "attributes": {
+                "sym": "common"
+            },
             "element": "meterSig"
         }
     },
@@ -11,7 +13,20 @@
         "icon": "metersig-cut",
         "name": "Cut time",
         "preset": {
-            "attributes": { "sym": "cut" },
+            "attributes": {
+                "sym": "cut"
+            },
+            "element": "meterSig"
+        }
+    },
+    {
+        "icon": "metersig-2-4",
+        "name": "2/4",
+        "preset": {
+            "attributes": {
+                "unit": "4",
+                "count": "2"
+            },
             "element": "meterSig"
         }
     },
@@ -19,8 +34,114 @@
         "icon": "metersig-3-4",
         "name": "3/4",
         "preset": {
-            "attributes": { "unit": "4", "count": "3" },
+            "attributes": {
+                "unit": "4",
+                "count": "3"
+            },
             "element": "meterSig"
+        }
+    },
+    {
+        "icon": "metersig-4-4",
+        "name": "4/4",
+        "preset": {
+            "attributes": {
+                "unit": "4",
+                "count": "4"
+            },
+            "element": "meterSig"
+        }
+    },
+    {
+        "icon": "metersig-2-2",
+        "name": "2/2",
+        "preset": {
+            "attributes": {
+                "unit": "2",
+                "count": "2"
+            },
+            "element": "meterSig"
+        }
+    },
+    {
+        "icon": "metersig-3-2",
+        "name": "3/2",
+        "preset": {
+            "attributes": {
+                "unit": "2",
+                "count": "3"
+            },
+            "element": "meterSig"
+        }
+    },
+    {
+        "icon": "metersig-3-8",
+        "name": "3/8",
+        "preset": {
+            "attributes": {
+                "unit": "8",
+                "count": "3"
+            },
+            "element": "meterSig"
+        }
+    },
+    {
+        "icon": "metersig-6-8",
+        "name": "6/8",
+        "preset": {
+            "attributes": {
+                "unit": "8",
+                "count": "6"
+            },
+            "element": "meterSig"
+        }
+    },
+    {
+        "icon": "metersig-9-8",
+        "name": "9/8",
+        "preset": {
+            "attributes": {
+                "unit": "8",
+                "count": "9"
+            },
+            "element": "meterSig"
+        }
+    },
+    {
+        "icon": "metersig-12-8",
+        "name": "12/8",
+        "preset": {
+            "attributes": {
+                "unit": "8",
+                "count": "12"
+            },
+            "element": "meterSig"
+        }
+    },
+    {
+        "icon": "metersig-3-4-2-4",
+        "name": "3/4 2/4",
+        "preset": {
+            "attributes": {
+                "func": "alternating"
+            },
+            "children": [
+                {
+                    "attributes": {
+                        "unit": "4",
+                        "count": "3"
+                    },
+                    "element": "meterSig"
+                },
+                                {
+                    "attributes": {
+                        "unit": "4",
+                        "count": "2"
+                    },
+                    "element": "meterSig"
+                }
+            ],
+            "element": "meterSigGrp"
         }
     }
 ]

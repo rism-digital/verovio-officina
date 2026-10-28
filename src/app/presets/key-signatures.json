@@ -22,5 +22,101 @@
             "attributes": { "sig": "2s" },
             "element": "keySig"
         }
+    },
+        {
+        "icon": "keysig-3s",
+        "name": "A major / F# minor",
+        "preset": {
+            "attributes": { "sig": "3s" },
+            "element": "keySig"
+        }
+    },
+        {
+        "icon": "keysig-4s",
+        "name": "E major / C# minor",
+        "preset": {
+            "attributes": { "sig": "4s" },
+            "element": "keySig"
+        }
+    },
+        {
+        "icon": "keysig-5s",
+        "name": "B major / G# minor",
+        "preset": {
+            "attributes": { "sig": "5s" },
+            "element": "keySig"
+        }
+    },
+        {
+        "icon": "keysig-6s",
+        "name": "F# major / D# minor",
+        "preset": {
+            "attributes": { "sig": "6s" },
+            "element": "keySig"
+        }
+    },
+    {
+        "icon": "keysig-7s",
+        "name": "C# major / A# minor",
+        "preset": {
+            "attributes": { "sig": "7s" },
+            "element": "keySig"
+        }
+    },
+    {
+        "icon": "keysig-1f",
+        "name": "F major / D minor",
+        "preset": {
+            "attributes": { "sig": "1f" },
+            "element": "keySig"
+        }
+    },
+    {
+        "icon": "keysig-2f",
+        "name": "B♭ major / G minor",
+        "preset": {
+            "attributes": { "sig": "2f" },
+            "element": "keySig"
+        }
+    },
+    {
+        "icon": "keysig-3f",
+        "name": "E♭ major / C minor",
+        "preset": {
+            "attributes": { "sig": "3f" },
+            "element": "keySig"
+        }
+    },
+    {
+        "icon": "keysig-4f",
+        "name": "A♭ major / F minor",
+        "preset": {
+            "attributes": { "sig": "4f" },
+            "element": "keySig"
+        }
+    },
+    {
+        "icon": "keysig-5f",
+        "name": "D♭ major / B♭ minor",
+        "preset": {
+            "attributes": { "sig": "5f" },
+            "element": "keySig"
+        }
+    },
+    {
+        "icon": "keysig-6f",
+        "name": "G♭ major / E♭ minor",
+        "preset": {
+            "attributes": { "sig": "6f" },
+            "element": "keySig"
+        }
+    },
+    {
+        "icon": "keysig-7f",
+        "name": "C♭ major / A♭ minor",
+        "preset": {
+            "attributes": { "sig": "7f" },
+            "element": "keySig"
+        }
     }
 ]

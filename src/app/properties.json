@@ -238,6 +238,25 @@
          "vo": "token"
       }
    },
+   "grpSym": {
+      "attrs": {
+         "symbol": [
+            "brace",
+            "bracket",
+            "bracketsq",
+            "line",
+            "none"
+         ],
+         "xml:id": []
+      },
+      "children": [],
+      "types": {
+         "xml:id": "ID",
+         "label": "string",
+         "type": "NMTOKEN",
+         "xml:lang": "language"
+      }
+   },
    "instrDef": {
       "attrs": {
          "azimuth": [],
@@ -571,8 +590,6 @@
             "TAB",
             "perc"
          ],
-         "instr": [],
-         "keysig": [],
          "label": [],
          "lines": [],
          "lines.color": [
@@ -729,13 +746,6 @@
             "false",
             "true"
          ],
-         "meter.count": [],
-         "meter.sym": [
-            "common",
-            "cut",
-            "open"
-         ],
-         "meter.unit": [],
          "n": [],
          "num": [],
          "numbase": [],
@@ -791,9 +801,6 @@
          "tune.pname": "token",
          "clef.line": "positiveInteger",
          "clef.dis": "positiveInteger",
-         "keysig": "token",
-         "meter.count": "string",
-         "meter.unit": "decimal",
          "num": "positiveInteger",
          "numbase": "positiveInteger",
          "trans.diat": "integer",
@@ -811,21 +818,14 @@
          ],
          "instr": [],
          "label": [],
-         "symbol": [
-            "brace",
-            "bracket",
-            "bracketsq",
-            "line",
-            "none"
-         ],
          "type": [],
          "xml:id": []
       },
       "children": [
+         "grpSym",
          "instrDef",
          "label",
          "labelAbbr",
-         "staffDef",
          "staffGrp"
       ],
       "types": {

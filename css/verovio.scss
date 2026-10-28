@@ -1480,6 +1480,14 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         pointer-events: none;
     }
 
+    .vrv-score-preset-toolbar .vrv-context-tool-button {
+        width: 64px;
+        height: 64px;
+        min-width: 48px;
+        min-height: 48px;
+        background-size: contain;
+    }
+
     ////////////////////////////////////////////////////////////////////////
     // Tree
     ////////////////////////////////////////////////////////////////////////
