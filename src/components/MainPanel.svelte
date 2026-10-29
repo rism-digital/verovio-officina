@@ -90,6 +90,17 @@
     let pendingDragParam: EditActionDragMoveParam | null = null;
     let dragStartPromise: Promise<void> | null = null;
     let liveDragPromise: Promise<void> | null = null;
+    let overlaySelectionQueue: Promise<void> = Promise.resolve();
+
+    function queueOverlaySelection(
+        operation: () => void | Promise<void>,
+    ): Promise<void> {
+        const pendingOperation = overlaySelectionQueue.then(operation);
+        overlaySelectionQueue = pendingOperation.catch((error) => {
+            console.error("Failed to select an SVG element", error);
+        });
+        return overlaySelectionQueue;
+    }
 
     function emitSize(width: number, height: number) {
         if (!onResize) return;
@@ -388,11 +399,13 @@
         }
 
         if (event.shiftKey && selection?.id) {
-            await onElementSecondarySelect?.(node.id);
+            await queueOverlaySelection(() =>
+                onElementSecondarySelect?.(node.id),
+            );
             return;
         }
 
-        await onElementSelect?.(node.id);
+        await queueOverlaySelection(() => onElementSelect?.(node.id));
     }
 
     async function onSVGOverlayDoubleClick(event: MouseEvent) {
@@ -404,15 +417,24 @@
 
         const node = getClosestMEIElement(<SVGElement>event.target, "note");
         if (node?.id) {
-            await onNoteDoubleClick?.(node.id);
+            await queueOverlaySelection(() => onNoteDoubleClick?.(node.id));
+            return;
+        }
+
+        const nodeDir = getClosestMEIElement(<SVGElement>event.target, ["dir", "dynam", "fing", "syl"]);
+        if (nodeDir?.id) {
+            await queueOverlaySelection(() =>
+                onTextParentDoubleClick?.(nodeDir.id),
+            );
             return;
         }
 
         const nodeStaff = getClosestMEIElement(<SVGElement>event.target, "staff");
-        if (nodeStaff?.id) await onStaffDoubleClick?.(nodeStaff.id);
-
-        const nodeDir = getClosestMEIElement(<SVGElement>event.target, ["dir", "dynam", "fing", "syl"]);
-        if (nodeDir?.id) await onTextParentDoubleClick?.(nodeDir.id);
+        if (nodeStaff?.id) {
+            await queueOverlaySelection(() =>
+                onStaffDoubleClick?.(nodeStaff.id),
+            );
+        }
     }
 
     function closeOverlayContextMenu() {
