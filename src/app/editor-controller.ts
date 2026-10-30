@@ -213,12 +213,6 @@ export class EditorController {
         this.worker.terminate();
     }
 
-    async exportSvg(): Promise<string> {
-        const exported = await this.bridge.verovio.renderToSVG(1);
-        this.stores.statusLine.set("Exported SVG file.");
-        return exported;
-    }
-
     async getMEI(options?: MEIExportOptions): Promise<string> {
         return this.bridge.verovio.getMEI(options);
     }
@@ -692,13 +686,6 @@ export class EditorController {
             action: action.action,
             param: this.resolveDialogValuePlaceholder(action.param, dialogValue),
         } as EditAction;
-    }
-
-    async saveDoc(): Promise<string> {
-        const exported = await this.bridge.verovio.getMEI();
-        this.stores.dirty.set(false);
-        this.stores.statusLine.set("Saved to local storage.");
-        return exported;
     }
 
     async setCurrentPage(nextPage: number): Promise<void> {

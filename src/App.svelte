@@ -437,10 +437,18 @@
         target.value = "";
     }
 
-    async function saveDoc() {
-        const exported = await controller.saveDoc();
-        localStorage.setItem(STORAGE_KEY, exported);
-        autosave?.markClean();
+    async function exportMeiDoc() {
+        const exported = await controller.getMEI();
+        const blob = new Blob([exported], { type: "application/mei+xml" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "score-export.mei";
+        document.body.append(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        statusLine.set("Exported MEI file.");
     }
 
     async function openCloudDocument(
@@ -461,17 +469,6 @@
         dirty.set(false);
         autosave?.markClean();
         statusLine.set(`Saved ${document.name} to cloud storage.`);
-    }
-
-    async function exportDoc() {
-        const exported = await controller.exportSvg();
-        const blob = new Blob([exported], { type: "image/svg+xml" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "score-export.svg";
-        link.click();
-        URL.revokeObjectURL(url);
     }
 
     async function toggleXmlMode() {
@@ -737,8 +734,7 @@
     <Menu
         onOpen={triggerOpenFile}
         onCloudDocuments={() => (cloudDocumentsOpen = true)}
-        onSave={saveDoc}
-        onExport={exportDoc}
+        onExportMEI={exportMeiDoc}
         onZoomIn={() => controller.adjustZoom(1)}
         onZoomOut={() => controller.adjustZoom(-1)}
         onPrevPage={() =>

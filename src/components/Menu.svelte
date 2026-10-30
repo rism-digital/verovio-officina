@@ -16,8 +16,7 @@
 
     export let onOpen: ActionHandler | null = null;
     export let onCloudDocuments: ActionHandler | null = null;
-    export let onSave: ActionHandler | null = null;
-    export let onExport: ActionHandler | null = null;
+    export let onExportMEI: ActionHandler | null = null;
     export let onZoomIn: ActionHandler | null = null;
     export let onZoomOut: ActionHandler | null = null;
     export let onPrevPage: ActionHandler | null = null;
@@ -79,12 +78,7 @@
             <div
                 class="vrv-menu-text"
                 data-before="Export MEI file"
-                on:click={() => onSave?.()}
-            ></div>
-            <div
-                class="vrv-menu-text"
-                data-before="Export as SVG"
-                on:click={() => onExport?.()}
+                on:click={() => onExportMEI?.()}
             ></div>
         </div>
     </div>
