@@ -792,12 +792,46 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                     gap: 10px;
                 }
 
-                .vrv-cloud-login,
                 .vrv-cloud-document-name {
                     display: grid;
                     grid-template-columns: auto minmax(0, 1fr) auto;
                     align-items: center;
                     gap: 8px;
+                }
+
+                .vrv-cloud-login,
+                .vrv-cloud-password {
+                    display: grid;
+                    grid-template-columns: auto minmax(0, 1fr);
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .vrv-cloud-login-actions,
+                .vrv-cloud-password-actions {
+                    display: flex;
+                    grid-column: 2;
+                    gap: 6px;
+                }
+
+                .vrv-cloud-tabs .vrv-tab-content {
+                    height: auto;
+                    overflow: visible;
+                }
+
+                .vrv-cloud-tabs .vrv-tab-content-panel {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                }
+
+                .vrv-cloud-tabs p {
+                    margin: 0;
+                }
+
+                .vrv-cloud-reset-password {
+                    align-self: flex-start;
+                    flex: 0 0 auto;
                 }
 
                 .vrv-cloud-account,
@@ -823,7 +857,8 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
 
                 .vrv-cloud-account > .vrv-context-action-button,
                 .vrv-cloud-actions > .vrv-context-action-button,
-                .vrv-cloud-login > .vrv-context-action-button {
+                .vrv-cloud-login-actions > .vrv-context-action-button,
+                .vrv-cloud-password-actions > .vrv-context-action-button {
                     flex: 0 0 auto;
                 }
 
@@ -875,6 +910,8 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 @extend .vrv-disableable;
                 background: $background;
                 border: 1px solid $background-border;
+                color: $text-color;
+                font-family: inherit;
                 height: $btn-height;
                 min-width: 100px;
                 display: flex;

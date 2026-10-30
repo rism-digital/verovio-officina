@@ -18,16 +18,23 @@
         | null = null;
     export let onClose: (() => void) | null = null;
 
+    type Tab = "documents" | "account";
+
     let user: CloudUser | null = null;
     let documents: ScoreDocument[] = [];
     let selectedId: string | null = null;
     let documentName = "Untitled.mei";
     let email = "";
+    let password = "";
+    let newPassword = "";
+    let confirmPassword = "";
     let message = "";
     let busy = false;
     let initialized = false;
     let unsubscribeUser: (() => void) | null = null;
     let usedBytes = 0;
+    let activeTab: Tab = "documents";
+    let passwordRecovery = false;
 
     $: usedBytes = documents.reduce(
         (total, document) => total + document.sizeBytes,
@@ -65,11 +72,16 @@
             message = "Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY to enable cloud storage.";
             return;
         }
+        passwordRecovery = repository.isPasswordRecovery();
+        activeTab = passwordRecovery ? "account" : "documents";
         user = await repository.currentUser();
         unsubscribeUser = repository.onUserChange((nextUser) => {
             user = nextUser;
             documents = [];
             selectedId = null;
+            password = "";
+            newPassword = "";
+            confirmPassword = "";
             if (nextUser) void run(refresh);
         });
         if (user) await refresh();
@@ -83,6 +95,11 @@
         selectedId = null;
         documentName = "Untitled.mei";
         email = "";
+        password = "";
+        newPassword = "";
+        confirmPassword = "";
+        activeTab = "documents";
+        passwordRecovery = false;
         message = "";
         busy = false;
     }
@@ -115,9 +132,53 @@
         });
     }
 
+    function signInWithPassword() {
+        if (!repository || !email.trim() || !password) return;
+        void run(async () => {
+            await repository!.signInWithPassword(email, password);
+            password = "";
+        });
+    }
+
+    function requestPasswordReset() {
+        if (!repository) return;
+        const resetEmail = user?.email ?? email.trim();
+        if (!resetEmail) {
+            message = "Enter an email address.";
+            return;
+        }
+        void run(async () => {
+            await repository!.requestPasswordReset(resetEmail);
+            message = "Check your email for the password setup/reset link.";
+        });
+    }
+
+    function setPassword() {
+        if (!repository || !passwordRecovery
+            || !newPassword || !confirmPassword) return;
+        if (newPassword !== confirmPassword) {
+            message = "The password confirmation does not match.";
+            return;
+        }
+        void run(async () => {
+            await repository!.setPassword(newPassword);
+            repository!.completePasswordRecovery();
+            passwordRecovery = false;
+            newPassword = "";
+            confirmPassword = "";
+            message = "Password updated.";
+        });
+    }
+
     function signOut() {
         if (!repository) return;
-        void run(() => repository!.signOut());
+        void run(async () => {
+            await repository!.signOut();
+            if (passwordRecovery) {
+                repository!.completePasswordRecovery();
+                passwordRecovery = false;
+            }
+        });
     }
 
     function openSelectedDocument() {
@@ -189,84 +250,181 @@
                 bind:value={email}
                 disabled={busy}
                 on:keydown={(event) => {
-                    if (event.key === "Enter") requestMagicLink();
+                    if (event.key === "Enter" && password) {
+                        signInWithPassword();
+                    }
                 }}
             />
-            <button
-                class="vrv-context-action-button"
-                type="button"
-                disabled={busy || !email.trim()}
-                on:click={requestMagicLink}
-            >Send magic link</button>
+            <label for="vrv-cloud-password">Password</label>
+            <input
+                id="vrv-cloud-password"
+                class="vrv-form-input"
+                type="password"
+                autocomplete="current-password"
+                bind:value={password}
+                disabled={busy}
+                on:keydown={(event) => {
+                    if (event.key === "Enter") signInWithPassword();
+                }}
+            />
+            <div class="vrv-cloud-login-actions">
+                <button
+                    class="vrv-context-action-button"
+                    type="button"
+                    disabled={busy || !email.trim() || !password}
+                    on:click={signInWithPassword}
+                >Sign in</button>
+                <button
+                    class="vrv-context-action-button"
+                    type="button"
+                    disabled={busy || !email.trim()}
+                    on:click={requestMagicLink}
+                >Send magic link</button>
+                <button
+                    class="vrv-context-action-button"
+                    type="button"
+                    disabled={busy || !email.trim()}
+                    on:click={requestPasswordReset}
+                >Reset password</button>
+            </div>
         </div>
     {:else}
-        <div class="vrv-cloud-account">
-            <span>{user.email ?? user.id}</span>
-            <button
-                class="vrv-context-action-button"
-                type="button"
-                disabled={busy}
-                on:click={signOut}
-            >Sign out</button>
-        </div>
-
-        {#if repository.quotaBytes !== null}
-            <div class="vrv-cloud-quota" aria-live="polite">
-                Storage: {formattedBytes(usedBytes)} of
-                {formattedBytes(repository.quotaBytes)}
+        <div class="vrv-tab-group vrv-cloud-tabs">
+            <div class="vrv-tab-selectors" role="tablist" aria-label="Cloud storage">
+                <button
+                    class="vrv-tab-selector"
+                    class:selected={activeTab === "documents"}
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === "documents"}
+                    on:click={() => activeTab = "documents"}
+                >Documents</button>
+                <button
+                    class="vrv-tab-selector"
+                    class:selected={activeTab === "account"}
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === "account"}
+                    on:click={() => activeTab = "account"}
+                >Account</button>
             </div>
-        {/if}
+            <div class="vrv-tab-content">
+                <div class="vrv-tab-content-panel" role="tabpanel">
+                    {#if activeTab === "documents"}
+                        {#if repository.quotaBytes !== null}
+                            <div class="vrv-cloud-quota" aria-live="polite">
+                                Storage: {formattedBytes(usedBytes)} of
+                                {formattedBytes(repository.quotaBytes)}
+                            </div>
+                        {/if}
 
-        <div class="vrv-cloud-document-list" aria-label="Cloud documents">
-            {#if documents.length === 0}
-                <div class="vrv-cloud-empty">No cloud documents yet.</div>
-            {:else}
-                {#each documents as document (document.id)}
-                    <button
-                        class="vrv-cloud-document"
-                        class:selected={selectedId === document.id}
-                        type="button"
-                        on:click={() => selectDocument(document)}
-                    >
-                        <span>{document.name}</span>
-                        <small>
-                            {formattedDate(document.updatedAt)}
-                            · {formattedBytes(document.sizeBytes)}
-                        </small>
-                    </button>
-                {/each}
-            {/if}
-        </div>
+                        <div class="vrv-cloud-document-list" aria-label="Cloud documents">
+                            {#if documents.length === 0}
+                                <div class="vrv-cloud-empty">No cloud documents yet.</div>
+                            {:else}
+                                {#each documents as document (document.id)}
+                                    <button
+                                        class="vrv-cloud-document"
+                                        class:selected={selectedId === document.id}
+                                        type="button"
+                                        on:click={() => selectDocument(document)}
+                                    >
+                                        <span>{document.name}</span>
+                                        <small>
+                                            {formattedDate(document.updatedAt)}
+                                            · {formattedBytes(document.sizeBytes)}
+                                        </small>
+                                    </button>
+                                {/each}
+                            {/if}
+                        </div>
 
-        <div class="vrv-cloud-document-name">
-            <label for="vrv-cloud-document-name">Document name</label>
-            <input
-                id="vrv-cloud-document-name"
-                class="vrv-form-input"
-                bind:value={documentName}
-                disabled={busy || selectedId !== null}
-            />
-        </div>
+                        <div class="vrv-cloud-document-name">
+                            <label for="vrv-cloud-document-name">Document name</label>
+                            <input
+                                id="vrv-cloud-document-name"
+                                class="vrv-form-input"
+                                bind:value={documentName}
+                                disabled={busy || selectedId !== null}
+                            />
+                        </div>
 
-        <div class="vrv-cloud-actions">
-            <button
-                class="vrv-context-action-button"
-                type="button"
-                disabled={busy || !selectedId}
-                on:click={openSelectedDocument}
-            >Open</button>
-            <button
-                class="vrv-context-action-button"
-                type="button"
-                disabled={busy || !documentName.trim()}
-                on:click={saveCurrentDocument}
-            >{selectedId ? "Save" : "Save as"}</button>
-            <button
-                class="vrv-context-action-button"
-                type="button"
-                disabled={busy || !selectedId}
-                on:click={deleteSelectedDocument}
-            >Delete</button>
+                        <div class="vrv-cloud-actions">
+                            <button
+                                class="vrv-context-action-button"
+                                type="button"
+                                disabled={busy || !selectedId}
+                                on:click={openSelectedDocument}
+                            >Open</button>
+                            <button
+                                class="vrv-context-action-button"
+                                type="button"
+                                disabled={busy || !documentName.trim()}
+                                on:click={saveCurrentDocument}
+                            >{selectedId ? "Save" : "Save as"}</button>
+                            <button
+                                class="vrv-context-action-button"
+                                type="button"
+                                disabled={busy || !selectedId}
+                                on:click={deleteSelectedDocument}
+                            >Delete</button>
+                        </div>
+                    {:else}
+                        <div class="vrv-cloud-account">
+                            <span>{user.email ?? user.id}</span>
+                            <button
+                                class="vrv-context-action-button"
+                                type="button"
+                                disabled={busy}
+                                on:click={signOut}
+                            >Sign out</button>
+                        </div>
+
+                        {#if passwordRecovery}
+                            <p>Enter a new password to complete password setup or recovery.</p>
+                            <div class="vrv-cloud-password">
+                                <label for="vrv-cloud-new-password">New password</label>
+                                <input
+                                    id="vrv-cloud-new-password"
+                                    class="vrv-form-input"
+                                    type="password"
+                                    autocomplete="new-password"
+                                    bind:value={newPassword}
+                                    disabled={busy}
+                                />
+                                <label for="vrv-cloud-confirm-password">Confirm password</label>
+                                <input
+                                    id="vrv-cloud-confirm-password"
+                                    class="vrv-form-input"
+                                    type="password"
+                                    autocomplete="new-password"
+                                    bind:value={confirmPassword}
+                                    disabled={busy}
+                                    on:keydown={(event) => {
+                                        if (event.key === "Enter") setPassword();
+                                    }}
+                                />
+                                <div class="vrv-cloud-password-actions">
+                                    <button
+                                        class="vrv-context-action-button"
+                                        type="button"
+                                        disabled={busy || !newPassword || !confirmPassword}
+                                        on:click={setPassword}
+                                    >Set password</button>
+                                </div>
+                            </div>
+                        {:else}
+                            <p>A verified email link is required to set or change the password.</p>
+                            <button
+                                class="vrv-context-action-button vrv-cloud-reset-password"
+                                type="button"
+                                disabled={busy || !user.email}
+                                on:click={requestPasswordReset}
+                            >Send password setup/reset link</button>
+                        {/if}
+                    {/if}
+                </div>
+            </div>
         </div>
     {/if}
 

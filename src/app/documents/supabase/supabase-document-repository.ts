@@ -12,6 +12,7 @@ import {
 const DEFAULT_BUCKET = "scores";
 const DEFAULT_USER_QUOTA_MB = 20;
 const LIST_PAGE_SIZE = 1000;
+const PASSWORD_RECOVERY_QUERY = "cloud-password-recovery";
 
 type StorageObject = {
     name: string;
@@ -39,6 +40,25 @@ function objectSize(object: StorageObject): number {
 
 function formatMegabytes(bytes: number): string {
     return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
+function passwordRecoveryUrl(): string {
+    const url = new URL(window.location.href);
+    url.hash = "";
+    url.searchParams.set(PASSWORD_RECOVERY_QUERY, "1");
+    return url.toString();
+}
+
+function isPasswordRecoveryUrl(): boolean {
+    return new URL(window.location.href).searchParams.get(
+        PASSWORD_RECOVERY_QUERY,
+    ) === "1";
+}
+
+function clearPasswordRecoveryUrl(): void {
+    const url = new URL(window.location.href);
+    url.searchParams.delete(PASSWORD_RECOVERY_QUERY);
+    window.history.replaceState(null, "", url);
 }
 
 function cloudUser(user: User | null): CloudUser | null {
@@ -133,6 +153,36 @@ export function createSupabaseDocumentRepository():
                 options: { emailRedirectTo: window.location.href.split("#")[0] },
             });
             if (error) throw error;
+        },
+
+        async requestPasswordReset(email) {
+            const { error } = await client.auth.resetPasswordForEmail(
+                email.trim(),
+                { redirectTo: passwordRecoveryUrl() },
+            );
+            if (error) throw error;
+        },
+
+        async signInWithPassword(email, password) {
+            const { error } = await client.auth.signInWithPassword({
+                email: email.trim(),
+                password,
+            });
+            if (error) throw error;
+        },
+
+        async setPassword(password) {
+            await requireUser();
+            const { error } = await client.auth.updateUser({ password });
+            if (error) throw error;
+        },
+
+        isPasswordRecovery() {
+            return isPasswordRecoveryUrl();
+        },
+
+        completePasswordRecovery() {
+            clearPasswordRecoveryUrl();
         },
 
         async signOut() {

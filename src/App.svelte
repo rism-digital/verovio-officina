@@ -113,6 +113,12 @@
     let autosave: AutosaveHandle | null = null;
     const cloudDocumentRepository = createSupabaseDocumentRepository();
 
+    onMount(() => {
+        if (cloudDocumentRepository?.isPasswordRecovery()) {
+            cloudDocumentsOpen = true;
+        }
+    });
+
     const ABOUT_LIBRARIES_HTML = `Libraries used in this application:\n\n\
 * [html-midi-player](https://github.com/cifkao/html-midi-player)\n\
 * [marked](https://marked.js.org/)\n\n`;
