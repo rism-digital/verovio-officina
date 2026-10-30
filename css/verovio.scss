@@ -783,6 +783,92 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 }
             }
 
+            &.vrv-dialog-cloud-documents {
+                width: min(600px, calc(100vw - 80px));
+
+                .vrv-dialog-content {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                }
+
+                .vrv-cloud-login,
+                .vrv-cloud-document-name {
+                    display: grid;
+                    grid-template-columns: auto minmax(0, 1fr) auto;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .vrv-cloud-account,
+                .vrv-cloud-actions {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+
+                .vrv-cloud-account > span {
+                    flex: 1 1 auto;
+                    min-width: 0;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .vrv-cloud-quota {
+                    font-size: 0.85rem;
+                    opacity: 0.7;
+                    text-align: right;
+                }
+
+                .vrv-cloud-account > .vrv-context-action-button,
+                .vrv-cloud-actions > .vrv-context-action-button,
+                .vrv-cloud-login > .vrv-context-action-button {
+                    flex: 0 0 auto;
+                }
+
+                .vrv-cloud-document-list {
+                    min-height: 180px;
+                    max-height: 320px;
+                    overflow-y: auto;
+                    border: 1px solid $background-border;
+                    background: $background-extra-light;
+                    padding: 4px;
+                }
+
+                .vrv-cloud-document {
+                    @extend .vrv-clickable;
+                    appearance: none;
+                    box-sizing: border-box;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 12px;
+                    width: 100%;
+                    border: 1px solid transparent;
+                    background: transparent;
+                    color: $text-color;
+                    font: inherit;
+                    padding: 5px 8px;
+                    text-align: left;
+                }
+
+                .vrv-cloud-document.selected {
+                    border-color: $background-border;
+                    background: $background-toggled;
+                }
+
+                .vrv-cloud-document small {
+                    opacity: 0.7;
+                    white-space: nowrap;
+                }
+
+                .vrv-cloud-empty,
+                .vrv-cloud-message {
+                    padding: 8px;
+                }
+            }
+
             .vrv-dialog-btn {
                 @extend .vrv-clickable;
                 @extend .vrv-activable;

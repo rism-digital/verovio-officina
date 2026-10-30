@@ -4,6 +4,7 @@
     import MainPanel from "./components/MainPanel.svelte";
     import XmlPanel from "./components/XmlPanel.svelte";
     import DialogAbout from "./components/dialogs/DialogAbout.svelte";
+    import DialogCloudDocuments from "./components/dialogs/DialogCloudDocuments.svelte";
     import DialogEnterValue from "./components/dialogs/DialogEnterValue.svelte";
     import DialogExport from "./components/dialogs/DialogExport.svelte";
     import DialogHelp from "./components/dialogs/DialogHelp.svelte";
@@ -20,6 +21,8 @@
     import { withBaseUrl } from "./app/asset-url";
     import { initMEIAutosave, type AutosaveHandle } from "./app/autosave";
     import { EditorController } from "./app/editor-controller";
+    import { createSupabaseDocumentRepository } from "./app/documents/supabase/supabase-document-repository";
+    import type { ScoreDocument } from "./app/documents/document-repository";
     import { RNGLoader } from "./app/rng-loader";
     import { initUserPreferencesPersistence } from "./app/user-preferences";
     import { createKeyShortcuts, keyShortcutMap, keyShortcutMapFromEvent } from "./app/key-actions";
@@ -89,6 +92,7 @@
     let xmlMode = false;
     let xmlContent = "";
     let aboutOpen = false;
+    let cloudDocumentsOpen = false;
     let helpOpen = false;
     let exportDialogOpen = false;
     let scorePropStaffGrpOpen = false;
@@ -107,6 +111,7 @@
     let xmlInitialContent = "";
     let stopPreferencesSync: Unsubscriber | null = null;
     let autosave: AutosaveHandle | null = null;
+    const cloudDocumentRepository = createSupabaseDocumentRepository();
 
     const ABOUT_LIBRARIES_HTML = `Libraries used in this application:\n\n\
 * [html-midi-player](https://github.com/cifkao/html-midi-player)\n\
@@ -438,6 +443,26 @@
         autosave?.markClean();
     }
 
+    async function openCloudDocument(
+        mei: string,
+        document: ScoreDocument,
+    ) {
+        editStatus.update((current) => ({ ...current, selection: null }));
+        localStorage.setItem(STORAGE_KEY, mei);
+        await controller.loadData(mei);
+        dirty.set(false);
+        autosave?.markClean();
+        cloudDocumentsOpen = false;
+        statusLine.set(`Opened ${document.name} from cloud storage.`);
+    }
+
+    function cloudDocumentSaved(document: ScoreDocument, mei: string) {
+        localStorage.setItem(STORAGE_KEY, mei);
+        dirty.set(false);
+        autosave?.markClean();
+        statusLine.set(`Saved ${document.name} to cloud storage.`);
+    }
+
     async function exportDoc() {
         const exported = await controller.exportSvg();
         const blob = new Blob([exported], { type: "image/svg+xml" });
@@ -711,6 +736,7 @@
 <div class="vrv-wrapper">
     <Menu
         onOpen={triggerOpenFile}
+        onCloudDocuments={() => (cloudDocumentsOpen = true)}
         onSave={saveDoc}
         onExport={exportDoc}
         onZoomIn={() => controller.adjustZoom(1)}
@@ -811,6 +837,15 @@
         licenseUrl={ABOUT_LICENSE_URL}
         changelogUrl={ABOUT_CHANGELOG_URL}
         onClose={() => (aboutOpen = false)}
+    />
+
+    <DialogCloudDocuments
+        open={cloudDocumentsOpen}
+        repository={cloudDocumentRepository}
+        getCurrentMEI={() => controller.getMEI()}
+        onOpenDocument={openCloudDocument}
+        onSaved={cloudDocumentSaved}
+        onClose={() => (cloudDocumentsOpen = false)}
     />
 
     <DialogHelp

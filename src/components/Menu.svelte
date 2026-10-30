@@ -15,6 +15,7 @@
     export let viewMode: ViewMode = "page";
 
     export let onOpen: ActionHandler | null = null;
+    export let onCloudDocuments: ActionHandler | null = null;
     export let onSave: ActionHandler | null = null;
     export let onExport: ActionHandler | null = null;
     export let onZoomIn: ActionHandler | null = null;
@@ -68,6 +69,11 @@
                 class="vrv-menu-text"
                 data-before="Import MEI file"
                 on:click={() => onOpen?.()}
+            ></div>
+            <div
+                class="vrv-menu-text"
+                data-before="Cloud documents…"
+                on:click={() => onCloudDocuments?.()}
             ></div>
             <div class="vrv-v-separator"></div>
             <div
