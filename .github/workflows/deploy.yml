@@ -32,6 +32,11 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SUPABASE_STORAGE_BUCKET: ${{ vars.VITE_SUPABASE_STORAGE_BUCKET }}
+          VITE_SUPABASE_USER_QUOTA_MB: ${{ vars.VITE_SUPABASE_USER_QUOTA_MB }}
         run: npm run build
 
       - name: Upload Pages artifact
