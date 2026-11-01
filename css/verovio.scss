@@ -469,6 +469,12 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 padding-bottom: $menu-padding;
             }
 
+            .vrv-menu-text[data-after]::after {
+                content: attr(data-after);
+                float: right;
+                margin-left: 32px;
+            }
+
             .vrv-menu-checked::after {
                 content: url(/icons/toolbar/checked.png);
                 padding-top: $menu-padding;
@@ -509,7 +515,7 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         }
 
         // Activate submenu
-        .vrv-menu:hover .vrv-menu-content {
+        .vrv-menu:hover:not(.disabled) .vrv-menu-content {
             display: flex;
         }
     }

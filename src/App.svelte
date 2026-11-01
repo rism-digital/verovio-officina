@@ -288,6 +288,11 @@
         canNavigateView && $verovioState.currentPage < $verovioState.pageCount;
     $: canUndo = menuInteractionEnabled && $editStatus.canUndo;
     $: canRedo = menuInteractionEnabled && $editStatus.canRedo;
+    $: staffSelected = $editStatus.selection?.element === "staff";
+    $: canCopyOrCut =
+        menuInteractionEnabled && staffSelected && $editStatus.canCopyOrCut;
+    $: canPaste =
+        menuInteractionEnabled && staffSelected && $editStatus.canPaste;
     $: canRefreshLayout = menuInteractionEnabled;
     $: canToggleShowHidden = menuInteractionEnabled;
     $: canToggleAutoBeam = menuInteractionEnabled;
@@ -304,12 +309,15 @@
             shortcut.inputModes
             && !shortcut.inputModes.includes(get(userPreferences).inputMode)
         ) return;
+        const shortcutContext = {
+            event,
+            editStatus: currentEditStatus,
+            selectionId: currentSelection?.id,
+        };
+        if (shortcut.enabled && !shortcut.enabled(shortcutContext)) return;
         event.preventDefault();
         if (get(workerBusy)) return;
-        await shortcut.run({
-            event,
-            selectionId: currentSelection?.id,
-        });
+        await shortcut.run(shortcutContext);
     }
 
     async function toggleMode() {
@@ -399,6 +407,21 @@
     async function redo() {
         if (get(workerBusy) || !get(editStatus).canRedo) return;
         await controller.handleRedo();
+    }
+
+    async function copy() {
+        if (!canCopyOrCut) return;
+        await controller.handleCopy();
+    }
+
+    async function cut() {
+        if (!canCopyOrCut) return;
+        await controller.handleCut();
+    }
+
+    async function paste() {
+        if (!canPaste) return;
+        await controller.handlePaste();
     }
 
     async function refreshLayout() {
@@ -741,6 +764,11 @@
         onOpen={triggerOpenFile}
         onCloudDocuments={() => (cloudDocumentsOpen = true)}
         onExportMEI={exportMeiDoc}
+        {canCopyOrCut}
+        {canPaste}
+        onCopy={copy}
+        onCut={cut}
+        onPaste={paste}
         onZoomIn={() => controller.adjustZoom(1)}
         onZoomOut={() => controller.adjustZoom(-1)}
         onPrevPage={() =>

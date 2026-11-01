@@ -1,9 +1,11 @@
 import type { EditorController } from "./editor-controller";
 import { pianoKeyboardShortcuts } from "./piano-keyboard";
 import type { InputMode } from "./state";
+import type { EditStatus } from "./types";
 
 export type KeyShortcutContext = {
     event: KeyboardEvent;
+    editStatus: EditStatus;
     selectionId?: string;
 };
 
@@ -19,6 +21,7 @@ export type KeyShortcut = {
     requiresSelection?: boolean;
     requiresInsertMode?: boolean;
     inputModes?: InputMode[];
+    enabled?: (context: KeyShortcutContext) => boolean;
     run: KeyShortcutHandler;
 };
 
@@ -176,6 +179,33 @@ export function createKeyShortcuts(
             primaryKey: true,
             shiftKey: true,
             run: async () => controller.handleRedo(),
+        },
+        {
+            key: "KeyC",
+            primaryKey: true,
+            requiresSelection: true,
+            enabled: ({ editStatus }) =>
+                editStatus.selection?.element === "staff"
+                && editStatus.canCopyOrCut,
+            run: async () => controller.handleCopy(),
+        },
+        {
+            key: "KeyX",
+            primaryKey: true,
+            requiresSelection: true,
+            enabled: ({ editStatus }) =>
+                editStatus.selection?.element === "staff"
+                && editStatus.canCopyOrCut,
+            run: async () => controller.handleCut(),
+        },
+        {
+            key: "KeyV",
+            primaryKey: true,
+            requiresSelection: true,
+            enabled: ({ editStatus }) =>
+                editStatus.selection?.element === "staff"
+                && editStatus.canPaste,
+            run: async () => controller.handlePaste(),
         },
         {
             key: "KeyL",

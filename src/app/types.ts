@@ -88,6 +88,8 @@ export interface EditStatus {
     chainedId: string;
     canUndo: boolean;
     canRedo: boolean;
+    canCopyOrCut: boolean;
+    canPaste: boolean;
     isMensuralMusicOnly: boolean;
     insertMode: boolean;
     selection: {
@@ -125,6 +127,7 @@ export interface EditResponseContent {
 
 export type EditActionParam =
     | EditActionChainParam
+    | EditActionClipboardParam
     | EditActionContextParam
     | EditActionDeleteParam
     | EditActionDragParam
@@ -164,6 +167,8 @@ export type EditAction =
     | EditActionChain
     | EditActionCommit
     | EditActionContext
+    | EditActionCopy
+    | EditActionCut
     | EditActionDelete
     | EditActionDrag
     | EditActionInsert
@@ -177,6 +182,7 @@ export type EditAction =
     | EditActionInsertRest
     | EditActionKeyDown
     | EditActionNavigate
+    | EditActionPaste
     | EditActionProperties   
     | EditActionRedo 
     | EditActionResetCursor
@@ -213,6 +219,16 @@ export type EditActionCommit = {
 export type EditActionContext = {
     action: "context";
     param: EditActionContextParam;
+};
+
+export type EditActionCopy = {
+    action: "copy";
+    param: EditActionClipboardParam;
+};
+
+export type EditActionCut = {
+    action: "cut";
+    param: EditActionClipboardParam;
 };
 
 export type EditActionDelete = {
@@ -283,6 +299,11 @@ export type EditActionKeyDown = {
 export type EditActionNavigate = {
     action: "navigate";
     param: EditActionNavigationParam;
+};
+
+export type EditActionPaste = {
+    action: "paste";
+    param: EditActionClipboardParam;
 };
 
 export type EditActionProperties = {
@@ -549,6 +570,10 @@ export type EditActionSelectParam = {
     elementId: string;
     secondary?: boolean;
     custom?: "note" | "staff" | "textParent";
+};
+
+export type EditActionClipboardParam = {
+    elementId: string;
 };
 
 export type EditActionSetParam = {

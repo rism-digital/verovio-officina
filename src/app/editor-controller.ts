@@ -542,6 +542,18 @@ export class EditorController {
         return await this.vrvUndoRedo("redo");
     }
 
+    async handleCopy(): Promise<boolean> {
+        return await this.vrvClipboardAction("copy");
+    }
+
+    async handleCut(): Promise<boolean> {
+        return await this.vrvClipboardAction("cut");
+    }
+
+    async handlePaste(): Promise<boolean> {
+        return await this.vrvClipboardAction("paste");
+    }
+
     async handleRefreshLayout(): Promise<void> {
         this.stores.workerBusy.set(true);
         try {
@@ -1158,6 +1170,40 @@ export class EditorController {
             this.stores.editResponseContent.set(null);
         }
         this.markDocumentChanged();
+        return true;
+    }
+
+    private async vrvClipboardAction(
+        action: "copy" | "cut" | "paste",
+    ): Promise<boolean> {
+        const currentStatus = get(this.stores.editStatus);
+        const canApply = action === "paste"
+            ? currentStatus.canPaste
+            : currentStatus.canCopyOrCut;
+        if (currentStatus.selection?.element !== "staff" || !canApply) {
+            return false;
+        }
+
+        const ok = await this.vrvEdit({
+            action,
+            param: { elementId: currentStatus.selection.id },
+        }, `Failed to ${action}`);
+        if (!ok) return false;
+
+        if (action === "copy") {
+            await this.vrvRefreshStatus();
+            this.stores.workerBusy.set(false);
+            return true;
+        }
+
+        await this.vrvApplyEditLayout(true);
+        this.markDocumentChanged();
+        const editStatus = await this.vrvRefreshStatus();
+        if (editStatus.selection?.id) {
+            await this.vrvSelect(editStatus.selection.id);
+        } else {
+            this.stores.editResponseContent.set(null);
+        }
         return true;
     }
 

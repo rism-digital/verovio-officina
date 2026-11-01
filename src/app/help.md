@@ -106,6 +106,9 @@ In insert mode, pressing `(` will add a tuplet and `)` will terminate it. Pressi
 | `Esc` | Leave insert mode or chord mode |
 | `Backspace` | Delete the selected element and move backward. |
 | `Delete` | Delete the selected element and move forward. |
+| `Primary+C` | Copy the selected staff. |
+| `Primary+X` | Cut the selected staff. |
+| `Primary+V` | Paste a staff at the selected staff. |
 | `Primary+Z` | Undo. |
 | `Primary+Y` | Redo. |
 | `Primary+Shift+Z` | Redo. |

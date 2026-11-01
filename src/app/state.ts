@@ -29,6 +29,8 @@ export const editStatus = writable<EditStatus>({
   chainedId: '',
   canUndo: false,
   canRedo: false,
+  canCopyOrCut: false,
+  canPaste: false,
   isMensuralMusicOnly: false,
   insertMode: false,
   selection: null,

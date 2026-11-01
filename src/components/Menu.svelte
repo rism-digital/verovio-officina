@@ -13,10 +13,15 @@
     export let canGoNext = false;
     export let xmlMode = false;
     export let viewMode: ViewMode = "page";
+    export let canCopyOrCut = false;
+    export let canPaste = false;
 
     export let onOpen: ActionHandler | null = null;
     export let onCloudDocuments: ActionHandler | null = null;
     export let onExportMEI: ActionHandler | null = null;
+    export let onCopy: ActionHandler | null = null;
+    export let onCut: ActionHandler | null = null;
+    export let onPaste: ActionHandler | null = null;
     export let onZoomIn: ActionHandler | null = null;
     export let onZoomOut: ActionHandler | null = null;
     export let onPrevPage: ActionHandler | null = null;
@@ -39,6 +44,7 @@
     let addMeasureItems: ResolvedMenuAction[] = [];
 
     $: addMeasureItems = resolveMenuActions();
+    $: clipboardMenuEnabled = canCopyOrCut || canPaste;
 
     function handleMenuItemKeydown(
         event: KeyboardEvent,
@@ -79,6 +85,34 @@
                 class="vrv-menu-text"
                 data-before="Export MEI file"
                 on:click={() => onExportMEI?.()}
+            ></div>
+        </div>
+    </div>
+    <div class="vrv-menu" class:disabled={!clipboardMenuEnabled}>
+        <div
+            class="vrv-btn-text"
+            class:disabled={!clipboardMenuEnabled}
+            data-before="Edit"
+        ></div>
+        <div class="vrv-menu-content">
+            <div class="vrv-v-separator"></div>
+            <div
+                class="vrv-menu-text {canCopyOrCut ? '' : 'disabled'}"
+                data-before="Copy"
+                data-after="Primary+C"
+                on:click={() => canCopyOrCut && onCopy?.()}
+            ></div>
+            <div
+                class="vrv-menu-text {canCopyOrCut ? '' : 'disabled'}"
+                data-before="Cut"
+                data-after="Primary+X"
+                on:click={() => canCopyOrCut && onCut?.()}
+            ></div>
+            <div
+                class="vrv-menu-text {canPaste ? '' : 'disabled'}"
+                data-before="Paste"
+                data-after="Primary+V"
+                on:click={() => canPaste && onPaste?.()}
             ></div>
         </div>
     </div>
