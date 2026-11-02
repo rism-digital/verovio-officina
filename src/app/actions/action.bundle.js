@@ -369,12 +369,45 @@ const stemPosition = [
     { name: "Stem up", action: "set-stem-up", icon: "icons/editor/stem-dir-up.png" },
 ]
 
+const insertClefSpecs = [
+    { name: "Insert F4 clef before", action: "insert-clef-f4-before", icon: "icons/editor/clef-F4-before.png", shape: "F", line: "4", insertMode: "insertBefore" },
+    { name: "Insert G2 clef before", action: "insert-clef-g2-before", icon: "icons/editor/clef-G2-before.png", shape: "G", line: "2", insertMode: "insertBefore" },
+    { name: "Insert C3 clef before", action: "insert-clef-c3-before", icon: "icons/editor/clef-C3-before.png", shape: "C", line: "3", insertMode: "insertBefore" },
+    { name: "Insert F4 clef after", action: "insert-clef-f4-after", icon: "icons/editor/clef-F4-after.png", shape: "F", line: "4", insertMode: "insertAfter" },
+    { name: "Insert G2 clef after", action: "insert-clef-g2-after", icon: "icons/editor/clef-G2-after.png", shape: "G", line: "2", insertMode: "insertAfter" },
+    { name: "Insert C3 clef after", action: "insert-clef-c3-after", icon: "icons/editor/clef-C3-after.png", shape: "C", line: "3", insertMode: "insertAfter" },
+]
+
+const insertClefs = insertClefSpecs.map(({ name, action, icon }) => ({
+    name,
+    action,
+    icon,
+}));
+
+const clefAndPlacementSpecs = [
+    { name: "G clef, line 2", action: "set-clef-g2", icon: "icons/editor/clef-E050.png", shape: "G", line: "2", disPlace: "", dis: "" },
+    { name: "F clef, line 4", action: "set-clef-f4", icon: "icons/editor/clef-E062.png", shape: "F", line: "4", disPlace: "", dis: "" },
+    { name: "C clef, line 3", action: "set-clef-c3", icon: "icons/editor/clef-E05C.png", shape: "C", line: "3", disPlace: "", dis: "" },
+    { name: "C clef, line 4", action: "set-clef-c4", icon: "icons/editor/clef-E05C.png", shape: "C", line: "4", disPlace: "", dis: "" },
+    { name: "G clef, octave above", action: "set-clef-g2-8-above", icon: "icons/editor/clef-E053.png", shape: "G", line: "2", disPlace: "above", dis: "8" },
+    { name: "G clef, two octaves above", action: "set-clef-g2-15-above", icon: "icons/editor/clef-E054.png", shape: "G", line: "2", disPlace: "above", dis: "15" },
+    { name: "G clef, octave below", action: "set-clef-g2-8-below", icon: "icons/editor/clef-E052.png", shape: "G", line: "2", disPlace: "below", dis: "8" },
+    { name: "G clef, two octaves below", action: "set-clef-g2-15-below", icon: "icons/editor/clef-E051.png", shape: "G", line: "2", disPlace: "below", dis: "15" },
+]
+
+const clefAndPlacement = clefAndPlacementSpecs.map(({ name, action, icon }) => ({
+    name,
+    action,
+    icon,
+}));
+
 export const contextButtonBars = {
     measure: [
         { label: "Right bar line", actions: setMeasureRightBarLines },
         { label: "Left bar line", actions: setMeasureLeftBarLines },
     ],
     chord: [
+        { label: "Clef before or after", actions: insertClefs },
         {
             label: "Stem",
             actions: stemPosition,
@@ -389,6 +422,7 @@ export const contextButtonBars = {
         },
     ],
     note: [
+        { label: "Clef before or after", actions: insertClefs },
         {
             label: "Accidentals",
             actions: [
@@ -414,6 +448,10 @@ export const contextButtonBars = {
             actions: insertDynamics
         },
         { label: "Spanning events", actions: insertControlEvent },
+    ],
+    clef: [
+        { label: "Clef and placement", actions: clefAndPlacement },
+        { label: "Enclose", actions: ornamentEnclosures },
     ],
     dir: [
         { label: "Placement", actions: controlEventPlace },
@@ -448,6 +486,7 @@ export const contextButtonBars = {
         { label: "Glyph", actions: setMordentGlyphs },
     ],
     rest: [
+        { label: "Clef before or after", actions: insertClefs },
         { label: "Dynamics", actions: insertDynamics },
         {
             label: "Punctual events",
@@ -488,6 +527,80 @@ const createAddArticulationAction = (value) => ({
                 elementId: "[chained-id]",
                 attribute: "artic",
                 value,
+            },
+        },
+        {
+            action: "commit",
+        },
+    ],
+});
+
+const createInsertClefAction = (shape, line, insertMode) => ({
+    action: "chain",
+    param: [
+        {
+            action: "insert",
+            param: {
+                elementName: "clef",
+                elementId: "[selection-id]",
+                insertMode,
+            },
+        },
+        {
+            action: "set",
+            param: {
+                elementId: "[chained-id]",
+                attribute: "shape",
+                value: shape,
+            },
+        },
+        {
+            action: "set",
+            param: {
+                elementId: "[chained-id]",
+                attribute: "line",
+                value: line,
+            },
+        },
+        {
+            action: "commit",
+        },
+    ],
+});
+
+const createSetClefAction = (shape, line, disPlace, dis) => ({
+    action: "chain",
+    param: [
+        {
+            action: "set",
+            param: {
+                elementId: "[selection-id]",
+                attribute: "shape",
+                value: shape,
+            },
+        },
+        {
+            action: "set",
+            param: {
+                elementId: "[selection-id]",
+                attribute: "line",
+                value: line,
+            },
+        },
+        {
+            action: "set",
+            param: {
+                elementId: "[selection-id]",
+                attribute: "dis.place",
+                value: disPlace,
+            },
+        },
+        {
+            action: "set",
+            param: {
+                elementId: "[selection-id]",
+                attribute: "dis",
+                value: dis,
             },
         },
         {
@@ -660,6 +773,20 @@ const measureBarLineDefinitions = Object.fromEntries(
     ])),
 );
 
+const insertClefDefinitions = Object.fromEntries(
+    insertClefSpecs.map(({ action, shape, line, insertMode }) => [
+        action,
+        createInsertClefAction(shape, line, insertMode),
+    ]),
+);
+
+const setClefDefinitions = Object.fromEntries(
+    clefAndPlacementSpecs.map(({ action, shape, line, disPlace, dis }) => [
+        action,
+        createSetClefAction(shape, line, disPlace, dis),
+    ]),
+);
+
 const createAddDynamicAction = (value) => ({
     action: "chain",
     param: [
@@ -746,6 +873,8 @@ const createAddTurnAction = (form) => ({
 });
 
 export const actionDefinitions = {
+    ...insertClefDefinitions,
+    ...setClefDefinitions,
     "reset-glyph": {
         action: "chain",
         param: [
