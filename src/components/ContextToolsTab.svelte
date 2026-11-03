@@ -142,7 +142,9 @@
         >
             {#each bar.actions as action}
                 <button
-                    class="vrv-context-tool-button"
+                    class="vrv-context-tool-button {action.buttonSize
+                        ? `vrv-context-tool-button-${action.buttonSize}`
+                        : ''}"
                     type="button"
                     title={action.label}
                     aria-label={action.label}

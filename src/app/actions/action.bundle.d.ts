@@ -21,9 +21,12 @@ export type ActionCatalogEntry =
     | ActionCatalogSubmenuEntry
     | ActionCatalogSeparatorEntry;
 
+export type ContextButtonSize = "wide" | "tall";
+
 export type ContextButtonEntry = ActionEntry & {
     icon: string;
     secondary?: boolean;
+    buttonSize?: ContextButtonSize;
 };
 
 export type ContextButtonBar = {

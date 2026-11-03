@@ -1609,6 +1609,22 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         pointer-events: none;
     }
 
+    .vrv-context-tool-button-wide {
+        width: 48px;
+        min-width: 48px;
+        height: 32px;
+        min-height: 32px;
+        background-size: contain;
+    }
+
+    .vrv-context-tool-button-tall {
+        width: 32px;
+        min-width: 32px;
+        height: 48px;
+        min-height: 48px;
+        background-size: contain;
+    }
+
     .vrv-score-preset-toolbar .vrv-context-tool-button {
         width: 64px;
         height: 64px;

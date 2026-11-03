@@ -7,7 +7,12 @@ import {
     contextTools,
     menuActions,
 } from "./actions/action.bundle";
-import type { ActionCatalogEntry, ActionEntry, ContextButtonEntry } from "./actions/action.bundle";
+import type {
+    ActionCatalogEntry,
+    ActionEntry,
+    ContextButtonEntry,
+    ContextButtonSize,
+} from "./actions/action.bundle";
 import type { Action } from "./types";
 
 export type ResolvedAction = Action & { actionKey: string };
@@ -16,7 +21,10 @@ export type ResolvedContextToolRow = ResolvedAction[];
 
 export type ResolvedContextToolGroup = ResolvedContextToolRow[];
 
-export type ResolvedContextButton = ResolvedAction & { iconUrl: string };
+export type ResolvedContextButton = ResolvedAction & {
+    iconUrl: string;
+    buttonSize?: ContextButtonSize;
+};
 
 export type ResolvedContextButtonBar = {
     label: string;
@@ -151,6 +159,7 @@ export function resolveContextButtonBars(
             resolvedActions.push({
                 ...resolvedAction,
                 iconUrl: withBaseUrl(button.icon),
+                buttonSize: button.buttonSize,
             });
         }
         if (resolvedActions.length > 0) {

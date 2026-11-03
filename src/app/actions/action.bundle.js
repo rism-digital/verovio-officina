@@ -239,10 +239,100 @@ const ornamentEnclosures = [
     { name: "Parentheses", action: "set-enclose-paren", value: "paren", icon: "icons/editor/enclose-paren.png" },
 ]
 
+const bracketEnclosures = ornamentEnclosures.filter(
+    ({ value }) => value !== "paren",
+);
+
+const insertAccidentals = [
+    { name: "Add flat", action: "add-accidental-flat", value: "f", icon: "icons/editor/accid-flat.png" },
+    { name: "Add natural", action: "add-accidental-natural", value: "n", icon: "icons/editor/accid-natural.png" },
+    { name: "Add sharp", action: "add-accidental-sharp", value: "s", icon: "icons/editor/accid-sharp.png" },
+    { name: "Add double sharp", action: "add-accidental-double-sharp", value: "x", icon: "icons/editor/accid-E263.png" },
+    { name: "Add double flat", action: "add-accidental-double-flat", value: "ff", icon: "icons/editor/accid-E264.png" },
+]
+
+const accidentalSpecs = [
+    ["E260", "Flat", "f"],
+    ["E269", "Sharp sharp", "ss"],
+    ["E262", "Sharp", "s"],
+    ["E263", "Double sharp", "x"],
+    ["E264", "Double flat", "ff"],
+    ["E265", "Triple sharp", "sx"],
+    ["E266", "Triple flat", "tf"],
+    ["E261", "Natural", "n"],
+    ["E267", "Natural flat", "nf"],
+    ["E268", "Natural sharp", "ns"],
+    ["E274", "Three-quarter-tones sharp, arrow up", "su"],
+    ["E275", "Quarter-tone sharp, arrow down", "sd"],
+    ["E270", "Quarter-tone flat, arrow up", "fu"],
+    ["E271", "Three-quarter-tones flat, arrow down", "fd"],
+    ["E272", "Quarter-tone sharp natural, arrow up", "nu"],
+    ["E273", "Quarter-tone flat natural, arrow down", "nd"],
+    ["E280", "Quarter-tone flat (Stein)", "1qf"],
+    ["E281", "Three-quarter-tones flat (Zimmermann)", "3qf"],
+    ["E282", "Quarter-tone sharp (Stein)", "1qs"],
+    ["E283", "Three-quarter-tones sharp (Stein)", "3qs"],
+    ["E447", "Büyük mücenneb sharp", "bms"],
+    ["E446", "Küçük mücenneb sharp", "kms"],
+    ["E445", "Bakiye sharp", "bs"],
+    ["E444", "Koma sharp", "ks"],
+    ["E443", "Koma flat", "kf"],
+    ["E442", "Bakiye flat", "bf"],
+    ["E441", "Küçük mücenneb flat", "kmf"],
+    ["E440", "Büyük mücenneb flat", "bmf"],
+    ["E460", "Koron", "koron"],
+    ["E461", "Sori", "sori"],
+]
+
+const setAccidentals = accidentalSpecs.map(([code, name, value]) => ({
+    name,
+    action: `set-accidental-${value}`,
+    icon: `icons/editor/accid-${code}.png`,
+}));
+
+const noteHeadShapes = [
+    { name: "Automatic", action: "set-note-head-auto", icon: "icons/editor/auto.png", attributes: {} },
+    { name: "Plus", action: "set-note-head-plus", icon: "icons/editor/head-E0AF.png", attributes: { "head.shape": "+" } },
+    { name: "Diamond", action: "set-note-head-diamond", icon: "icons/editor/head-E0DB.png", attributes: { "head.shape": "diamond" } },
+    { name: "Void diamond", action: "set-note-head-diamond-void", icon: "icons/editor/head-E0D9.png", attributes: { "head.shape": "diamond", "head.fill": "void" } },
+    { name: "Slash", action: "set-note-head-slash", icon: "icons/editor/head-E101.png", attributes: { "head.shape": "slash" } },
+    { name: "X", action: "set-note-head-x", icon: "icons/editor/head-E0A9.png", attributes: { "head.shape": "x" } },
+    { name: "Parentheses", action: "set-note-head-paren", icon: "icons/editor/head-E0CE.png", attributes: { "head.mod": "paren" } },
+    { name: "Wide black diamond", action: "set-note-head-diamond-black-wide", icon: "icons/editor/head-E0DC.png", attributes: { "glyph.name": "noteheadDiamondBlackWide" } },
+    { name: "Wide white diamond", action: "set-note-head-diamond-white-wide", icon: "icons/editor/head-E0DE.png", attributes: { "glyph.name": "noteheadDiamondWhiteWide" } },
+    { name: "No notehead", action: "set-note-head-null", icon: "icons/editor/head-null.png", attributes: { "glyph.name": "noteheadNull" } },
+    { name: "Circle X", action: "set-note-head-circle-x", icon: "icons/editor/head-E0B3.png", attributes: { "head.shape": "U+E0B3" } },
+    { name: "Whole notehead with X", action: "set-note-head-whole-x", icon: "icons/editor/head-E0B5.png", attributes: { "head.shape": "U+E0B5" } },
+]
+
 const insertControlEvent = [
     { name: "Add hairpin", action: "add-hairpin", icon: "icons/editor/hairpin.png", secondary: true },
     { name: "Add slur", action: "add-slur", icon: "icons/editor/slur.png", secondary: true },
 ]
+
+const insertArpegSpecs = [
+    { name: "Add arpeggio", action: "insert-arpeg", icon: "icons/editor/arpeg.png" },
+    { name: "Add upward arpeggio", action: "insert-arpeg-up", icon: "icons/editor/arpeg-up.png", order: "up" },
+    { name: "Add downward arpeggio", action: "insert-arpeg-down", icon: "icons/editor/arpeg-down.png", order: "down" },
+]
+
+const insertArpegs = insertArpegSpecs.map(({ name, action, icon }) => ({
+    name,
+    action,
+    icon,
+}));
+
+const setArpegSpecs = [
+    { name: "Plain arpeggio", action: "set-arpeg-plain", icon: "icons/editor/arpeg.png", arrow: "", order: "" },
+    { name: "Upward arpeggio", action: "set-arpeg-up", icon: "icons/editor/arpeg-up.png", arrow: "true", order: "up" },
+    { name: "Downward arpeggio", action: "set-arpeg-down", icon: "icons/editor/arpeg-down.png", arrow: "true", order: "down" },
+]
+
+const setArpegs = setArpegSpecs.map(({ name, action, icon }) => ({
+    name,
+    action,
+    icon,
+}));
 
 const insertPitchedPunctualEvents = [
     { name: "Add trill", action: "add-trill", icon: "icons/editor/trill.png" },
@@ -385,20 +475,23 @@ const insertClefs = insertClefSpecs.map(({ name, action, icon }) => ({
 }));
 
 const clefAndPlacementSpecs = [
-    { name: "G clef, line 2", action: "set-clef-g2", icon: "icons/editor/clef-E050.png", shape: "G", line: "2", disPlace: "", dis: "" },
-    { name: "F clef, line 4", action: "set-clef-f4", icon: "icons/editor/clef-E062.png", shape: "F", line: "4", disPlace: "", dis: "" },
-    { name: "C clef, line 3", action: "set-clef-c3", icon: "icons/editor/clef-E05C.png", shape: "C", line: "3", disPlace: "", dis: "" },
-    { name: "C clef, line 4", action: "set-clef-c4", icon: "icons/editor/clef-E05C.png", shape: "C", line: "4", disPlace: "", dis: "" },
-    { name: "G clef, octave above", action: "set-clef-g2-8-above", icon: "icons/editor/clef-E053.png", shape: "G", line: "2", disPlace: "above", dis: "8" },
-    { name: "G clef, two octaves above", action: "set-clef-g2-15-above", icon: "icons/editor/clef-E054.png", shape: "G", line: "2", disPlace: "above", dis: "15" },
-    { name: "G clef, octave below", action: "set-clef-g2-8-below", icon: "icons/editor/clef-E052.png", shape: "G", line: "2", disPlace: "below", dis: "8" },
-    { name: "G clef, two octaves below", action: "set-clef-g2-15-below", icon: "icons/editor/clef-E051.png", shape: "G", line: "2", disPlace: "below", dis: "15" },
+    { name: "G clef, line 2", action: "set-clef-g2", icon: "icons/editor/clef-G2.png", shape: "G", line: "2", disPlace: "", dis: "" },
+    { name: "F clef, line 4", action: "set-clef-f4", icon: "icons/editor/clef-F4.png", shape: "F", line: "4", disPlace: "", dis: "" },
+    { name: "C clef, line 1", action: "set-clef-c1", icon: "icons/editor/clef-C1.png", shape: "C", line: "1", disPlace: "", dis: "" },
+    { name: "C clef, line 2", action: "set-clef-c2", icon: "icons/editor/clef-C2.png", shape: "C", line: "2", disPlace: "", dis: "" },
+    { name: "C clef, line 3", action: "set-clef-c3", icon: "icons/editor/clef-C3.png", shape: "C", line: "3", disPlace: "", dis: "" },
+    { name: "C clef, line 4", action: "set-clef-c4", icon: "icons/editor/clef-C4.png", shape: "C", line: "4", disPlace: "", dis: "" },
+    { name: "G clef, octave above", action: "set-clef-g2-8-above", icon: "icons/editor/clef-G2-8-above.png", shape: "G", line: "2", disPlace: "above", dis: "8" },
+    { name: "G clef, two octaves above", action: "set-clef-g2-15-above", icon: "icons/editor/clef-G2-15-above.png", shape: "G", line: "2", disPlace: "above", dis: "15" },
+    { name: "G clef, octave below", action: "set-clef-g2-8-below", icon: "icons/editor/clef-G2-8-below.png", shape: "G", line: "2", disPlace: "below", dis: "8" },
+    { name: "F clef, octave below", action: "set-clef-g2-8-below", icon: "icons/editor/clef-F4-8-below.png", shape: "F", line: "4", disPlace: "below", dis: "8" },
 ]
 
 const clefAndPlacement = clefAndPlacementSpecs.map(({ name, action, icon }) => ({
     name,
     action,
     icon,
+    buttonSize: "tall",
 }));
 
 export const contextButtonBars = {
@@ -406,8 +499,17 @@ export const contextButtonBars = {
         { label: "Right bar line", actions: setMeasureRightBarLines },
         { label: "Left bar line", actions: setMeasureLeftBarLines },
     ],
+    accid: [
+        { label: "Accidental", actions: setAccidentals },
+        { label: "Enclose", actions: ornamentEnclosures },
+    ],
+    arpeg: [
+        { label: "Arpeggio", actions: setArpegs },
+        { label: "Enclose", actions: bracketEnclosures },
+    ],
     chord: [
         { label: "Clef before or after", actions: insertClefs },
+        { label: "Arpeggio", actions: insertArpegs },
         {
             label: "Stem",
             actions: stemPosition,
@@ -422,14 +524,11 @@ export const contextButtonBars = {
         },
     ],
     note: [
+        { label: "Spanning events", actions: insertControlEvent },
         { label: "Clef before or after", actions: insertClefs },
         {
             label: "Accidentals",
-            actions: [
-                { name: "Add flat", action: "add-accidental-flat", icon: "icons/editor/accid-flat.png" },
-                { name: "Add natural", action: "add-accidental-natural", icon: "icons/editor/accid-natural.png" },
-                { name: "Add sharp", action: "add-accidental-sharp", icon: "icons/editor/accid-sharp.png" },
-            ],
+            actions: insertAccidentals,
         },
         {
             label: "Stem",
@@ -447,11 +546,11 @@ export const contextButtonBars = {
             label: "Dynamics",
             actions: insertDynamics
         },
-        { label: "Spanning events", actions: insertControlEvent },
+        { label: "Head shape", actions: noteHeadShapes },
     ],
     clef: [
-        { label: "Clef and placement", actions: clefAndPlacement },
-        { label: "Enclose", actions: ornamentEnclosures },
+        { label: "Clef and octava", actions: clefAndPlacement },
+        { label: "Enclose", actions: bracketEnclosures },
     ],
     dir: [
         { label: "Placement", actions: controlEventPlace },
@@ -527,6 +626,90 @@ const createAddArticulationAction = (value) => ({
                 elementId: "[chained-id]",
                 attribute: "artic",
                 value,
+            },
+        },
+        {
+            action: "commit",
+        },
+    ],
+});
+
+const createAddAccidentalAction = (value) => ({
+    action: "chain",
+    param: [
+        {
+            action: "insert",
+            param: {
+                elementName: "accid",
+                elementId: "[selection-id]",
+                insertMode: "appendChildNoDuplicate",
+            },
+        },
+        {
+            action: "set",
+            param: {
+                elementId: "[chained-id]",
+                attribute: "accid",
+                value,
+            },
+        },
+        {
+            action: "commit",
+        },
+    ],
+});
+
+const createInsertArpegAction = (order) => ({
+    action: "chain",
+    param: [
+        {
+            action: "insertControl",
+            param: {
+                elementName: "arpeg",
+                startId: "[selection-id]",
+            },
+        },
+        ...(order ? [
+            {
+                action: "set",
+                param: {
+                    elementId: "[chained-id]",
+                    attribute: "arrow",
+                    value: "true",
+                },
+            },
+            {
+                action: "set",
+                param: {
+                    elementId: "[chained-id]",
+                    attribute: "order",
+                    value: order,
+                },
+            },
+        ] : []),
+        {
+            action: "commit",
+        },
+    ],
+});
+
+const createSetArpegAction = (arrow, order) => ({
+    action: "chain",
+    param: [
+        {
+            action: "set",
+            param: {
+                elementId: "[selection-id]",
+                attribute: "arrow",
+                value: arrow,
+            },
+        },
+        {
+            action: "set",
+            param: {
+                elementId: "[selection-id]",
+                attribute: "order",
+                value: order,
             },
         },
         {
@@ -650,6 +833,63 @@ const createSetGlyphAction = (glyphName) => ({
         },
     ],
 });
+
+const createSetAccidentalAction = (value) => ({
+    action: "chain",
+    param: [
+        {
+            action: "set",
+            param: {
+                elementId: "[selection-id]",
+                attribute: "accid",
+                value,
+            },
+        },
+        {
+            action: "commit",
+        },
+    ],
+});
+
+const accidentalDefinitions = Object.fromEntries([
+    ["set-accidental-auto", createSetAccidentalAction("")],
+    ...accidentalSpecs.map(([, , value]) => [
+        `set-accidental-${value}`,
+        createSetAccidentalAction(value),
+    ]),
+]);
+
+const noteHeadAttributeNames = [
+    "head.shape",
+    "head.fill",
+    "head.mod",
+    "glyph.name",
+    "glyph.auth",
+];
+
+const createSetNoteHeadAction = (attributes) => ({
+    action: "chain",
+    param: [
+        ...noteHeadAttributeNames.map((attribute) => ({
+            action: "set",
+            param: {
+                elementId: "[selection-id]",
+                attribute,
+                value: attributes[attribute] ?? "",
+            },
+        })),
+        {
+            action: "commit",
+        },
+    ],
+});
+
+const noteHeadDefinitions = Object.fromEntries(
+    noteHeadShapes.map(({ action, attributes }) => [
+        action,
+        createSetNoteHeadAction(attributes),
+    ]),
+);
 
 const createSetMeasureBarLineAction = (attribute, value) => ({
     action: "chain",
@@ -787,6 +1027,27 @@ const setClefDefinitions = Object.fromEntries(
     ]),
 );
 
+const insertAccidentalDefinitions = Object.fromEntries(
+    insertAccidentals.map(({ action, value }) => [
+        action,
+        createAddAccidentalAction(value),
+    ]),
+);
+
+const insertArpegDefinitions = Object.fromEntries(
+    insertArpegSpecs.map(({ action, order }) => [
+        action,
+        createInsertArpegAction(order),
+    ]),
+);
+
+const setArpegDefinitions = Object.fromEntries(
+    setArpegSpecs.map(({ action, arrow, order }) => [
+        action,
+        createSetArpegAction(arrow, order),
+    ]),
+);
+
 const createAddDynamicAction = (value) => ({
     action: "chain",
     param: [
@@ -875,6 +1136,11 @@ const createAddTurnAction = (form) => ({
 export const actionDefinitions = {
     ...insertClefDefinitions,
     ...setClefDefinitions,
+    ...insertAccidentalDefinitions,
+    ...insertArpegDefinitions,
+    ...setArpegDefinitions,
+    ...accidentalDefinitions,
+    ...noteHeadDefinitions,
     "reset-glyph": {
         action: "chain",
         param: [
@@ -1055,78 +1321,6 @@ export const actionDefinitions = {
                 param: {
                     update: "removeStaffGroup",
                     elementId: "[selection-id]",
-                },
-            },
-            {
-                action: "commit",
-            },
-        ],
-    },
-    "add-accidental-flat": {
-        action: "chain",
-        param: [
-            {
-                action: "insert",
-                param: {
-                    elementName: "accid",
-                    elementId: "[selection-id]",
-                    insertMode: "appendChildNoDuplicate",
-                },
-            },
-            {
-                action: "set",
-                param: {
-                    elementId: "[chained-id]",
-                    attribute: "accid",
-                    value: "f",
-                },
-            },
-            {
-                action: "commit",
-            },
-        ],
-    },
-    "add-accidental-natural": {
-        action: "chain",
-        param: [
-            {
-                action: "insert",
-                param: {
-                    elementName: "accid",
-                    elementId: "[selection-id]",
-                    insertMode: "appendChildNoDuplicate",
-                },
-            },
-            {
-                action: "set",
-                param: {
-                    elementId: "[chained-id]",
-                    attribute: "accid",
-                    value: "n",
-                },
-            },
-            {
-                action: "commit",
-            },
-        ],
-    },
-    "add-accidental-sharp": {
-        action: "chain",
-        param: [
-            {
-                action: "insert",
-                param: {
-                    elementName: "accid",
-                    elementId: "[selection-id]",
-                    insertMode: "appendChildNoDuplicate",
-                },
-            },
-            {
-                action: "set",
-                param: {
-                    elementId: "[chained-id]",
-                    attribute: "accid",
-                    value: "s",
                 },
             },
             {
