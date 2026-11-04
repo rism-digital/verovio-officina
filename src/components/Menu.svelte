@@ -20,6 +20,7 @@
     export let onImportClipboard: ActionHandler | null = null;
     export let onCloudDocuments: ActionHandler | null = null;
     export let onExportMEI: ActionHandler | null = null;
+    export let onExportClipboard: ActionHandler | null = null;
     export let onCopy: ActionHandler | null = null;
     export let onCut: ActionHandler | null = null;
     export let onPaste: ActionHandler | null = null;
@@ -73,7 +74,7 @@
             <div class="vrv-v-separator"></div>
             <div
                 class="vrv-menu-text"
-                data-before="Import MEI file"
+                data-before="Import file"
                 on:click={() => onOpen?.()}
             ></div>
             <div
@@ -95,6 +96,15 @@
                 class="vrv-menu-text"
                 data-before="Export MEI file"
                 on:click={() => onExportMEI?.()}
+            ></div>
+            <div
+                class="vrv-menu-text"
+                data-before="Export MEI to clipboard"
+                role="menuitem"
+                tabindex="0"
+                on:click={() => onExportClipboard?.()}
+                on:keydown={(event) =>
+                    handleMenuItemKeydown(event, onExportClipboard)}
             ></div>
         </div>
     </div>

@@ -500,6 +500,16 @@
         statusLine.set("Exported MEI file.");
     }
 
+    async function exportToClipboard() {
+        try {
+            await navigator.clipboard.writeText(await controller.getMEI());
+            statusLine.set("Exported MEI to clipboard.");
+        } catch (error) {
+            console.error("Failed to export MEI to clipboard", error);
+            statusLine.set("Failed to export MEI to clipboard.");
+        }
+    }
+
     async function openCloudDocument(
         mei: string,
         document: ScoreDocument,
@@ -785,6 +795,7 @@
         onImportClipboard={importFromClipboard}
         onCloudDocuments={() => (cloudDocumentsOpen = true)}
         onExportMEI={exportMeiDoc}
+        onExportClipboard={exportToClipboard}
         {canCopyOrCut}
         {canPaste}
         onCopy={copy}
