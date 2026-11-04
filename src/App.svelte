@@ -466,6 +466,26 @@
         target.value = "";
     }
 
+    async function importFromClipboard() {
+        try {
+            const content = await navigator.clipboard.readText();
+            if (!content.trim()) {
+                statusLine.set("The clipboard is empty.");
+                return;
+            }
+
+            editStatus.update((current) => ({ ...current, selection: null }));
+            localStorage.setItem(STORAGE_KEY, content);
+            await controller.loadData(content);
+            dirty.set(false);
+            autosave?.markClean();
+            statusLine.set("Imported MEI from clipboard.");
+        } catch (error) {
+            console.error("Failed to import MEI from clipboard", error);
+            statusLine.set("Failed to import MEI from clipboard.");
+        }
+    }
+
     async function exportMeiDoc() {
         const exported = await controller.getMEI();
         const blob = new Blob([exported], { type: "application/mei+xml" });
@@ -762,6 +782,7 @@
 <div class="vrv-wrapper">
     <Menu
         onOpen={triggerOpenFile}
+        onImportClipboard={importFromClipboard}
         onCloudDocuments={() => (cloudDocumentsOpen = true)}
         onExportMEI={exportMeiDoc}
         {canCopyOrCut}
