@@ -62,7 +62,6 @@
         //"http://localhost:8001/build/verovio-toolkit-wasm.js";
         withBaseUrl("verovio/verovio-toolkit-wasm.js");
     const MEI_ALL_SCHEMA_URL ="https://music-encoding.org/schema/5.1/mei-all.rng";
-    const MEI_BASIC_SCHEMA_URL = "https://music-encoding.org/schema/5.1/mei-basic.rng";
     const STORAGE_KEY = "verovio-editor";
     const MEI_EXPORT_OPTIONS_STORAGE_KEY = "verovio-mei-export-options";
     const HELP_SEEN_STORAGE_KEY = "verovio-help-seen";
@@ -88,7 +87,6 @@
     let fileInput: HTMLInputElement | null = null;
     let verovioVersion = "";
     let rngMEIAll: RNGLoader | null = null;
-    let rngMEIBasic: RNGLoader | null = null;
     let xmlMode = false;
     let xmlContent = "";
     let aboutOpen = false;
@@ -190,13 +188,12 @@
         verovioVersion = await controller.init(VEROVIO_URL);
         meiExportOptions = loadMEIExportOptionsFromStorage();
 
-        rngMEIAll = new RNGLoader();
-        rngMEIBasic = new RNGLoader();
+        const meiAllLoader = new RNGLoader();
 
         try {
-            await loadRngSchema(rngMEIAll, MEI_ALL_SCHEMA_URL);
-            await loadRngSchema(rngMEIBasic, MEI_BASIC_SCHEMA_URL);
-            statusLine.set("Loaded RNG schemas.");
+            await loadRngSchema(meiAllLoader, MEI_ALL_SCHEMA_URL);
+            rngMEIAll = meiAllLoader;
+            statusLine.set("Loaded MEI All schema.");
         } catch (error) {
             console.error("Failed to load RNG schema", error);
             statusLine.set("Failed to load RNG schema.");
@@ -886,7 +883,6 @@
             {contextToolsApi}
             editResponseContent={$editResponseContent}
             {rngMEIAll}
-            {rngMEIBasic}
         />
     {/if}
 
@@ -918,6 +914,7 @@
     <DialogUserPreferences
         open={settingsOpen}
         value={$userPreferences}
+        {rngMEIAll}
         onConfirm={updateUserPreferences}
         onClose={() => (settingsOpen = false)}
     />

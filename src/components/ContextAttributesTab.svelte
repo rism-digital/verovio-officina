@@ -8,7 +8,6 @@
 
     export let editResponseContent: EditResponseContent | null = null;
     export let rngMEIAll: RNGLoader | null = null;
-    export let rngMEIBasic: RNGLoader | null = null;
     export let onEditAttribute: EditActionSetHandler | null = null;
 </script>
 
@@ -16,7 +15,6 @@
     <AttributeList
         {editResponseContent}
         {rngMEIAll}
-        {rngMEIBasic}
         onEditSet={onEditAttribute}
     />
 {/if}

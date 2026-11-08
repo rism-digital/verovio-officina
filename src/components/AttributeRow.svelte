@@ -5,17 +5,12 @@
     export let name: string;
     export let value: string;
     export let optionsAll: string[] | null = null;
-    export let optionsBasic: string[] | null = null;
     export let readOnly = false;
     export let customOptions: string[] | null = null;
     export let attributeType: string | null = null;
     export let onEditAttribute: EditActionSetHandler | null = null;
 
-    $: filteredAll = optionsAll && optionsBasic
-        ? optionsAll.filter((opt) => !optionsBasic.includes(opt))
-        : optionsAll ?? [];
-
-    $: hasOptions = (optionsBasic && optionsBasic.length > 0) || filteredAll.length > 0;
+    $: hasOptions = Boolean(optionsAll?.length);
 
     $: numericInput = attributeType === "positiveInteger"
         ? { type: "number", min: "1", step: "1" }
@@ -76,22 +71,9 @@
                 on:change={handleChange}
             >
                 <option value=""></option>
-                {#if optionsBasic && filteredAll.length > 0}
-                    <optgroup label="MEI-basic">
-                        {#each renderOptions(optionsBasic, value) as opt}
-                            <option value={opt.value} selected={opt.selected}>{opt.value}</option>
-                        {/each}
-                    </optgroup>
-                    <optgroup label="MEI-all">
-                        {#each renderOptions(filteredAll, value) as opt}
-                            <option value={opt.value} selected={opt.selected}>{opt.value}</option>
-                        {/each}
-                    </optgroup>
-                {:else}
-                    {#each renderOptions(optionsAll ?? optionsBasic ?? [], value) as opt}
-                        <option value={opt.value} selected={opt.selected}>{opt.value}</option>
-                    {/each}
-                {/if}
+                {#each renderOptions(optionsAll ?? [], value) as opt}
+                    <option value={opt.value} selected={opt.selected}>{opt.value}</option>
+                {/each}
             </select>
         {:else}
             <input

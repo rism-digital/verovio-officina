@@ -2,10 +2,11 @@
     import AttributeRow from "./AttributeRow.svelte";
     import type { EditActionSetParam, EditActionSetHandler as EditSetHandler, EditResponseContent } from "../app/types";
     import type { ElementDef, RNGLoader } from "../app/rng-loader";
+    import { EXCLUDED_ATTRIBUTES } from "../app/attribute-preferences";
+    import { userPreferences } from "../app/state";
 
     export let editResponseContent: EditResponseContent | null = null;
     export let rngMEIAll: RNGLoader | null = null;
-    export let rngMEIBasic: RNGLoader | null = null;
     export let onEditSet: EditSetHandler | null = null;
 
     $: elementName = editResponseContent?.object?.element ?? "";
@@ -24,19 +25,20 @@
 
     $: allTags =
         elementName && rngMEIAll ? rngMEIAll.getTags()[elementName] : null;
-    $: basicTags =
-        elementName && rngMEIBasic ? rngMEIBasic.getTags()[elementName] : null;
     $: allAttrs = isElementDef(allTags) ? allTags.attrs : {};
-    $: basicAttrs = isElementDef(basicTags) ? basicTags.attrs : {};
     $: allTypes = isElementDef(allTags) ? allTags.types : {};
-    $: basicTypes = isElementDef(basicTags) ? basicTags.types : {};
-    $: typeFor = (name: string) => basicTypes?.[name] ?? allTypes?.[name] ?? null;
+    $: typeFor = (name: string) => allTypes?.[name] ?? null;
     $: usedNames = new Set(Object.keys(attributes));
-    $: basicNames = Object.keys(basicAttrs).filter(
-        (name) => !usedNames.has(name),
+    $: excludedNames = new Set(EXCLUDED_ATTRIBUTES[elementName] ?? []);
+    $: preferredNames = ($userPreferences.preferredAttributes[elementName] ?? []).filter(
+        (name) => name in allAttrs
+            && !excludedNames.has(name)
+            && !usedNames.has(name),
     );
     $: allNames = Object.keys(allAttrs).filter(
-        (name) => !usedNames.has(name) && !basicNames.includes(name),
+        (name) => !excludedNames.has(name)
+            && !usedNames.has(name)
+            && !preferredNames.includes(name),
     );
 
     const readOnlyPatterns: RegExp[] = [
@@ -63,33 +65,15 @@
         return readOnlyPatterns.some((pattern) => pattern.test(input));
     }
 
-    let showBasic = false;
     let showAll = false;
 
-    $: hasBasicSection = basicNames.length > 0;
     $: hasAllSection = allNames.length > 0;
-    $: hasExpandableSection = hasBasicSection || hasAllSection;
-    $: primaryExpanded = hasBasicSection ? showBasic : showAll;
-
-    $: if (!hasBasicSection) {
-        showBasic = false;
-    }
     $: if (!hasAllSection) {
         showAll = false;
     }
 
-    function togglePrimary() {
-        if (hasBasicSection) {
-            showBasic = !showBasic;
-            if (!showBasic) showAll = false;
-            return;
-        }
-        showAll = !showAll;
-    }
-
     function toggleAll() {
         showAll = !showAll;
-        if (showAll && hasBasicSection) showBasic = true;
     }
 
     function emitTextEdit(attValue: string, commit: boolean) {
@@ -135,51 +119,35 @@
                     {name}
                     value={String(value)}
                     optionsAll={allAttrs?.[name] ?? null}
-                    optionsBasic={basicAttrs?.[name] ?? null}
                     attributeType={typeFor(name)}
                     readOnly={isReadOnly(name)}
                     customOptions={customOptionsFor(name)}
                     onEditAttribute={onEditSet}
                 />
             {/each}
-            {#if hasExpandableSection}
+            {#each preferredNames as name}
+                <AttributeRow
+                    elementId={editResponseContent?.object?.id ?? null}
+                    {name}
+                    value=""
+                    optionsAll={allAttrs?.[name] ?? null}
+                    attributeType={typeFor(name)}
+                    readOnly={isReadOnly(name)}
+                    customOptions={customOptionsFor(name)}
+                    onEditAttribute={onEditSet}
+                />
+            {/each}
+            {#if hasAllSection}
                 <tr>
                     <td colspan="2" class="vrv-show-more">
                         <span
-                            class={primaryExpanded ? "more" : "close more"}
-                            on:click={togglePrimary}
+                            class={showAll ? "all" : "close all"}
+                            on:click={toggleAll}
                         ></span>
                     </td>
                 </tr>
             {/if}
         </tbody>
-        {#if basicNames.length > 0}
-            <tbody style="display: {showBasic ? 'table-row-group' : 'none'};">
-                {#each basicNames as name}
-                    <AttributeRow
-                        elementId={editResponseContent?.object?.id ?? null}
-                        {name}
-                        value=""
-                        optionsAll={allAttrs?.[name] ?? null}
-                        optionsBasic={basicAttrs?.[name] ?? null}
-                        attributeType={typeFor(name)}
-                        readOnly={isReadOnly(name)}
-                        customOptions={customOptionsFor(name)}
-                        onEditAttribute={onEditSet}
-                    />
-                {/each}
-                {#if allNames.length > 0}
-                    <tr>
-                        <td colspan="2" class="vrv-show-more">
-                            <span
-                                class={showAll ? "all" : "close all"}
-                                on:click={toggleAll}
-                            ></span>
-                        </td>
-                    </tr>
-                {/if}
-            </tbody>
-        {/if}
         {#if allNames.length > 0}
             <tbody style="display: {showAll ? 'table-row-group' : 'none'};">
                 {#each allNames as name}
@@ -188,7 +156,6 @@
                         {name}
                         value=""
                         optionsAll={allAttrs?.[name] ?? null}
-                        optionsBasic={basicAttrs?.[name] ?? null}
                         attributeType={typeFor(name)}
                         readOnly={isReadOnly(name)}
                         customOptions={customOptionsFor(name)}

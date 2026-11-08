@@ -16,7 +16,6 @@
     export let onContextAction: ((action: Action) => void) | null = null;
     export let editResponseContent: EditResponseContent | null = null;
     export let rngMEIAll: RNGLoader | null = null;
-    export let rngMEIBasic: RNGLoader | null = null;
     export let onEditAttribute: EditActionSetHandler | null = null;
     export let contextToolsApi: ContextToolsApi | null = null;
 
@@ -65,7 +64,6 @@
                     <ContextAttributesTab
                         {editResponseContent}
                         {rngMEIAll}
-                        {rngMEIBasic}
                         {onEditAttribute}
                     />
                 {/if}

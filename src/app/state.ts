@@ -1,5 +1,10 @@
 import { writable } from 'svelte/store';
 import type { EditResponseContent, EditStatus, ViewModel } from './types';
+import {
+    clonePreferredAttributes,
+    DEFAULT_PREFERRED_ATTRIBUTES,
+    type PreferredAttributes,
+} from './attribute-preferences';
 
 export type InputMode = 'pitchFirst' | 'durationFirst' | 'combined';
 export type ViewMode = 'page' | 'responsive';
@@ -13,6 +18,7 @@ export type UserPreferences = {
     autoBeam: boolean;
     viewMode: ViewMode;
     zoom: number;
+    preferredAttributes: PreferredAttributes;
 };
 
 export const DEFAULT_USER_PREFERENCES: UserPreferences = {
@@ -23,6 +29,7 @@ export const DEFAULT_USER_PREFERENCES: UserPreferences = {
     autoBeam: true,
     viewMode: 'page',
     zoom: 100,
+    preferredAttributes: clonePreferredAttributes(DEFAULT_PREFERRED_ATTRIBUTES),
 };
 
 export const editStatus = writable<EditStatus>({

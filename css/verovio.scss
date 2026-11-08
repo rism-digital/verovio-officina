@@ -987,6 +987,35 @@ $font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
                 padding-bottom: 10px;
                 line-height: 22px;
 
+                .vrv-preferred-attributes {
+                    margin-top: 12px;
+
+                    .vrv-preferred-attributes-element {
+                        align-items: center;
+                        display: grid;
+                        gap: 8px;
+                        grid-template-columns: auto minmax(0, 1fr);
+                    }
+
+                    .vrv-preferred-attributes-list {
+                        display: grid;
+                        gap: 4px 12px;
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                        margin-top: 8px;
+
+                        label {
+                            align-items: center;
+                            display: flex;
+                            gap: 6px;
+                            min-width: 0;
+
+                            span {
+                                overflow-wrap: anywhere;
+                            }
+                        }
+                    }
+                }
+
                 details {
                     margin-bottom: 10px;
                 }

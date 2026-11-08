@@ -1,4 +1,5 @@
 import type { Unsubscriber } from "svelte/store";
+import { loadPreferredAttributes } from "./attribute-preferences";
 import {
     DEFAULT_USER_PREFERENCES,
     userPreferences,
@@ -55,6 +56,9 @@ export function loadUserPreferencesFromStorage(): UserPreferences {
             zoom: isZoom(parsed.zoom)
                 ? parsed.zoom
                 : DEFAULT_USER_PREFERENCES.zoom,
+            preferredAttributes: loadPreferredAttributes(
+                parsed.preferredAttributes,
+            ),
         };
     } catch {
         return DEFAULT_USER_PREFERENCES;

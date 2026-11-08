@@ -69,7 +69,6 @@
                         {name}
                         value={attributes[name] ?? ""}
                         optionsAll={schemaAttrs[name] ?? null}
-                        optionsBasic={null}
                         attributeType={schemaTypes[name] ?? null}
                         readOnly={readOnly || isReadOnly(elementName, name)}
                         customOptions={customOptionsFor(elementName, name)}
