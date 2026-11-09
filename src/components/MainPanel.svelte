@@ -124,7 +124,16 @@
                 filterMarkup = "";
             });
 
-        if (!verovioView || typeof ResizeObserver === "undefined") return;
+        if (!verovioView) return;
+        const initialRect = verovioView.getBoundingClientRect();
+        const initialSize = {
+            width: Math.max(0, Math.floor(initialRect.width)),
+            height: Math.max(0, Math.floor(initialRect.height)),
+        };
+        lastSize = initialSize;
+        onResize?.(initialSize);
+
+        if (typeof ResizeObserver === "undefined") return;
         resizeObserver = new ResizeObserver((entries) => {
             for (const entry of entries) {
                 const { width, height } = entry.contentRect;
