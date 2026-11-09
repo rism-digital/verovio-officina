@@ -90,6 +90,7 @@
         startY: number;
         scale: number;
         moved: boolean;
+        selectionReady: Promise<void>;
     } | null = null;
     let pendingDragParam: EditActionDragMoveParam | null = null;
     let dragStartPromise: Promise<void> | null = null;
@@ -312,15 +313,18 @@
     } {
         const target = event.target instanceof Element ? event.target : null;
         const page = target?.closest("svg") as SVGSVGElement | null;
-        const bounds = page?.getBoundingClientRect()
+        const screenTransform = page?.getScreenCTM();
+        const fallbackBounds = page?.getBoundingClientRect()
             ?? svgOverlay?.getBoundingClientRect();
+        const pageOriginX = screenTransform?.e ?? fallbackBounds?.left ?? 0;
+        const pageOriginY = screenTransform?.f ?? fallbackBounds?.top ?? 0;
         const scale = Math.max(zoom, 1) / 100;
         return {
             startX:
-                (event.clientX - (bounds?.left ?? 0)) / scale
+                (event.clientX - pageOriginX) / scale
                 - pageMarginLeft,
             startY:
-                (event.clientY - (bounds?.top ?? 0)) / scale
+                (event.clientY - pageOriginY) / scale
                 - pageMarginTop,
         };
     }
@@ -347,9 +351,10 @@
 
     function queueLiveDrag(param: EditActionDragMoveParam) {
         if (!dragState) return;
+        const currentDrag = dragState;
         pendingDragParam = param;
-        dragStartPromise ??= Promise.resolve(
-            onElementDrag?.(dragStartParam(dragState)),
+        dragStartPromise ??= currentDrag.selectionReady.then(() =>
+            onElementDrag?.(dragStartParam(currentDrag)),
         );
         if (!liveDragPromise) {
             liveDragPromise = flushLiveDrag();
@@ -393,7 +398,7 @@
             || param.dy !== 0;
         removeDragListeners();
         if (!moved) return;
-        dragStartPromise ??= Promise.resolve(
+        dragStartPromise ??= completedDrag.selectionReady.then(() =>
             onElementDrag?.(dragStartParam(completedDrag)),
         );
         await (liveDragPromise ?? dragStartPromise);
@@ -402,7 +407,10 @@
         dragStartPromise = null;
     }
 
-    function startDrag(event: MouseEvent) {
+    function startDrag(
+        event: MouseEvent,
+        selectionReady: Promise<void> = Promise.resolve(),
+    ) {
         const { startX, startY } = dragStartPosition(event);
         dragState = {
             clientStartX: event.clientX,
@@ -411,6 +419,7 @@
             startY,
             scale: Math.max(zoom, 1) / 100,
             moved: false,
+            selectionReady,
         };
         window.addEventListener("mousemove", onSelectedElementDrag);
         window.addEventListener("mouseup", finishDrag);
@@ -426,15 +435,18 @@
 
         const target = <SVGElement>event.target;
         const draggableNode = getClosestMEIElement(target, ["note", "rest"]);
-        const draggableSelection =
+        const draggablePointer =
             !insertMode
             && event.button === 0
             && !event.shiftKey
-            && selection?.id === draggableNode?.id
-            && (selection?.element === "note" || selection?.element === "rest");
-        if (draggableSelection && draggableNode) {
+            && Boolean(draggableNode?.id);
+        if (draggablePointer && draggableNode) {
             closeOverlayContextMenu();
-            startDrag(event);
+            const selectionReady = selection?.id === draggableNode.id
+                ? Promise.resolve()
+                : queueOverlaySelection(() =>
+                    onElementSelect?.(draggableNode.id));
+            startDrag(event, selectionReady);
             return;
         }
 
