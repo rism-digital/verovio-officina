@@ -1,6 +1,6 @@
-import defaultAttributes from "./attributes/default.json";
-import excludedElements from "./attributes/element-excludes.json";
-import excludedAttributes from "./attributes/excludes.json";
+import defaultAttributes from "./schema-settings/default.json";
+import excludedElements from "./schema-settings/element-excludes.json";
+import excludedAttributes from "./schema-settings/excludes.json";
 
 export type PreferredAttributes = Record<string, string[]>;
 

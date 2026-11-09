@@ -1,6 +1,6 @@
 <script lang="ts">
     import AttributeRow from "./AttributeRow.svelte";
-    import propertiesSchema from "../app/properties.json";
+    import propertiesSchema from "../app/schema-settings/properties.json";
     import type { TreeNodeData, EditActionSetHandler } from "../app/types";
     import type { ElementDef } from "../app/rng-loader";
     import { treeNodeKey } from "../app/tree-node-key";

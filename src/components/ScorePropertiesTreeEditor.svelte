@@ -1,5 +1,5 @@
 <script lang="ts">
-    import propertiesSchema from "../app/properties.json";
+    import propertiesSchema from "../app/schema-settings/properties.json";
     import type { ResolvedMenuEntry } from "../app/action-resolver";
     import type { ElementDef } from "../app/rng-loader";
     import type {

@@ -1,0 +1,52 @@
+{
+    "chord": [
+        "beam",
+        "slur",
+        "tie",
+        "tuplet"
+    ],
+    "note": [
+        "accid",
+        "accid.ges",
+        "artic",
+        "artic.ges",
+        "beam",
+        "slur",
+        "tie",
+        "tuplet"
+    ],
+    "rest": [
+        "slur",
+        "tuplet"
+    ],
+    "scoreDef": [
+        "clef.color",
+        "clef.dis",
+        "clef.dis.place",
+        "clef.line",
+        "clef.shape",
+        "clef.visible",
+        "key.accid",
+        "key.mode",
+        "key.pname",
+        "keysig",
+        "keysig.cancelaccid",
+        "keysig.visible",
+        "mensur.color",
+        "mensur.dot",
+        "mensur.form",
+        "mensur.loc",
+        "mensur.orient",
+        "mensur.sign",
+        "mensur.size",
+        "mensur.slash",
+        "meter.count",
+        "meter.form",
+        "meter.showchange",
+        "meter.sign",
+        "meter.unit",
+        "meter.visible",
+        "modusmaior",
+        "modusminor"
+    ]
+}
