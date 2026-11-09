@@ -861,6 +861,8 @@
             view={$viewModel}
             viewMode={$userPreferences.viewMode}
             zoom={$userPreferences.zoom}
+            pageMarginLeft={controller.pageMarginLeft}
+            pageMarginTop={controller.pageMarginTop}
             selection={$editStatus.selection}
             insertMode={$editStatus.insertMode}
             pianoKeyboardEnabled={$userPreferences.pianoKeyboardEnabled}

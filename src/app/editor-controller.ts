@@ -93,6 +93,14 @@ export class EditorController {
         this.stores = stores;
     }
 
+    get pageMarginLeft(): number {
+        return this.verovioOptions.pageMarginLeft;
+    }
+
+    get pageMarginTop(): number {
+        return this.verovioOptions.pageMarginTop;
+    }
+
     async adjustZoom(direction: 1 | -1): Promise<void> {
         await this.vrvRefreshStatus();
         const preferences = get(this.stores.userPreferences);

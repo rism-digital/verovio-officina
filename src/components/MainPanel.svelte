@@ -9,6 +9,7 @@
         ContextToolsApi,
         EditActionDragHandler,
         EditActionDragMoveParam,
+        EditActionDragStartParam,
         EditActionSetParam,
         EditActionSetHandler,
         EditResponseContent,
@@ -24,6 +25,8 @@
     export let view: ViewModel;
     export let viewMode: ViewMode = "page";
     export let zoom = 100;
+    export let pageMarginLeft = 0;
+    export let pageMarginTop = 0;
     export let selection: EditStatus["selection"] = null;
     export let insertMode = false;
     export let pianoKeyboardEnabled = false;
@@ -81,6 +84,8 @@
         targetElement: string;
     } | null = null;
     let dragState: {
+        clientStartX: number;
+        clientStartY: number;
         startX: number;
         startY: number;
         scale: number;
@@ -296,8 +301,37 @@
     ): EditActionDragMoveParam {
         return {
             phase: "move",
-            dx: (event.clientX - state.startX) / state.scale,
-            dy: (event.clientY - state.startY) / state.scale,
+            dx: (event.clientX - state.clientStartX) / state.scale,
+            dy: (event.clientY - state.clientStartY) / state.scale,
+        };
+    }
+
+    function dragStartPosition(event: MouseEvent): {
+        startX: number;
+        startY: number;
+    } {
+        const target = event.target instanceof Element ? event.target : null;
+        const page = target?.closest("svg") as SVGSVGElement | null;
+        const bounds = page?.getBoundingClientRect()
+            ?? svgOverlay?.getBoundingClientRect();
+        const scale = Math.max(zoom, 1) / 100;
+        return {
+            startX:
+                (event.clientX - (bounds?.left ?? 0)) / scale
+                - pageMarginLeft,
+            startY:
+                (event.clientY - (bounds?.top ?? 0)) / scale
+                - pageMarginTop,
+        };
+    }
+
+    function dragStartParam(
+        state: NonNullable<typeof dragState>,
+    ): EditActionDragStartParam {
+        return {
+            phase: "start",
+            startX: state.startX,
+            startY: state.startY,
         };
     }
 
@@ -312,9 +346,10 @@
     }
 
     function queueLiveDrag(param: EditActionDragMoveParam) {
+        if (!dragState) return;
         pendingDragParam = param;
         dragStartPromise ??= Promise.resolve(
-            onElementDrag?.({ phase: "start" }),
+            onElementDrag?.(dragStartParam(dragState)),
         );
         if (!liveDragPromise) {
             liveDragPromise = flushLiveDrag();
@@ -359,7 +394,7 @@
         removeDragListeners();
         if (!moved) return;
         dragStartPromise ??= Promise.resolve(
-            onElementDrag?.({ phase: "start" }),
+            onElementDrag?.(dragStartParam(completedDrag)),
         );
         await (liveDragPromise ?? dragStartPromise);
         await onElementDrag?.(param);
@@ -368,9 +403,12 @@
     }
 
     function startDrag(event: MouseEvent) {
+        const { startX, startY } = dragStartPosition(event);
         dragState = {
-            startX: event.clientX,
-            startY: event.clientY,
+            clientStartX: event.clientX,
+            clientStartY: event.clientY,
+            startX,
+            startY,
             scale: Math.max(zoom, 1) / 100,
             moved: false,
         };
