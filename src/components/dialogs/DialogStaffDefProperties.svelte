@@ -9,11 +9,13 @@
         type ScorePropertyPreset,
     } from "../../app/score-property-presets";
     import type { ScoreDefinitionUpdate, TreeNodeData } from "../../app/types";
+    import type { RNGLoader } from "../../app/rng-loader";
     import ScorePropertiesTreeEditor from "../ScorePropertiesTreeEditor.svelte";
     import Dialog from "./Dialog.svelte";
 
     export let open = false;
     export let subTree: TreeNodeData | null = null;
+    export let rngMEIAll: RNGLoader | null = null;
     export let onConfirm: ((
         scoreDef: TreeNodeData | null,
         edited: boolean,
@@ -114,7 +116,10 @@
                         </div>
                     </div>
                 {:else}
-                    <ScorePropertiesTreeEditor bind:value={localStaffDef} />
+                    <ScorePropertiesTreeEditor
+                        bind:value={localStaffDef}
+                        {rngMEIAll}
+                    />
                 {/if}
             </div>
         </div>

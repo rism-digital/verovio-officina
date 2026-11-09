@@ -26,11 +26,13 @@ export const DEFAULT_PREFERRED_ATTRIBUTES = normalizeAttributes(
 
 export const EXCLUDED_ATTRIBUTES = normalizeAttributes(excludedAttributes);
 
-export const EXCLUDED_PREFERENCE_ELEMENTS = new Set(
+export const EXCLUDED_ELEMENTS = new Set(
     excludedElements.filter(
         (element): element is string => typeof element === "string",
     ),
 );
+
+export const EXCLUDED_PREFERENCE_ELEMENTS = EXCLUDED_ELEMENTS;
 
 export function clonePreferredAttributes(
     attributes: PreferredAttributes,

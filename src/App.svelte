@@ -929,6 +929,7 @@
 
     <DialogScoreProperties
         open={scorePropStaffGrpOpen}
+        {rngMEIAll}
         title="Staff groups"
         subTree={dialogSubTree}
         update="staffGrp"
@@ -946,6 +947,7 @@
 
     <DialogStaffDefProperties
         open={scorePropStaffDefOpen}
+        {rngMEIAll}
         subTree={dialogSubTree}
         onConfirm={confirmPropertiesDialog}
         onCancel={closePropertiesDialog}
@@ -953,6 +955,7 @@
 
     <DialogMeterSigProperties
         open={scorePropMeterSigOpen}
+        {rngMEIAll}
         subTree={dialogSubTree}
         onConfirm={confirmPropertiesDialog}
         onCancel={closePropertiesDialog}
@@ -960,6 +963,7 @@
 
     <DialogKeySigProperties
         open={scorePropKeySigOpen}
+        {rngMEIAll}
         subTree={dialogSubTree}
         onConfirm={confirmPropertiesDialog}
         onCancel={closePropertiesDialog}
@@ -967,6 +971,7 @@
 
     <DialogScoreProperties
         open={scorePropHeaderFooterOpen}
+        {rngMEIAll}
         title="Header and footer"
         subTree={dialogSubTree}
         update="scoreDef"

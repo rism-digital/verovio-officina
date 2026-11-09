@@ -1,7 +1,7 @@
 <script lang="ts">
-    import propertiesSchema from "../app/schema-settings/properties.json";
     import type { ResolvedMenuEntry } from "../app/action-resolver";
-    import type { ElementDef } from "../app/rng-loader";
+    import type { RNGLoader } from "../app/rng-loader";
+    import { resolveScorePropertyDefinitions } from "../app/score-property-schema";
     import type {
         EditActionSetParam,
         TargetedContextAction,
@@ -13,6 +13,7 @@
     import Tree from "./Tree.svelte";
 
     export let value: TreeNodeData | null = null;
+    export let rngMEIAll: RNGLoader | null = null;
     export let disabledElements: string[] = [];
     export let preventDelete: string[] = ["staffGrp", "staffDef"];
     export let preventDeleteIfContains: Record<string, string[]> = {};
@@ -21,7 +22,7 @@
 
     let selectedNodeId: string | null = null;
     const ancestors: TreeNodeData[] = [];
-    const elementDefinitions = propertiesSchema as Record<string, ElementDef>;
+    $: elementDefinitions = resolveScorePropertyDefinitions(rngMEIAll);
 
     function findNodeByKey(
         node: TreeNodeData | null,
@@ -350,6 +351,7 @@
                 {:else}
                     <ScorePropertiesAttributeList
                         node={selectedNode}
+                        {elementDefinitions}
                         readOnly={selectedNodeDisabled}
                         onEditSet={handleAttributeEdit}
                     />

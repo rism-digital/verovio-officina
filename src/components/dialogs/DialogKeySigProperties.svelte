@@ -2,10 +2,12 @@
     import keySignaturePresetsJson from "../../app/presets/key-signatures.json";
     import type { ScorePropertyPreset } from "../../app/score-property-presets";
     import type { ScoreDefinitionUpdate, TreeNodeData } from "../../app/types";
+    import type { RNGLoader } from "../../app/rng-loader";
     import DialogPresetScoreProperties from "./DialogPresetScoreProperties.svelte";
 
     export let open = false;
     export let subTree: TreeNodeData | null = null;
+    export let rngMEIAll: RNGLoader | null = null;
     export let onConfirm: ((
         scoreDef: TreeNodeData | null,
         edited: boolean,
@@ -22,6 +24,7 @@
     presetTabLabel="Common values"
     {presets}
     {subTree}
+    {rngMEIAll}
     update="keySig"
     {onConfirm}
     {onCancel}

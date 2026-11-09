@@ -1,11 +1,11 @@
 <script lang="ts">
     import AttributeRow from "./AttributeRow.svelte";
-    import propertiesSchema from "../app/schema-settings/properties.json";
     import type { TreeNodeData, EditActionSetHandler } from "../app/types";
     import type { ElementDef } from "../app/rng-loader";
     import { treeNodeKey } from "../app/tree-node-key";
 
     export let node: TreeNodeData | null = null;
+    export let elementDefinitions: Record<string, ElementDef> = {};
     export let readOnly = false;
     export let onEditSet: EditActionSetHandler | null = null;
 
@@ -51,7 +51,7 @@
 
     $: elementName = node?.element ?? "";
     $: attributes = normalizeAttributes(node);
-    $: elementSchema = (propertiesSchema as Record<string, ElementDef>)[elementName] ?? null;
+    $: elementSchema = elementDefinitions[elementName] ?? null;
     $: schemaAttrs = elementSchema?.attrs ?? {};
     $: schemaTypes = elementSchema?.types ?? {};
     $: schemaNames = Object.keys(schemaAttrs);

@@ -7,12 +7,14 @@
         ScoreDefinitionUpdate,
         TreeNodeData,
     } from "../../app/types";
+    import type { RNGLoader } from "../../app/rng-loader";
     import ScorePropertiesTreeEditor from "../ScorePropertiesTreeEditor.svelte";
     import Dialog from "./Dialog.svelte";
 
     export let open = false;
     export let title = "Score properties";
     export let subTree: TreeNodeData | null = null;
+    export let rngMEIAll: RNGLoader | null = null;
     export let update: ScoreDefinitionUpdate = "scoreDef";
     export let disabledElements: string[] = [];
     export let preventDelete: string[] = ["staffGrp", "staffDef"];
@@ -50,6 +52,7 @@
 >
     <ScorePropertiesTreeEditor
         bind:value={localScoreDef}
+        {rngMEIAll}
         {disabledElements}
         {preventDelete}
         {preventDeleteIfContains}

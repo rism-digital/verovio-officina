@@ -5,6 +5,9 @@
         "tie",
         "tuplet"
     ],
+    "keySig": [
+        "accid"
+    ],
     "note": [
         "accid",
         "accid.ges",
