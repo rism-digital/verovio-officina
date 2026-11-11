@@ -24,6 +24,14 @@ export type WorkerResponse = {
     error?: string;
 };
 
+export type WorkerCall = {
+    taskId: string;
+    method: string;
+    args: unknown[];
+};
+
+export type WorkerCallListener = (call: WorkerCall) => void;
+
 
 let seq = 0;
 
@@ -39,6 +47,8 @@ export type WorkerBridge = {
     verovio: {
         [M in VerovioMethod]: (...args: Parameters<VerovioToolkit[M]>) => Promise<ReturnType<VerovioToolkit[M]>>;
     };
+    subscribeCalls: (listener: WorkerCallListener) => () => void;
+    whenIdle: () => Promise<void>;
 };
 
 export function createWorkerBridge(
@@ -49,6 +59,24 @@ export function createWorkerBridge(
         string,
         { resolve: (value: any) => void; reject: (err: Error) => void }
     >();
+    const callListeners = new Set<WorkerCallListener>();
+    const idleResolvers = new Set<() => void>();
+
+    function notifyCall(call: WorkerCall) {
+        for (const listener of callListeners) {
+            try {
+                listener(call);
+            } catch (error) {
+                console.error("Worker call listener failed", error);
+            }
+        }
+    }
+
+    function resolveIdle() {
+        if (pending.size !== 0) return;
+        for (const resolve of idleResolvers) resolve();
+        idleResolvers.clear();
+    }
 
     worker.addEventListener('message', (event: MessageEvent<WorkerResponse>) => {
         const message = event.data;
@@ -57,9 +85,11 @@ export function createWorkerBridge(
         pending.delete(message.taskId);
         if (message.error) {
             handler.reject(new Error(message.error));
+            resolveIdle();
             return;
         }
         handler.resolve(message.result);
+        resolveIdle();
     });
 
     worker.addEventListener('error', (event) => {
@@ -68,6 +98,7 @@ export function createWorkerBridge(
             pending.delete(taskId);
             handler.reject(new Error(message));
         }
+        resolveIdle();
     });
 
     worker.addEventListener('messageerror', () => {
@@ -75,6 +106,7 @@ export function createWorkerBridge(
             pending.delete(taskId);
             handler.reject(new Error('Worker message error'));
         }
+        resolveIdle();
     });
 
     function call<M extends VerovioMethod>(
@@ -83,13 +115,15 @@ export function createWorkerBridge(
     ): Promise<ReturnType<VerovioToolkit[M]>> {
         const taskId = `task_${seq++}`;
         const originalMethod = methodAliases[method] ?? String(method);
+        const callArgs = (args ?? []) as unknown[];
         const payload: VerovioRequest = {
             taskId,
             method: originalMethod,
-            args,
+            args: callArgs,
         };
         return new Promise((resolve, reject) => {
             pending.set(taskId, { resolve, reject });
+            notifyCall({ taskId, method: originalMethod, args: callArgs });
             worker.postMessage(payload as WorkerRequest);
         });
     }
@@ -117,6 +151,14 @@ export function createWorkerBridge(
             });
         },
         call,
-        verovio
+        verovio,
+        subscribeCalls(listener) {
+            callListeners.add(listener);
+            return () => callListeners.delete(listener);
+        },
+        whenIdle() {
+            if (pending.size === 0) return Promise.resolve();
+            return new Promise<void>((resolve) => idleResolvers.add(resolve));
+        },
     };
 }

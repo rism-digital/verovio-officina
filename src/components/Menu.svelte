@@ -15,6 +15,8 @@
     export let viewMode: ViewMode = "page";
     export let canCopyOrCut = false;
     export let canPaste = false;
+    export let canStartActionRecording = false;
+    export let canStopActionRecording = false;
 
     export let onOpen: ActionHandler | null = null;
     export let onImportClipboard: ActionHandler | null = null;
@@ -24,6 +26,8 @@
     export let onCopy: ActionHandler | null = null;
     export let onCut: ActionHandler | null = null;
     export let onPaste: ActionHandler | null = null;
+    export let onStartActionRecording: ActionHandler | null = null;
+    export let onStopActionRecording: ActionHandler | null = null;
     export let onZoomIn: ActionHandler | null = null;
     export let onZoomOut: ActionHandler | null = null;
     export let onPrevPage: ActionHandler | null = null;
@@ -160,6 +164,36 @@
                 on:click={() => onViewModeChange?.("responsive")}
                 on:keydown={(event) =>
                     handleViewModeKeydown(event, "responsive")}
+            ></div>
+        </div>
+    </div>
+    <div class="vrv-menu">
+        <div class="vrv-btn-text" data-before="Tools"></div>
+        <div class="vrv-menu-content">
+            <div class="vrv-v-separator"></div>
+            <div
+                class="vrv-menu-text {canStartActionRecording ? '' : 'disabled'}"
+                data-before="Start recording actions"
+                role="menuitem"
+                tabindex="0"
+                on:click={() =>
+                    canStartActionRecording && onStartActionRecording?.()}
+                on:keydown={(event) => handleMenuItemKeydown(
+                    event,
+                    canStartActionRecording ? onStartActionRecording : null,
+                )}
+            ></div>
+            <div
+                class="vrv-menu-text {canStopActionRecording ? '' : 'disabled'}"
+                data-before="Stop recording actions"
+                role="menuitem"
+                tabindex="0"
+                on:click={() =>
+                    canStopActionRecording && onStopActionRecording?.()}
+                on:keydown={(event) => handleMenuItemKeydown(
+                    event,
+                    canStopActionRecording ? onStopActionRecording : null,
+                )}
             ></div>
         </div>
     </div>

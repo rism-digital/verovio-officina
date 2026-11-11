@@ -56,6 +56,10 @@ export function loadUserPreferencesFromStorage(): UserPreferences {
             zoom: isZoom(parsed.zoom)
                 ? parsed.zoom
                 : DEFAULT_USER_PREFERENCES.zoom,
+            recordInDepthActions:
+                typeof parsed.recordInDepthActions === "boolean"
+                    ? parsed.recordInDepthActions
+                    : DEFAULT_USER_PREFERENCES.recordInDepthActions,
             preferredAttributes: loadPreferredAttributes(
                 parsed.preferredAttributes,
             ),

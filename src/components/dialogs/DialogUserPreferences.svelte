@@ -19,12 +19,14 @@
     export let onCancel: ((value: number) => void) | null = null;
 
     let inputMode: InputMode = value.inputMode;
+    let recordInDepthActions = value.recordInDepthActions;
     let preferredAttributes = clonePreferredAttributes(
         value.preferredAttributes,
     );
 
     $: if (open) {
         inputMode = value.inputMode;
+        recordInDepthActions = value.recordInDepthActions;
         preferredAttributes = clonePreferredAttributes(
             value.preferredAttributes,
         );
@@ -38,6 +40,7 @@
         onConfirm?.({
             ...value,
             inputMode,
+            recordInDepthActions,
             preferredAttributes,
         });
         onOk?.(result);
@@ -60,6 +63,13 @@
             <option value="pitchFirst">Pitch first</option>
             <option value="combined">Combined</option>
         </select>
+
+        <div class="vrv-dialog-label">Record in-depth actions</div>
+        <input
+            class="vrv-dialog-input"
+            type="checkbox"
+            bind:checked={recordInDepthActions}
+        />
     </div>
     <PreferredAttributesPreference
         {rngMEIAll}

@@ -5,6 +5,7 @@ import {
     DEFAULT_PREFERRED_ATTRIBUTES,
     type PreferredAttributes,
 } from './attribute-preferences';
+import type { ActionRecordingStatus } from './recording/recording-types';
 
 export type InputMode = 'pitchFirst' | 'durationFirst' | 'combined';
 export type ViewMode = 'page' | 'responsive';
@@ -18,6 +19,7 @@ export type UserPreferences = {
     autoBeam: boolean;
     viewMode: ViewMode;
     zoom: number;
+    recordInDepthActions: boolean;
     preferredAttributes: PreferredAttributes;
 };
 
@@ -29,6 +31,7 @@ export const DEFAULT_USER_PREFERENCES: UserPreferences = {
     autoBeam: true,
     viewMode: 'page',
     zoom: 100,
+    recordInDepthActions: true,
     preferredAttributes: clonePreferredAttributes(DEFAULT_PREFERRED_ATTRIBUTES),
 };
 
@@ -61,3 +64,4 @@ export const userPreferences = writable<UserPreferences>(DEFAULT_USER_PREFERENCE
 export const pianoKeyboardMode = writable<PianoKeyboardMode>('auto');
 export const pianoKeyboardOctave = writable(4);
 export const statusLine = writable('Ready');
+export const actionRecordingStatus = writable<ActionRecordingStatus>('idle');

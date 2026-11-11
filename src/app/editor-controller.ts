@@ -19,6 +19,13 @@ import type {
 } from "./types";
 import type { VerovioOptions } from "./worker/verovio-types";
 import { createWorkerBridge, type WorkerBridge } from "./worker/bridge";
+import { ActionRecorder } from "./recording/action-recorder";
+import { ActionRecordingCoordinator } from "./recording/recording-coordinator";
+import type {
+    ActionRecordingBundle,
+    ActionRecordingStart,
+    ActionRecordingStatus,
+} from "./recording/recording-types";
 import { enableInsertMode } from "./editor-rules";
 import {
     keyboardOctaveForPitch,
@@ -56,12 +63,16 @@ type ControllerStores = {
     pianoKeyboardMode: Writable<PianoKeyboardMode>;
     pianoKeyboardOctave: Writable<number>;
     userPreferences: Writable<UserPreferences>;
+    actionRecordingStatus: Writable<ActionRecordingStatus>;
 };
 
 export class EditorController {
     private readonly worker: Worker;
     private readonly bridge: WorkerBridge;
     private readonly stores: ControllerStores;
+    private readonly actionRecorder: ActionRecorder;
+    private readonly actionRecordingCoordinator: ActionRecordingCoordinator;
+    private readonly unsubscribeWorkerCalls: () => void;
     private lastLayoutSize = { width: 0, height: 0 };
     private svgRenderId = 0;
     private verovioOptions: VerovioOptions = {
@@ -91,6 +102,19 @@ export class EditorController {
         this.worker = new Worker(workerUrl, { type: "classic" });
         this.bridge = createWorkerBridge(this.worker);
         this.stores = stores;
+        this.actionRecorder = new ActionRecorder();
+        this.unsubscribeWorkerCalls = this.bridge.subscribeCalls((call) => {
+            this.actionRecorder.recordWorkerCall(call);
+        });
+        this.actionRecordingCoordinator = new ActionRecordingCoordinator(
+            this.actionRecorder,
+            {
+                prepareRecordingStart: () => this.prepareActionRecordingStart(),
+                setInteractionBlocked: (blocked) => this.stores.workerBusy.set(blocked),
+                setStatus: (status) => this.stores.actionRecordingStatus.set(status),
+                whenIdle: () => this.bridge.whenIdle(),
+            },
+        );
     }
 
     get pageMarginLeft(): number {
@@ -218,7 +242,16 @@ export class EditorController {
     }
 
     destroy(): void {
+        this.unsubscribeWorkerCalls();
         this.worker.terminate();
+    }
+
+    async startActionRecording(recordInDepthActions: boolean): Promise<boolean> {
+        return this.actionRecordingCoordinator.start(recordInDepthActions);
+    }
+
+    async stopActionRecording(): Promise<ActionRecordingBundle | null> {
+        return this.actionRecordingCoordinator.stop();
     }
 
     async getMEI(options?: MEIExportOptions): Promise<string> {
@@ -738,6 +771,56 @@ export class EditorController {
         this.verovioOptions = {
             ...this.verovioOptions,
             ...patch,
+        };
+    }
+
+    private async prepareActionRecordingStart(): Promise<ActionRecordingStart> {
+        const currentPage = get(this.stores.verovioState).currentPage;
+        const preferences = get(this.stores.userPreferences);
+        const initialMEI = await this.bridge.verovio.getMEI({
+            basic: false,
+            removeIds: false,
+            ignoreHeader: false,
+        });
+        const currentOptions = await this.bridge.verovio.getOptions();
+        const xmlIdSeed = this.verovioOptions.xmlIdSeed > 0
+            ? this.verovioOptions.xmlIdSeed
+            : 1;
+        const options: Record<string, unknown> = {
+            ...currentOptions,
+            xmlIdSeed,
+        };
+        this.updateVerovioOptions({ xmlIdSeed });
+        await this.bridge.verovio.setOptions(options as unknown as VerovioOptions);
+        await this.bridge.verovio.loadData(initialMEI);
+
+        await this.vrvRefreshStatus();
+        const pageCount = await this.vrvRefreshPageCount();
+        const restoredPage = Math.min(currentPage, Math.max(1, pageCount));
+        this.stores.verovioState.update((current) => ({
+            ...current,
+            currentPage: restoredPage,
+        }));
+        await this.vrvRefreshSVG();
+        this.stores.workerBusy.set(true);
+
+        const verovioVersion = await this.bridge.verovio.getVersion();
+        this.stores.editResponseContent.set(null);
+        const scale = typeof options.scale === "number"
+            ? options.scale
+            : this.verovioOptions.scale;
+        return {
+            initialMEI,
+            verovioVersion,
+            initial: {
+                meiFile: "initial.mei",
+                options,
+                page: restoredPage,
+                scale,
+                zoom: preferences.zoom,
+                viewMode: preferences.viewMode,
+                layoutSize: { ...this.lastLayoutSize },
+            },
         };
     }
 

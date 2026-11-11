@@ -25,6 +25,7 @@
     import type { ScoreDocument } from "./app/documents/document-repository";
     import { RNGLoader } from "./app/rng-loader";
     import { initUserPreferencesPersistence } from "./app/user-preferences";
+    import { downloadActionRecording } from "./app/recording/recording-export";
     import { createKeyShortcuts, keyShortcutMap, keyShortcutMapFromEvent } from "./app/key-actions";
     import {
         beginToolbarAction,
@@ -44,6 +45,7 @@
     import type { InputMode, UserPreferences, ViewMode } from "./app/state";
     import {
         DEFAULT_USER_PREFERENCES,
+        actionRecordingStatus,
         dirty,
         documentRevision,
         editResponseContent,
@@ -164,6 +166,7 @@
             pianoKeyboardMode,
             pianoKeyboardOctave,
             userPreferences,
+            actionRecordingStatus,
         },
     );
 
@@ -293,6 +296,12 @@
     $: canRefreshLayout = menuInteractionEnabled;
     $: canToggleShowHidden = menuInteractionEnabled;
     $: canToggleAutoBeam = menuInteractionEnabled;
+    $: canStartActionRecording =
+        menuInteractionEnabled
+        && Boolean($viewModel.svg)
+        && $actionRecordingStatus === "idle";
+    $: canStopActionRecording =
+        !$workerBusy && $actionRecordingStatus === "recording";
 
     async function handleGlobalKeydown(event: KeyboardEvent) {
         const shortcut = shortcutByKey.get(keyShortcutMapFromEvent(event));
@@ -425,6 +434,37 @@
         if (get(workerBusy)) return;
         await controller.handleRefreshLayout();
         statusLine.set("Layout refreshed.");
+    }
+
+    async function startActionRecording() {
+        if (!canStartActionRecording) return;
+        try {
+            const started = await controller.startActionRecording(
+                get(userPreferences).recordInDepthActions,
+            );
+            statusLine.set(started
+                ? "Started recording actions."
+                : "Could not start recording actions.");
+        } catch (error) {
+            console.error("Failed to start action recording", error);
+            statusLine.set("Failed to start recording actions.");
+        }
+    }
+
+    async function stopActionRecording() {
+        if (!canStopActionRecording) return;
+        try {
+            const bundle = await controller.stopActionRecording();
+            if (!bundle) {
+                statusLine.set("Could not stop recording actions.");
+                return;
+            }
+            downloadActionRecording(bundle);
+            statusLine.set("Stopped and exported recorded actions.");
+        } catch (error) {
+            console.error("Failed to stop action recording", error);
+            statusLine.set("Failed to stop recording actions.");
+        }
     }
 
     async function toggleShowHidden() {
@@ -798,6 +838,10 @@
         onCopy={copy}
         onCut={cut}
         onPaste={paste}
+        {canStartActionRecording}
+        {canStopActionRecording}
+        onStartActionRecording={startActionRecording}
+        onStopActionRecording={stopActionRecording}
         onZoomIn={() => controller.adjustZoom(1)}
         onZoomOut={() => controller.adjustZoom(-1)}
         onPrevPage={() =>
