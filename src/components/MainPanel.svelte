@@ -161,7 +161,7 @@
 
     function updateOverlay() {
         if (!svgWrapper || !svgOverlay) return;
-        svgOverlay.innerHTML = svgWrapper.innerHTML;
+        svgOverlay.innerHTML = view.svg;
 
         // Remove bounding boxes and other non-essential elements, and prepare for selection
         svgWrapper.querySelectorAll("g.bounding-box").forEach((node) => {
