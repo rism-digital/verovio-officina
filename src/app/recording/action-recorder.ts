@@ -6,11 +6,20 @@ import type {
     RecordedToolkitCall,
 } from "./recording-types";
 
+const NON_IN_DEPTH_METHODS = new Set([
+    "editResponse",
+    "editStatus",
+    "getMEI",
+    "getPageWithElement",
+    "redoPagePitchPosLayout",
+    "renderToSVG",
+]);
+
 function cloneValue<T>(value: T): T {
     return JSON.parse(JSON.stringify(value)) as T;
 }
 
-function isDragMove(call: WorkerCall): boolean {
+function isNonInDepthEdit(call: WorkerCall): boolean {
     if (call.method !== "edit") return false;
     const action = call.args[0];
     if (!action || typeof action !== "object") return false;
@@ -18,7 +27,8 @@ function isDragMove(call: WorkerCall): boolean {
         action?: unknown;
         param?: { phase?: unknown };
     };
-    return candidate.action === "drag" && candidate.param?.phase === "move";
+    return candidate.action === "context"
+        || (candidate.action === "drag" && candidate.param?.phase === "move");
 }
 
 export class ActionRecorder {
@@ -47,7 +57,7 @@ export class ActionRecorder {
     recordWorkerCall(call: WorkerCall): void {
         if (!this.recording) return;
         if (!this.recording.recordInDepthActions) {
-            if (call.method === "redoPagePitchPosLayout" || isDragMove(call)) return;
+            if (NON_IN_DEPTH_METHODS.has(call.method) || isNonInDepthEdit(call)) return;
         }
         const event: RecordedToolkitCall = {
             sequence: this.recording.events.length + 1,
