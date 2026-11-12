@@ -72,7 +72,6 @@ export class EditorController {
     private readonly stores: ControllerStores;
     private readonly actionRecorder: ActionRecorder;
     private readonly actionRecordingCoordinator: ActionRecordingCoordinator;
-    private readonly unsubscribeWorkerCalls: () => void;
     private lastLayoutSize = { width: 0, height: 0 };
     private svgRenderId = 0;
     private verovioOptions: VerovioOptions = {
@@ -100,12 +99,9 @@ export class EditorController {
 
     constructor(workerUrl: string | URL, stores: ControllerStores) {
         this.worker = new Worker(workerUrl, { type: "classic" });
-        this.bridge = createWorkerBridge(this.worker);
         this.stores = stores;
         this.actionRecorder = new ActionRecorder();
-        this.unsubscribeWorkerCalls = this.bridge.subscribeCalls((call) => {
-            this.actionRecorder.recordWorkerCall(call);
-        });
+        this.bridge = createWorkerBridge(this.worker, this.actionRecorder);
         this.actionRecordingCoordinator = new ActionRecordingCoordinator(
             this.actionRecorder,
             {
@@ -242,7 +238,6 @@ export class EditorController {
     }
 
     destroy(): void {
-        this.unsubscribeWorkerCalls();
         this.worker.terminate();
     }
 

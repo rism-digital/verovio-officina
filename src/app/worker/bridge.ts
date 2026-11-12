@@ -1,3 +1,4 @@
+import type { ActionRecorder } from "../recording/action-recorder";
 import {
     VEROVIO_METHOD_ALIASES,
     type VerovioToolkit,
@@ -30,9 +31,6 @@ export type WorkerCall = {
     args: unknown[];
 };
 
-export type WorkerCallListener = (call: WorkerCall) => void;
-
-
 let seq = 0;
 
 type VerovioMethod = keyof VerovioToolkit;
@@ -47,28 +45,25 @@ export type WorkerBridge = {
     verovio: {
         [M in VerovioMethod]: (...args: Parameters<VerovioToolkit[M]>) => Promise<ReturnType<VerovioToolkit[M]>>;
     };
-    subscribeCalls: (listener: WorkerCallListener) => () => void;
     whenIdle: () => Promise<void>;
 };
 
 export function createWorkerBridge(
     worker: Worker,
+    actionRecorder: ActionRecorder,
     methodAliases: VerovioMethodAliases = VEROVIO_METHOD_ALIASES,
 ): WorkerBridge {
     const pending = new Map<
         string,
         { resolve: (value: any) => void; reject: (err: Error) => void }
     >();
-    const callListeners = new Set<WorkerCallListener>();
     const idleResolvers = new Set<() => void>();
 
-    function notifyCall(call: WorkerCall) {
-        for (const listener of callListeners) {
-            try {
-                listener(call);
-            } catch (error) {
-                console.error("Worker call listener failed", error);
-            }
+    function recordCall(call: WorkerCall) {
+        try {
+            actionRecorder.recordWorkerCall(call);
+        } catch (error) {
+            console.error("Failed to record worker call", error);
         }
     }
 
@@ -123,7 +118,7 @@ export function createWorkerBridge(
         };
         return new Promise((resolve, reject) => {
             pending.set(taskId, { resolve, reject });
-            notifyCall({ taskId, method: originalMethod, args: callArgs });
+            recordCall({ taskId, method: originalMethod, args: callArgs });
             worker.postMessage(payload as WorkerRequest);
         });
     }
@@ -152,10 +147,6 @@ export function createWorkerBridge(
         },
         call,
         verovio,
-        subscribeCalls(listener) {
-            callListeners.add(listener);
-            return () => callListeners.delete(listener);
-        },
         whenIdle() {
             if (pending.size === 0) return Promise.resolve();
             return new Promise<void>((resolve) => idleResolvers.add(resolve));

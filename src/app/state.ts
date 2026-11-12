@@ -31,7 +31,7 @@ export const DEFAULT_USER_PREFERENCES: UserPreferences = {
     autoBeam: true,
     viewMode: 'page',
     zoom: 100,
-    recordInDepthActions: true,
+    recordInDepthActions: false,
     preferredAttributes: clonePreferredAttributes(DEFAULT_PREFERRED_ATTRIBUTES),
 };
 
