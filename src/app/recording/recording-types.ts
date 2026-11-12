@@ -37,5 +37,6 @@ export type ActionRecordingStart = {
 
 export type ActionRecordingBundle = {
     initialMEI: string;
+    finalMEI: string;
     recording: ActionRecording;
 };

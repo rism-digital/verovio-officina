@@ -6,6 +6,7 @@ import type {
 } from "./recording-types";
 
 export type ActionRecordingHost = {
+    getFinalMEI: () => Promise<string>;
     prepareRecordingStart: () => Promise<ActionRecordingStart>;
     setInteractionBlocked: (blocked: boolean) => void;
     setStatus: (status: ActionRecordingStatus) => void;
@@ -44,7 +45,8 @@ export class ActionRecordingCoordinator {
         this.host.setInteractionBlocked(true);
         try {
             await this.host.whenIdle();
-            const bundle = this.recorder.stop();
+            const finalMEI = await this.host.getFinalMEI();
+            const bundle = this.recorder.stop(finalMEI);
             this.updateStatus("idle");
             return bundle;
         } catch (error) {

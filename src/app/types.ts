@@ -421,7 +421,7 @@ export type EditActionDeleteParam = {
 export type EditActionDragParam =
     | { phase: "start"; startX: number; startY: number }
     | { phase: "move"; dx: number; dy: number }
-    | { phase: "end" };
+    | { phase: "end"; dx: number; dy: number };
 
 export type EditActionDragStartParam = Extract<
     EditActionDragParam,

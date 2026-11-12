@@ -41,6 +41,18 @@ const NON_DELETABLE_ELEMENTS = new Set(["staff", "layer"]);
 const PAGE_MODE_HEIGHT = 2970;
 const PAGE_MODE_WIDTH = 2100;
 
+function getNonDefaultOptions(
+    options: Record<string, unknown>,
+    defaultOptions: Record<string, unknown>,
+): Record<string, unknown> {
+    return Object.fromEntries(
+        Object.entries(options).filter(([name, value]) =>
+            !(name in defaultOptions)
+            || JSON.stringify(value) !== JSON.stringify(defaultOptions[name]),
+        ),
+    );
+}
+
 export const finaleSpeedyDurationToMEI: Record<number, string> = {
     55: "1",
     54: "2",
@@ -105,6 +117,7 @@ export class EditorController {
         this.actionRecordingCoordinator = new ActionRecordingCoordinator(
             this.actionRecorder,
             {
+                getFinalMEI: () => this.getActionRecordingMEI(),
                 prepareRecordingStart: () => this.prepareActionRecordingStart(),
                 setInteractionBlocked: (blocked) => this.stores.workerBusy.set(blocked),
                 setStatus: (status) => this.stores.actionRecordingStatus.set(status),
@@ -769,24 +782,33 @@ export class EditorController {
         };
     }
 
-    private async prepareActionRecordingStart(): Promise<ActionRecordingStart> {
-        const currentPage = get(this.stores.verovioState).currentPage;
-        const preferences = get(this.stores.userPreferences);
-        const initialMEI = await this.bridge.verovio.getMEI({
+    private getActionRecordingMEI(): Promise<string> {
+        return this.bridge.verovio.getMEI({
             basic: false,
             removeIds: false,
             ignoreHeader: false,
         });
+    }
+
+    private async prepareActionRecordingStart(): Promise<ActionRecordingStart> {
+        const currentPage = get(this.stores.verovioState).currentPage;
+        const preferences = get(this.stores.userPreferences);
+        const initialMEI = await this.getActionRecordingMEI();
         const currentOptions = await this.bridge.verovio.getOptions();
+        const defaultOptions = await this.bridge.verovio.getDefaultOptions();
         const xmlIdSeed = this.verovioOptions.xmlIdSeed > 0
             ? this.verovioOptions.xmlIdSeed
             : 1;
-        const options: Record<string, unknown> = {
+        const effectiveOptions: Record<string, unknown> = {
             ...currentOptions,
             xmlIdSeed,
         };
+        const recordingOptions = getNonDefaultOptions(
+            effectiveOptions,
+            defaultOptions,
+        );
         this.updateVerovioOptions({ xmlIdSeed });
-        await this.bridge.verovio.setOptions(options as unknown as VerovioOptions);
+        await this.bridge.verovio.setOptions(effectiveOptions as unknown as VerovioOptions);
         await this.bridge.verovio.loadData(initialMEI);
 
         await this.vrvRefreshStatus();
@@ -801,15 +823,15 @@ export class EditorController {
 
         const verovioVersion = await this.bridge.verovio.getVersion();
         this.stores.editResponseContent.set(null);
-        const scale = typeof options.scale === "number"
-            ? options.scale
+        const scale = typeof effectiveOptions.scale === "number"
+            ? effectiveOptions.scale
             : this.verovioOptions.scale;
         return {
             initialMEI,
             verovioVersion,
             initial: {
                 meiFile: "initial.mei",
-                options,
+                options: recordingOptions,
                 page: restoredPage,
                 scale,
                 zoom: preferences.zoom,

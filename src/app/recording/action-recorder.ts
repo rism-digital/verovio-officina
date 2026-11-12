@@ -68,10 +68,11 @@ export class ActionRecorder {
         this.recording.events.push(event);
     }
 
-    stop(): ActionRecordingBundle {
+    stop(finalMEI: string): ActionRecordingBundle {
         if (!this.recording) throw new Error("Action recording is not active");
         const bundle: ActionRecordingBundle = {
             initialMEI: this.initialMEI,
+            finalMEI,
             recording: cloneValue(this.recording),
         };
         this.recording = null;

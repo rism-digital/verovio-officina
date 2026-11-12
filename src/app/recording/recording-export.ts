@@ -17,6 +17,7 @@ function downloadBlob(filename: string, blob: Blob) {
 export function downloadActionRecording(bundle: ActionRecordingBundle): void {
     const archive = zipSync({
         "initial.mei": strToU8(bundle.initialMEI),
+        "final.mei": strToU8(bundle.finalMEI),
         "recording.json": strToU8(JSON.stringify(bundle.recording, null, 4)),
         "replay.mjs": strToU8(generateJavaScriptReplay()),
         "replay.py": strToU8(generatePythonReplay()),

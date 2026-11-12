@@ -89,6 +89,8 @@
         startX: number;
         startY: number;
         scale: number;
+        dx: number;
+        dy: number;
         moved: boolean;
         selectionReady: Promise<void>;
     } | null = null;
@@ -365,6 +367,8 @@
         if (!dragState) return;
         event.preventDefault();
         const param = dragDelta(event, dragState);
+        dragState.dx = param.dx;
+        dragState.dy = param.dy;
         dragState.moved ||= param.dx !== 0 || param.dy !== 0;
         console.log("Drag delta", param.dx, param.dy);
         if (dragState.moved) {
@@ -379,12 +383,17 @@
     }
 
     function cancelDrag() {
+        const cancelledDrag = dragState;
         const wasDragging = dragStartPromise !== null;
         removeDragListeners();
         pendingDragParam = null;
-        if (wasDragging) {
+        if (wasDragging && cancelledDrag) {
             const precedingActions = liveDragPromise ?? dragStartPromise ?? Promise.resolve();
-            void precedingActions.then(() => onElementDrag?.({ phase: "end" }));
+            void precedingActions.then(() => onElementDrag?.({
+                phase: "end",
+                dx: cancelledDrag.dx,
+                dy: cancelledDrag.dy,
+            }));
         }
         dragStartPromise = null;
     }
@@ -403,7 +412,7 @@
         );
         await (liveDragPromise ?? dragStartPromise);
         await onElementDrag?.(param);
-        await onElementDrag?.({ phase: "end" });
+        await onElementDrag?.({ phase: "end", dx: param.dx, dy: param.dy });
         dragStartPromise = null;
     }
 
@@ -418,6 +427,8 @@
             startX,
             startY,
             scale: Math.max(zoom, 1) / 100,
+            dx: 0,
+            dy: 0,
             moved: false,
             selectionReady,
         };
