@@ -84,6 +84,7 @@ export class EditorController {
     private readonly stores: ControllerStores;
     private readonly actionRecorder: ActionRecorder;
     private readonly actionRecordingCoordinator: ActionRecordingCoordinator;
+    private dragging = false;
     private lastLayoutSize = { width: 0, height: 0 };
     private svgRenderId = 0;
     private verovioOptions: VerovioOptions = {
@@ -889,22 +890,35 @@ export class EditorController {
     }
 
     async vrvDrag(param: EditActionDragParam): Promise<void> {
+        if (param.phase === "start") {
+            this.dragging = true;
+        }
         const ok = await this.vrvEdit({
             action: "drag",
             param,
         }, "Failed to drag the selected element");
-        if (!ok) return;
+        if (!ok) {
+            this.dragging = false;
+            return;
+        }
 
         if (param.phase === "start") return;
 
         const commit = param.phase === "end";
-        await this.vrvApplyEditLayout(commit);
-        if (commit) {
-            this.markDocumentChanged();
-        }
-        await this.vrvRefreshStatus();
-        if (commit) {
-            await this.vrvRefreshContextFromSelection();
+        try {
+            await this.vrvApplyEditLayout(commit);
+            if (commit) {
+                this.markDocumentChanged();
+            }
+            await this.vrvRefreshStatus();
+            if (commit) {
+                await this.vrvRefreshContextFromSelection();
+            }
+        } finally {
+            if (commit) {
+                this.dragging = false;
+                this.stores.workerBusy.set(false);
+            }
         }
     }
 
@@ -1115,7 +1129,9 @@ export class EditorController {
         const viewModel = get(this.stores.viewModel);
         this.svgRenderId += 1;
         this.stores.viewModel.set({ ...viewModel, svg, svgId: this.svgRenderId });
-        this.stores.workerBusy.set(false);
+        if (!this.dragging) {
+            this.stores.workerBusy.set(false);
+        }
     }
 
     async vrvResetCursor(maintainChordMode: boolean): Promise<void> {
